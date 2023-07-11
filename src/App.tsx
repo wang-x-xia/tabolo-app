@@ -4,6 +4,7 @@ import {GithubOutlined} from '@ant-design/icons';
 import {useState} from "react";
 import {Driver} from "neo4j-driver";
 import {SetupNeo4j} from "./neo4j/component.tsx";
+import {View} from "./view/component.tsx";
 
 function App() {
     const [driver, setup] = useState<Driver | null>(null);
@@ -11,7 +12,9 @@ function App() {
         <>
             <Layout>
                 <Layout.Content>
-                    {driver == null ? <SetupNeo4j onNeo4jSetup={setup}/> : <span>Connected</span>}
+                    {driver == null ?
+                        <SetupNeo4j onNeo4jSetup={setup}/> :
+                        <View driver={driver}></View>}
                 </Layout.Content>
                 <Layout.Footer>
                     Tabolo APP
