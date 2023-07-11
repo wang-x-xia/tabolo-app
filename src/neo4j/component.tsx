@@ -11,8 +11,7 @@ interface Neo4jForm {
     auto: boolean
 }
 
-export function SetupNeo4j({children}: { children: any }) {
-    const [driver, setup] = useState<Driver | null>(null);
+export function SetupNeo4j({onNeo4jSetup}: { onNeo4jSetup: (driver: Driver) => void }) {
     const [connecting, setConnecting] = useState(false)
     const [init, setInit] = useState(false)
     const [form] = useForm<Neo4jForm>()
@@ -36,7 +35,7 @@ export function SetupNeo4j({children}: { children: any }) {
             setConnecting(true)
             const serverInfo = await driver.getServerInfo()
             console.log(serverInfo)
-            setup(driver)
+            onNeo4jSetup(driver)
         } catch (e) {
             console.log(e)
             if (autoConnect) {
@@ -58,19 +57,18 @@ export function SetupNeo4j({children}: { children: any }) {
                 remember: true,
                 auto: true
             })
-            return
-        }
-        const loaded = JSON.parse(store) as Neo4jForm
-        form.setFieldsValue(loaded)
-        if (loaded.auto) {
-            connect(loaded, {autoConnect: true})
+        } else {
+            const loaded = JSON.parse(store) as Neo4jForm
+            form.setFieldsValue(loaded)
+            if (loaded.auto) {
+                connect(loaded, {autoConnect: true})
+            }
         }
     }
 
     return (
         <>
-            {children}
-            <Modal title="Connect to Neo4j" open={driver === null} footer={null}>
+            <Modal title="Connect to Neo4j" open={true} footer={null}>
                 <Form name="basic" layout="vertical" disabled={connecting} form={form}
                       onFinish={connect}>
                     <Form.Item label="Neo4j URI" name="uri" rules={[{required: true}]}>

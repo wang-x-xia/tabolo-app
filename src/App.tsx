@@ -1,16 +1,17 @@
 import './App.css'
 import {Layout} from "antd";
 import {GithubOutlined} from '@ant-design/icons';
+import {useState} from "react";
+import {Driver} from "neo4j-driver";
 import {SetupNeo4j} from "./neo4j/component.tsx";
 
 function App() {
+    const [driver, setup] = useState<Driver | null>(null);
     return (
         <>
             <Layout>
                 <Layout.Content>
-                    <SetupNeo4j>
-                        Content
-                    </SetupNeo4j>
+                    {driver == null ? <SetupNeo4j onNeo4jSetup={setup}/> : <span>Connected</span>}
                 </Layout.Content>
                 <Layout.Footer>
                     Tabolo APP
