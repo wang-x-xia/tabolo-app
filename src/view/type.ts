@@ -7,7 +7,7 @@ export interface RowHeader {
     name: string,
     description: string,
     key: string,
-    type: "node"
+    type: "node" | "auto"
 }
 
 export interface Row {
