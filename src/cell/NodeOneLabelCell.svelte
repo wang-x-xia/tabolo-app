@@ -22,14 +22,16 @@
     let config = nodeCellConfig(label)
 </script>
 
-{#if $config.type === "ShowLabel"}
-    <Button {id} size="sm">{label}</Button>
-{:else if $config.type === "ShowOneField"}
-    <Button {id} size="sm" outline>
-        {`<${label}>`}
-        <PrimitiveCell data={data.properties[$config.key]}/>
-    </Button>
-{/if}
+<span {id}>
+    {#if $config.type === "ShowLabel"}
+        <Button size="sm">{label}</Button>
+    {:else if $config.type === "ShowOneField"}
+        <Button size="sm" outline>
+            {`<${label}>`}
+            <PrimitiveCell data={data.properties[$config.key]}/>
+        </Button>
+    {/if}
+</span>
 <Popover title={`${label} Properties`} triggeredBy={idSelector(id)}>
     <Table>
         <TableHead>
