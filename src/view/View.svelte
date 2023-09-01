@@ -12,6 +12,8 @@
         TableHeadCell
     } from "flowbite-svelte";
     import Cell from "../cell/Cell.svelte";
+    import {setContext} from "svelte";
+    import {DataSourceKey, fromDriver} from "../data/source";
 
     export let driver: Driver
 
@@ -41,6 +43,7 @@
 
     queryData()
 
+    setContext(DataSourceKey, fromDriver(driver))
 </script>
 
 <div>

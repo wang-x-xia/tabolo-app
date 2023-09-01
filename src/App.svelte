@@ -3,12 +3,16 @@
     import View from "./view/View.svelte";
     import type {Driver} from "neo4j-driver";
     import type {ComponentEvents} from "svelte";
+    import {setContext} from "svelte";
+    import {ConfigLoaderKey, DefaultConfigLoader} from "./data/config";
 
     let driver: Driver = null
 
     function connect(d: ComponentEvents<SetupNeo4j>["connect"]) {
         driver = d.detail
     }
+
+    setContext(ConfigLoaderKey, DefaultConfigLoader)
 </script>
 
 <main>
