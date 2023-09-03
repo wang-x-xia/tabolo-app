@@ -2,8 +2,7 @@ import type {Readable} from "svelte/store";
 import {readable} from "svelte/store";
 import type {Config} from "../data/config";
 import {getConfigLoader} from "../data/config";
-import type {Cypher} from "../data/graph";
-import {getCypher} from "../data/graph";
+import {getGraphMeta} from "../data/graph";
 
 export type NodeCellConfig = ShowLabel | ShowOneField
 
@@ -16,11 +15,9 @@ export interface ShowOneField extends Config {
     key: string
 }
 
-const cache = new Map<Cypher, Map<string, Promise<NodeCellConfig | undefined>>>()
-
 export function nodeCellConfig(label: string): Readable<NodeCellConfig> {
     let configLoader = getConfigLoader();
-    let cypher = getCypher();
+    let graphMeta = getGraphMeta();
     let defaultValue: ShowLabel = {type: "ShowLabel", provider: "default"}
     return readable<NodeCellConfig>(defaultValue, (set) => {
             async function _() {
@@ -31,32 +28,14 @@ export function nodeCellConfig(label: string): Readable<NodeCellConfig> {
                     return
                 }
 
-                // form constraint
-                if (!cache.has(cypher)) {
-                    cache.set(cypher, new Map())
-                }
-                let dsCache = cache.get(cypher)
-                if (!dsCache.has(label)) {
-                    async function loadFromConstraint(): Promise<NodeCellConfig | undefined> {
-                        const constraints = await cypher.query(
-                            'SHOW CONSTRAINTS WHERE type = "UNIQUENESS" AND labelsOrTypes =[$label] AND entityType = "NODE" AND size(properties) = 1',
-                            {label: label})
-                        if (constraints.records.length == 1) {
-                            return {
-                                provider: "unique constraint",
-                                type: "ShowOneField",
-                                key: constraints.records[0].properties[0]
-                            }
-                        }
-                        return undefined
-                    }
-
-                    dsCache.set(label, loadFromConstraint())
-                }
-                const cached = await dsCache.get(label)
-                if (cached !== undefined) {
-                    set(cached)
-                    return
+                const meta = await graphMeta.getLabel(label)
+                const oneKeyUniqueConstraint = meta.uniqueConstraints.filter(it => it.length === 1)
+                if (oneKeyUniqueConstraint.length == 1) {
+                    set({
+                        provider: "unique constraint",
+                        type: "ShowOneField",
+                        key: oneKeyUniqueConstraint[0][0]
+                    })
                 }
             }
 
