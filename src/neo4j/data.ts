@@ -6,8 +6,10 @@ import type {
     GraphNode,
     GraphNodeLabelMeta,
     GraphPropertyMeta,
+    GraphPropertyType,
     GraphRelationship
 } from "../data/graph";
+import {addTypeHint} from "../data/graph";
 import type {Driver, Node, Record as Neo4jRecord, Relationship} from "neo4j-driver";
 import {isInt, isNode, isRelationship, types} from "neo4j-driver";
 
@@ -29,14 +31,6 @@ class Neo4jWrapper implements Graph, GraphMeta, Cypher {
         return {};
     }
 
-    isNode(value: any): value is GraphNode {
-        return Object.hasOwn(value, internalValueKey) && isNode(value[internalValueKey])
-    }
-
-    isRelationship(value: any): value is GraphRelationship {
-        return Object.hasOwn(value, internalValueKey) && isRelationship(value[internalValueKey])
-    }
-
     getLabel(label: string): Promise<GraphNodeLabelMeta> {
         if (!this.labelMetaCache.has(label)) {
             this.labelMetaCache.set(label, this._getLabel(label))
@@ -54,11 +48,8 @@ class Neo4jWrapper implements Graph, GraphMeta, Cypher {
         const properties = propertiesResult.records.map<GraphPropertyMeta>(it => {
             return {
                 key: it.get("propertyName"),
-                name: null,
-                description: null,
                 required: it.get("mandatory"),
-                priority: null,
-                types: it.get("propertyTypes")
+                types: convertTypes(it.get("propertyTypes"))
             }
         })
         const uniqueConstraintsResult =
@@ -70,15 +61,8 @@ class Neo4jWrapper implements Graph, GraphMeta, Cypher {
         const uniqueConstraints = uniqueConstraintsResult.records.map(it => {
             return it.get("properties") as string[]
         })
-        console.log({
-            label: label,
-            name: null,
-            properties: properties,
-            uniqueConstraints: uniqueConstraints
-        })
         return {
             label: label,
-            name: null,
             properties: properties,
             uniqueConstraints: uniqueConstraints
         }
@@ -99,12 +83,6 @@ class Neo4jWrapper implements Graph, GraphMeta, Cypher {
 
 export function fromDriver(driver: Driver): Graph & GraphMeta & Cypher {
     return new Neo4jWrapper(driver);
-}
-
-const internalValueKey = Symbol("neo4j")
-
-interface WithNeo4j {
-    [internalValueKey]: any
 }
 
 function convertRecord(record: Neo4jRecord): Record<string, any> {
@@ -141,23 +119,53 @@ function convertValue(value: any): any {
         .map(([key, value]) => [key, convertValue(value)]))
 }
 
-function convertNode(node: Node): WithNeo4j & GraphNode {
-    return {
-        [internalValueKey]: node,
+function convertNode(node: Node): GraphNode {
+    return addTypeHint("node", {
         id: node.elementId,
         labels: node.labels,
-        properties: node.properties,
-    }
+        properties: convertValue(node.properties),
+    })
 }
 
 
-function convertRelationship(relationship: Relationship): WithNeo4j & GraphRelationship {
-    return {
-        [internalValueKey]: relationship,
+function convertRelationship(relationship: Relationship): GraphRelationship {
+    return addTypeHint("relationship", {
         id: relationship.elementId,
         type: relationship.type,
         properties: relationship.properties,
         startNodeId: relationship.startNodeElementId,
         endNodeId: relationship.endNodeElementId,
+    })
+}
+
+function convertTypes(types: string[]): GraphPropertyType[] {
+    return Array.from(new Set(types.map(it => convertType(it))))
+}
+
+/**
+ * The neo4j type doesn't have a unified rule or wiki for that.
+ * Use the source code to mapping them:
+ * https://github.com/search?q=repo%3Aneo4j%2Fneo4j%20getTypeName&type=code
+ */
+function convertType(type: string): GraphPropertyType {
+    if (type.endsWith("Array")) {
+        return "list"
     }
+    switch (type) {
+        case "Integer":
+        case "Long":
+        case "Double":
+        case "Float":
+        case "Short":
+            return "number";
+        case "Boolean":
+            return "boolean";
+        case "List":
+            return "list"
+        case "Map":
+            return "map"
+        case "String":
+            return "string"
+    }
+    throw Error(`Unsupported type ${type}`)
 }

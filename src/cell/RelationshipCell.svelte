@@ -15,7 +15,7 @@
 
     export let data: GraphRelationship
 
-    let id = "relationship-cell-" + randomElementId()
+    const id = randomElementId("relationship-cell")
 </script>
 
 <Button {id}>{data.type}</Button>

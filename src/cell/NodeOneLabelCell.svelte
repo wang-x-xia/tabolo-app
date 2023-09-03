@@ -17,9 +17,9 @@
     export let data: GraphNode
     export let label: string
 
-    let id = "node-cell-" + randomElementId()
+    const id = randomElementId("node-cell")
 
-    let config = nodeCellConfig(label)
+    const config = nodeCellConfig(label)
 </script>
 
 <span {id}>
