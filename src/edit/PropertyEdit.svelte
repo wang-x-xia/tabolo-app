@@ -10,8 +10,9 @@
     export let draft: GraphNode
 
     const id = randomElementId("property-edit")
-    if (property !== null) {
-        key = property.key
+    const _property = property
+    if (_property !== null) {
+        key = _property.key
     }
 
     const origin = draft.properties[key]
@@ -19,8 +20,8 @@
 
     if (origin === undefined) {
         draft.properties[key] = null
-        if (property !== null && property.types.length == 0) {
-            type = property.types[0]
+        if (_property !== null && _property.types.length == 0) {
+            type = _property.types[0]
         }
     } else {
         type = getType(origin)
@@ -38,8 +39,8 @@
         <Select size="sm" class="w-28" sr-only items={types} bind:value={type}/>
     </div>
     {#if (type === "string")}
-        <Input {id} required={property?.required} bind:value={draft.properties[key]}/>
+        <Input {id} required={_property?.required} bind:value={draft.properties[key]}/>
     {:else if (type === "number")}
-        <Input {id} required={property?.required} type="number" bind:value={draft.properties[key]}/>
+        <Input {id} required={_property?.required} type="number" bind:value={draft.properties[key]}/>
     {/if}
 </div>
