@@ -1,4 +1,4 @@
-import {getContext} from "svelte";
+import {defineInContext} from "../util";
 
 export interface ConfigLoader {
     loadConfig<T extends Config>(id: string): Promise<T | undefined>
@@ -8,11 +8,7 @@ export interface Config {
     provider: string
 }
 
-export const ConfigLoaderKey = "ConfigLoader"
-
-export function getConfigLoader(): ConfigLoader {
-    return getContext(ConfigLoaderKey)
-}
+export const [getConfigLoader, setConfigLoader] = defineInContext<ConfigLoader>("ConfigLoader")
 
 class ConfigLoaderImpl implements ConfigLoader {
 

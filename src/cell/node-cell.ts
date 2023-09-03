@@ -2,8 +2,8 @@ import type {Readable} from "svelte/store";
 import {readable} from "svelte/store";
 import type {Config} from "../data/config";
 import {getConfigLoader} from "../data/config";
-import type {DataSource} from "../data/source"
-import {getDataSource} from "../data/source";
+import type {Cypher} from "../data/graph";
+import {getCypher} from "../data/graph";
 
 export type NodeCellConfig = ShowLabel | ShowOneField
 
@@ -16,11 +16,11 @@ export interface ShowOneField extends Config {
     key: string
 }
 
-const cache = new Map<DataSource, Map<string, Promise<NodeCellConfig | undefined>>>()
+const cache = new Map<Cypher, Map<string, Promise<NodeCellConfig | undefined>>>()
 
 export function nodeCellConfig(label: string): Readable<NodeCellConfig> {
     let configLoader = getConfigLoader();
-    let dataSource = getDataSource();
+    let cypher = getCypher();
     let defaultValue: ShowLabel = {type: "ShowLabel", provider: "default"}
     return readable<NodeCellConfig>(defaultValue, (set) => {
             async function _() {
@@ -32,20 +32,20 @@ export function nodeCellConfig(label: string): Readable<NodeCellConfig> {
                 }
 
                 // form constraint
-                if (!cache.has(dataSource)) {
-                    cache.set(dataSource, new Map())
+                if (!cache.has(cypher)) {
+                    cache.set(cypher, new Map())
                 }
-                let dsCache = cache.get(dataSource)
+                let dsCache = cache.get(cypher)
                 if (!dsCache.has(label)) {
                     async function loadFromConstraint(): Promise<NodeCellConfig | undefined> {
-                        const constraints = await dataSource.query(
+                        const constraints = await cypher.query(
                             'SHOW CONSTRAINTS WHERE type = "UNIQUENESS" AND labelsOrTypes =[$label] AND entityType = "NODE" AND size(properties) = 1',
                             {label: label})
                         if (constraints.records.length == 1) {
                             return {
                                 provider: "unique constraint",
                                 type: "ShowOneField",
-                                key: constraints.records[0].get("properties")[0]
+                                key: constraints.records[0].properties[0]
                             }
                         }
                         return undefined

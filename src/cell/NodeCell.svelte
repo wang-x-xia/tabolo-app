@@ -1,8 +1,8 @@
 <script lang="ts">
-    import {Node} from "neo4j-driver";
     import NodeOneLabelCell from "./NodeOneLabelCell.svelte";
+    import type {GraphNode} from "../data/graph.js";
 
-    export let data: Node
+    export let data: GraphNode
 
 </script>
 

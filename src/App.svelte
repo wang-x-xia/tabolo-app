@@ -1,25 +1,27 @@
 <script lang="ts">
-    import SetupNeo4j from "./neo4j/SetupNeo4j.svelte";
+    import ConnectNeo4j from "./neo4j/ConnectNeo4j.svelte";
     import View from "./view/View.svelte";
     import type {Driver} from "neo4j-driver";
     import type {ComponentEvents} from "svelte";
-    import {setContext} from "svelte";
-    import {ConfigLoaderKey, DefaultConfigLoader} from "./data/config";
+    import {DefaultConfigLoader, setConfigLoader} from "./data/config";
+    import PrepareNeo4jData from "./neo4j/PrepareNeo4jData.svelte";
 
     let driver: Driver = null
 
-    function connect(d: ComponentEvents<SetupNeo4j>["connect"]) {
+    function connect(d: ComponentEvents<ConnectNeo4j>["connect"]) {
         driver = d.detail
     }
 
-    setContext(ConfigLoaderKey, DefaultConfigLoader)
+    setConfigLoader(DefaultConfigLoader)
 </script>
 
 <main>
     {#if driver === null}
-        <SetupNeo4j on:connect={connect}></SetupNeo4j>
+        <ConnectNeo4j on:connect={connect}/>
     {:else }
-        <View {driver}></View>
+        <PrepareNeo4jData {driver}>
+            <View/>
+        </PrepareNeo4jData>
     {/if}
     <footer class="footer p-10 bg-neutral text-neutral-content">
         <div>

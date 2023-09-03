@@ -1,5 +1,4 @@
 <script lang="ts">
-    import type {Driver} from "neo4j-driver";
     import type {RowHeader, ViewData} from "./type";
     import {
         Button,
@@ -12,15 +11,14 @@
         TableHeadCell
     } from "flowbite-svelte";
     import Cell from "../cell/Cell.svelte";
-    import {setContext} from "svelte";
-    import {DataSourceKey, fromDriver} from "../data/source";
+    import {getCypher} from "../data/graph";
 
-    export let driver: Driver
+    let cypher = getCypher()
 
     let query = "MATCH (n) RETURN n"
 
     async function _queryData(): Promise<ViewData> {
-        const queryResult = await driver.executeQuery(query)
+        const queryResult = await cypher.query(query)
         const headers: RowHeader[] = queryResult.keys.map(key => {
             return {
                 name: key,
@@ -31,7 +29,7 @@
         });
         return {
             headers: headers,
-            rows: queryResult.records.map(it => it.toObject())
+            rows: queryResult.records
         }
     }
 
@@ -43,7 +41,6 @@
 
     queryData()
 
-    setContext(DataSourceKey, fromDriver(driver))
 </script>
 
 <div>

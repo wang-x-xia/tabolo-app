@@ -1,5 +1,4 @@
 <script lang="ts">
-    import {Node} from "neo4j-driver";
     import {
         Button,
         Popover,
@@ -13,8 +12,9 @@
     import PrimitiveCell from "./PrimitiveCell.svelte";
     import {idSelector, randomElementId} from "../util";
     import {nodeCellConfig} from "./node-cell";
+    import type {GraphNode} from "../data/graph.js";
 
-    export let data: Node
+    export let data: GraphNode
     export let label: string
 
     let id = "node-cell-" + randomElementId()

@@ -1,5 +1,4 @@
 <script lang="ts">
-    import {Relationship} from "neo4j-driver";
     import {
         Button,
         Popover,
@@ -12,8 +11,9 @@
     } from "flowbite-svelte";
     import PrimitiveCell from "./PrimitiveCell.svelte";
     import {idSelector, randomElementId} from "../util";
+    import type {GraphRelationship} from "../data/graph";
 
-    export let data: Relationship
+    export let data: GraphRelationship
 
     let id = "relationship-cell-" + randomElementId()
 </script>
