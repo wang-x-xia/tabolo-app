@@ -10,7 +10,7 @@ import type {
     GraphRelationship
 } from "../data/graph";
 import {addTypeHint} from "../data/graph";
-import type {Driver, Node, Record as Neo4jRecord, Relationship} from "neo4j-driver";
+import type {Driver, EagerResult, Node, Record as Neo4jRecord, RecordShape, Relationship} from "neo4j-driver";
 import {isInt, isNode, isRelationship, types} from "neo4j-driver";
 
 
@@ -79,6 +79,35 @@ class Neo4jWrapper implements Graph, GraphMeta, Cypher {
             records: result.records.map(it => convertRecord(it))
         }
     }
+
+    async editNode(id: string, properties: Record<string, any>, old?: Record<string, any>): Promise<GraphNode> {
+        let result: EagerResult<RecordShape>;
+        if (old === undefined) {
+            result = await this.driver.executeQuery("MATCH (n) " +
+                "WHERE elementId(n) = $id " +
+                "SET n += $properties " +
+                "RETURN n", {
+                id: id,
+                properties: properties
+            })
+        } else {
+            result = await this.driver.executeQuery("MATCH (n) " +
+                "WHERE elementId(n) = $id " +
+                "AND properties(n) = $old " +
+                "SET n += $properties " +
+                "RETURN n", {
+                id: id,
+                old: old,
+                properties: properties
+            })
+        }
+        if (result.records.length > 0) {
+            return convertNode(result.records[0].get("n"))
+        } else {
+            console.log(result)
+            throw new Error("Invalid result")
+        }
+    }
 }
 
 export function fromDriver(driver: Driver): Graph & GraphMeta & Cypher {
@@ -101,7 +130,7 @@ function convertValue(value: any): any {
         } else {
             return value.toBigInt()
         }
-    } else if (typeof value === "string" || value === null) {
+    } else if (typeof value === "string" || typeof value === "number" || value === null) {
         return value
     }
 

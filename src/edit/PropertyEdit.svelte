@@ -2,7 +2,7 @@
     import type {PropertyMeta} from "./node-edit";
     import type {GraphNode, GraphType} from "../data/graph";
     import {getType} from "../data/graph";
-    import {Input, Label, Select} from "flowbite-svelte";
+    import {Input, Label, NumberInput, Select} from "flowbite-svelte";
     import {randomElementId} from "../util";
 
     export let key: string | null = null
@@ -41,6 +41,6 @@
     {#if (type === "string")}
         <Input {id} required={_property?.required} bind:value={draft.properties[key]}/>
     {:else if (type === "number")}
-        <Input {id} required={_property?.required} type="number" bind:value={draft.properties[key]}/>
+        <NumberInput {id} required={_property?.required} bind:value={draft.properties[key]}/>
     {/if}
 </div>

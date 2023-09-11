@@ -1,6 +1,6 @@
 <script lang="ts">
     import type {GraphNode} from "../data/graph";
-    import {copyGraphNode} from "../data/graph";
+    import {copyGraphNode, getGraph} from "../data/graph";
     import type {NodeEditConfig} from "./node-edit";
     import {nodeEditConfig} from "./node-edit";
     import PropertyEdit from "./PropertyEdit.svelte";
@@ -14,6 +14,7 @@
     let draft = copyGraphNode(data)
 
     const config = nodeEditConfig(data.labels)
+    const graph = getGraph()
 
     const remains = derived<Readable<NodeEditConfig>, string[]>(config, (value, set) => {
         const keys = new Set(Object.keys(draft.properties));
@@ -26,9 +27,17 @@
         list.sort()
         set(list)
     })
+
+    async function save() {
+        data = await graph.editNode(data.id, draft.properties, data.properties)
+    }
+
+    function reset() {
+        draft = copyGraphNode(data)
+    }
 </script>
 
-<form class="space-y-6">
+<form class="space-y-6" on:submit|preventDefault={save}>
     <div>
         <Label class="mb-2">Node ID</Label>
         <Input disabled value={data.id}/>
@@ -77,7 +86,7 @@
         {/key}
     {/key}
     <div class="space-x-4">
-        <Button>Save</Button>
-        <Button type="button" color="alternative" on:click={() =>(draft = {...data})}>Reset</Button>
+        <Button type="submit">Save</Button>
+        <Button type="button" color="alternative" on:click={reset}>Reset</Button>
     </div>
 </form>

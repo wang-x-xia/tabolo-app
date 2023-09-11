@@ -5,7 +5,7 @@ import type {GraphPropertyMeta} from "../data/graph";
 import {getGraphMeta} from "../data/graph";
 
 export interface NodeEditConfig extends Config {
-    labels: [string, GraphPropertyMeta[]][],
+    labels: [string, PropertyMeta[]][],
 }
 
 export function nodeEditConfig(labels: string[]): Readable<NodeEditConfig> {
@@ -25,7 +25,7 @@ export function nodeEditConfig(labels: string[]): Readable<NodeEditConfig> {
                     sharedLabels.get(p.key).add(labelMeta.label)
                 })
             })
-            const results = labelMetas.map<[string, GraphPropertyMeta[]]>(labelMeta => {
+            const results = labelMetas.map<[string, PropertyMeta[]]>(labelMeta => {
                 return [
                     labelMeta.label,
                     labelMeta.properties.map<PropertyMeta>(p => ({

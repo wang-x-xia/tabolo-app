@@ -12,6 +12,8 @@ export interface Graph {
     getNodes(id: string[]): Promise<Record<string, GraphNode>>
 
     searchNodes(): Promise<GraphNode[]>
+
+    editNode(id: string, properties: Record<string, any>, old?: Record<string, any>): Promise<GraphNode>
 }
 
 export interface GraphMeta {
