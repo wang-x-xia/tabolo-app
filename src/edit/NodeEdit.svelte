@@ -64,34 +64,28 @@
     <!-- Key here to reload all component if config/remains changed -->
     <!-- If not, some of AccordionItem wont be opened -->
     {#key $config}
-        {#key remains}
-            <Accordion multiple>
-                {#each $config.labels as [label, properties]}
-                    <AccordionItem open paddingDefault="p-4">
-                        <span slot="header">{label}</span>
-                        <div class="space-y-6">
-                            {#each properties as property}
-                                {#key draft}
-                                    <PropertyEdit {property} {draft}/>
-                                {/key}
-                            {/each}
-                        </div>
-                    </AccordionItem>
-                {/each}
-                {#if (remains.length > 0)}
-                    <AccordionItem open paddingDefault="p-4">
-                        <span slot="header">Remaining</span>
-                        <div class="space-y-6">
-                            {#each remains as key}
-                                {#key draft}
-                                    <PropertyEdit {key} {draft}/>
-                                {/key}
-                            {/each}
-                        </div>
-                    </AccordionItem>
-                {/if}
-            </Accordion>
-        {/key}
+        <Accordion multiple>
+            {#each $config.labels as [label, properties]}
+                <AccordionItem open paddingDefault="p-4">
+                    <span slot="header">{label}</span>
+                    <div class="space-y-6">
+                        {#each properties as property}
+                            <PropertyEdit {property} bind:value={draft.properties[property.key]}/>
+                        {/each}
+                    </div>
+                </AccordionItem>
+            {/each}
+            {#if (remains.length > 0)}
+                <AccordionItem open paddingDefault="p-4">
+                    <span slot="header">Remaining</span>
+                    <div class="space-y-6">
+                        {#each remains as key}
+                            <PropertyEdit {key} bind:value={draft.properties[key]}/>
+                        {/each}
+                    </div>
+                </AccordionItem>
+            {/if}
+        </Accordion>
     {/key}
     <div class="space-x-4">
         <Button type="submit">Save</Button>
