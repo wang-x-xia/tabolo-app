@@ -1,15 +1,13 @@
 import type {Config} from "../data/config";
 import type {Readable} from "svelte/store";
 import {asyncReadable} from "../util";
-import type {GraphPropertyMeta} from "../data/graph";
-import {getGraphMeta} from "../data/graph";
+import type {GraphMeta, GraphNode, GraphPropertyMeta} from "../data/graph";
 
 export interface NodeEditConfig extends Config {
     labels: [string, PropertyMeta[]][],
 }
 
-export function nodeEditConfig(labels: string[]): Readable<NodeEditConfig> {
-    const meta = getGraphMeta()
+export function nodeEditConfig(labels: string[], meta: GraphMeta): Readable<NodeEditConfig> {
     return asyncReadable<NodeEditConfig>({
             provider: "default",
             labels: labels.map(l => [l, []])
@@ -38,6 +36,19 @@ export function nodeEditConfig(labels: string[]): Readable<NodeEditConfig> {
                 labels: results
             }
         })
+}
+
+
+export function remainsProperties(configValue: NodeEditConfig, draft: GraphNode) {
+    const keys = new Set(Object.keys(draft.properties));
+    configValue.labels.forEach(([_, value]) => {
+        value.forEach(p => {
+            keys.delete(p.key)
+        })
+    })
+    let remains = Array.from(keys)
+    remains.sort()
+    return remains
 }
 
 export interface PropertyMeta extends GraphPropertyMeta {

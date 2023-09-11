@@ -14,10 +14,14 @@ export interface Graph {
     searchNodes(): Promise<GraphNode[]>
 
     editNode(id: string, properties: Record<string, any>, old?: Record<string, any>): Promise<GraphNode>
+
+    addLabelToNode(id: string, label: string): Promise<GraphNode>
 }
 
 export interface GraphMeta {
     getLabel(label: string): Promise<GraphNodeLabelMeta>
+
+    getLabels(): Promise<string[]>
 }
 
 export interface Cypher extends Graph {
@@ -162,7 +166,7 @@ export interface CypherQueryResult {
 export interface GraphPropertyMeta {
     key: string,
     required: boolean,
-    types: GraphType[]
+    types: GraphPropertyType[]
 }
 
 export interface GraphNodeLabelMeta {

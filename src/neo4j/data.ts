@@ -13,6 +13,11 @@ import {addTypeHint} from "../data/graph";
 import type {Driver, EagerResult, Node, Record as Neo4jRecord, RecordShape, Relationship} from "neo4j-driver";
 import {isInt, isNode, isRelationship, types} from "neo4j-driver";
 
+const BLANK: GraphPropertyMeta = {
+    key: "",
+    required: true,
+    types: []
+}
 
 class Neo4jWrapper implements Graph, GraphMeta, Cypher {
 
@@ -45,13 +50,20 @@ class Neo4jWrapper implements Graph, GraphMeta, Cypher {
                 "WHERE $label IN nodeLabels " +
                 "RETURN propertyName, propertyTypes, mandatory",
                 {label: label});
-        const properties = propertiesResult.records.map<GraphPropertyMeta>(it => {
-            return {
-                key: it.get("propertyName"),
-                required: it.get("mandatory"),
-                types: convertTypes(it.get("propertyTypes"))
-            }
+        const map = new Map<string, GraphPropertyMeta>()
+        propertiesResult.records.forEach(it => {
+            const name = it.get("propertyName")
+            const original = map.has(name) ? map.get(name) : BLANK;
+            map.set(name, {
+                key: name,
+                required: original.required && it.get("mandatory"),
+                types: uniqueTypes([
+                    ...original.types,
+                    ...convertTypes(it.get("propertyTypes"))])
+            })
         })
+        const properties = Array.from(map.values()).sort((l, r) =>
+            l.key.localeCompare(r.key))
         const uniqueConstraintsResult =
             await this.driver.executeQuery("SHOW CONSTRAINTS " +
                 'WHERE type = "UNIQUENESS" ' +
@@ -66,6 +78,11 @@ class Neo4jWrapper implements Graph, GraphMeta, Cypher {
             properties: properties,
             uniqueConstraints: uniqueConstraints
         }
+    }
+
+    async getLabels(): Promise<string[]> {
+        const labels = await this.driver.executeQuery("CALL db.labels")
+        return labels.records.map(it => it.get("label"))
     }
 
     async searchNodes(): Promise<GraphNode[]> {
@@ -101,6 +118,23 @@ class Neo4jWrapper implements Graph, GraphMeta, Cypher {
                 properties: properties
             })
         }
+        if (result.records.length > 0) {
+            return convertNode(result.records[0].get("n"))
+        } else {
+            console.log(result)
+            throw new Error("Invalid result")
+        }
+    }
+
+    async addLabelToNode(id: string, label: string): Promise<GraphNode> {
+        const result = await this.driver.executeQuery("MATCH (n) " +
+            "WHERE elementId(n) = $id " +
+            "CALL apoc.create.addLabels(n, [$label]) " +
+            "YIELD node " +
+            "RETURN node as n", {
+            id: id,
+            label: label
+        })
         if (result.records.length > 0) {
             return convertNode(result.records[0].get("n"))
         } else {
@@ -168,7 +202,11 @@ function convertRelationship(relationship: Relationship): GraphRelationship {
 }
 
 function convertTypes(types: string[]): GraphPropertyType[] {
-    return Array.from(new Set(types.map(it => convertType(it))))
+    return types.map(it => convertType(it))
+}
+
+function uniqueTypes(types: GraphPropertyType[]): GraphPropertyType[] {
+    return Array.from(new Set(types)).sort()
 }
 
 /**
