@@ -17,7 +17,7 @@
 
     let type: GraphType = "string"
 
-    if (value === undefined) {
+    if (value === null || value === undefined) {
         value = null
         if (_property !== null && _property.types.length == 0) {
             type = _property.types[0]
@@ -34,7 +34,12 @@
 
 <div>
     <div class=" flex justify-between items-baseline mb-2">
-        <Label for={id} defaultClass="text-sm">{key}</Label>
+        <Label for={id} defaultClass="text-sm">
+            {key}
+            {#if (_property !== null && _property.required)}
+                <span class="text-red-500">*</span>
+            {/if}
+        </Label>
         <Select size="sm" class="w-28" sr-only items={types} bind:value={type}/>
     </div>
     {#if (type === "string")}

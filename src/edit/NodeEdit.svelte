@@ -43,6 +43,14 @@
         data = await graph.addLabelToNode(data.id, label)
         reset()
     }
+
+    let newKey = ""
+
+    function addProperty() {
+        const tmp = copyGraphNode(draft)
+        tmp.properties[newKey] = null
+        draft = tmp
+    }
 </script>
 
 <form class="space-y-6" on:submit|preventDefault={save}>
@@ -75,16 +83,23 @@
                     </div>
                 </AccordionItem>
             {/each}
-            {#if (remains.length > 0)}
-                <AccordionItem open paddingDefault="p-4">
-                    <span slot="header">Remaining</span>
-                    <div class="space-y-6">
-                        {#each remains as key}
-                            <PropertyEdit {key} bind:value={draft.properties[key]}/>
-                        {/each}
+            <AccordionItem open paddingDefault="p-4">
+                <span slot="header">Remaining</span>
+                <div class="space-y-6">
+                    <div>
+                        <Label class="mb-2">New Key</Label>
+                        <ButtonGroup class="w-full">
+                            <Input bind:value={newKey}/>
+                            <Button color="primary" on:click={addProperty}>
+                                <PlusSolid size="sm"/>
+                            </Button>
+                        </ButtonGroup>
                     </div>
-                </AccordionItem>
-            {/if}
+                    {#each remains as key}
+                        <PropertyEdit {key} bind:value={draft.properties[key]}/>
+                    {/each}
+                </div>
+            </AccordionItem>
         </Accordion>
     {/key}
     <div class="space-x-4">
