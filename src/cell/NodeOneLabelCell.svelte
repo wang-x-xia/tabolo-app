@@ -9,7 +9,7 @@
         TableHead,
         TableHeadCell
     } from "flowbite-svelte";
-    import PrimitiveCell from "./PrimitiveCell.svelte";
+    import PropertyValueCell from "./PropertyValueCell.svelte";
     import {idSelector, randomElementId} from "../util";
     import {nodeCellConfig} from "./node-cell";
     import type {GraphNode} from "../data/graph.js";
@@ -28,7 +28,7 @@
     {:else if $config.type === "ShowOneField"}
         <Button size="sm" outline>
             {`<${label}>`}
-            <PrimitiveCell data={data.properties[$config.key]}/>
+            <PropertyValueCell data={data.properties[$config.key]}/>
         </Button>
     {/if}
 </span>
@@ -43,7 +43,7 @@
                 <TableBodyRow>
                     <TableBodyCell>{key}</TableBodyCell>
                     <TableBodyCell>
-                        <PrimitiveCell data={value}></PrimitiveCell>
+                        <PropertyValueCell data={value}></PropertyValueCell>
                     </TableBodyCell>
                 </TableBodyRow>
             {/each}

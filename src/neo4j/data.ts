@@ -6,20 +6,23 @@ import type {
     GraphNode,
     GraphNodeLabelMeta,
     GraphPropertyMeta,
-    GraphPropertyType,
-    GraphRelationship
+    GraphPropertyValue,
+    GraphRelationship,
+    GraphValue
 } from "../data/graph";
-import {addTypeHint} from "../data/graph";
-import type {Driver, EagerResult, Node, Record as Neo4jRecord, RecordShape, Relationship} from "neo4j-driver";
-import {isInt, isNode, isRelationship, types} from "neo4j-driver";
+import type {Driver, Node, Record as Neo4jRecord, Relationship} from "neo4j-driver";
+import {isNode, isRelationship} from "neo4j-driver";
+import type {GraphEdit} from "../edit/graph-edit";
+import type {GraphNodeEditHandler} from "../edit/node-edit";
+import {GraphNodeEditHandlerImpl} from "../edit/node-edit";
+import type {GraphPropertyEditHandler} from "../edit/property-edit";
 
 const BLANK: GraphPropertyMeta = {
     key: "",
     required: true,
-    types: []
 }
 
-class Neo4jWrapper implements Graph, GraphMeta, Cypher {
+class Neo4jWrapper implements Graph, GraphEdit, GraphMeta, Cypher {
 
     private driver: Driver
     private labelMetaCache = new Map<string, Promise<GraphNodeLabelMeta>>()
@@ -57,9 +60,6 @@ class Neo4jWrapper implements Graph, GraphMeta, Cypher {
             map.set(name, {
                 key: name,
                 required: original.required && it.get("mandatory"),
-                types: uniqueTypes([
-                    ...original.types,
-                    ...convertTypes(it.get("propertyTypes"))])
             })
         })
         const properties = Array.from(map.values()).sort((l, r) =>
@@ -97,27 +97,44 @@ class Neo4jWrapper implements Graph, GraphMeta, Cypher {
         }
     }
 
-    async editNode(id: string, properties: Record<string, any>, old?: Record<string, any>): Promise<GraphNode> {
-        let result: EagerResult<RecordShape>;
-        if (old === undefined) {
-            result = await this.driver.executeQuery("MATCH (n) " +
-                "WHERE elementId(n) = $id " +
-                "SET n += $properties " +
-                "RETURN n", {
-                id: id,
-                properties: properties
-            })
+    nodeEditHandler(node: GraphNode): GraphNodeEditHandler {
+        return new GraphNodeEditHandlerImpl(node, this);
+    }
+
+    nodePropertyEditHandler(data: GraphNode, key: string, value: GraphPropertyValue | null): GraphPropertyEditHandler {
+        if (value === null) {
+            return {
+                key,
+                mutable: true,
+                required: false,
+                value: "",
+            }
         } else {
-            result = await this.driver.executeQuery("MATCH (n) " +
-                "WHERE elementId(n) = $id " +
-                "AND properties(n) = $old " +
-                "SET n += $properties " +
-                "RETURN n", {
-                id: id,
-                old: old,
-                properties: properties
-            })
+            return {
+                key,
+                mutable: (value as Neo4jGraphPropertyValue).editStr,
+                required: false,
+                value: value.value,
+            }
         }
+    }
+
+    async editNodeProperties(node: GraphNode, propertyHandlers: Record<string, GraphPropertyEditHandler>): Promise<GraphNode> {
+        const old = Object.fromEntries(Object.entries(node.properties)
+            .filter(([, value]) => (value as Neo4jGraphPropertyValue).editStr)
+            .map(([key, value]) => [key, value.value])
+        );
+        const properties = Object.fromEntries(Object.entries(propertyHandlers)
+            .filter(([, value]) => value.mutable)
+            .map(([key, value]) => [key, value.value])
+        );
+        const result = await this.driver.executeQuery("MATCH (n) " +
+            "WHERE elementId(n) = $id " +
+            "AND properties(n) = $old " +
+            "SET n += $properties " +
+            "RETURN n", {
+            id: node.id, old, properties,
+        })
         if (result.records.length > 0) {
             return convertNode(result.records[0].get("n"))
         } else {
@@ -144,69 +161,80 @@ class Neo4jWrapper implements Graph, GraphMeta, Cypher {
     }
 }
 
-export function fromDriver(driver: Driver): Graph & GraphMeta & Cypher {
+export function fromDriver(driver: Driver): Graph & GraphEdit & GraphMeta & Cypher {
     return new Neo4jWrapper(driver);
 }
 
-function convertRecord(record: Neo4jRecord): Record<string, any> {
+function convertRecord(record: Neo4jRecord): Record<string, GraphValue> {
     return Object.fromEntries(Object.entries(record.toObject()).map(([key, value]) => [key, convertValue(value)]))
 }
 
-function convertValue(value: any): any {
+function convertValue(value: any): GraphValue {
     // Map data types in Neo4j
     if (isNode(value)) {
-        return convertNode(value)
+        return {
+            type: "node",
+            value: convertNode(value),
+        }
     } else if (isRelationship(value)) {
-        return convertRelationship(value)
-    } else if (isInt(value)) {
-        if (value.inSafeRange()) {
-            return value.toNumber()
-        } else {
-            return value.toBigInt()
+        return {
+            type: "relationship",
+            value: convertRelationship(value),
         }
-    } else if (typeof value === "string" || typeof value === "number" || value === null) {
-        return value
-    }
-
-    // Assert not other types
-    for (const type of Object.values(types)) {
-        if (value instanceof (type as any)) {
-            throw Error("Unsupported type in Tabolo!!!")
+    } else {
+        return {
+            type: "property",
+            value: convertPropertyValue(value)
         }
     }
-
-    if (Array.isArray(value)) {
-        return value.map(v => convertValue(v))
-    }
-    return Object.fromEntries(Object.entries(value)
-        .map(([key, value]) => [key, convertValue(value)]))
 }
 
+
+function convertProperties(record: Record<string, any>): Record<string, GraphPropertyValue> {
+    return Object.fromEntries(Object.entries(record).map(([key, value]) => [key, convertPropertyValue(value)]))
+}
+
+function convertPropertyValue(value: any): GraphPropertyValue {
+    // Map data types in Neo4j
+    if (isNode(value)) {
+        return {
+            value: "Node:" + value.elementId,
+        }
+    } else if (isRelationship(value)) {
+        return {
+            value: "Relationship:" + value.elementId,
+        }
+    } else {
+        return {
+            value: value.toString(),
+            editStr: typeof value === "string",
+        }
+    }
+}
+
+
 function convertNode(node: Node): GraphNode {
-    return addTypeHint("node", {
+    return {
         id: node.elementId,
         labels: node.labels,
-        properties: convertValue(node.properties),
-    })
+        properties: convertProperties(node.properties),
+    }
 }
 
 
 function convertRelationship(relationship: Relationship): GraphRelationship {
-    return addTypeHint("relationship", {
+    return {
         id: relationship.elementId,
         type: relationship.type,
-        properties: relationship.properties,
+        properties: convertProperties(relationship.properties),
         startNodeId: relationship.startNodeElementId,
         endNodeId: relationship.endNodeElementId,
-    })
+    }
 }
 
-function convertTypes(types: string[]): GraphPropertyType[] {
-    return types.map(it => convertType(it))
-}
-
-function uniqueTypes(types: GraphPropertyType[]): GraphPropertyType[] {
-    return Array.from(new Set(types)).sort()
+interface Neo4jGraphPropertyValue extends GraphPropertyValue {
+    // Mark the field is string, then can edit it
+    editStr: boolean
 }
 
 /**
@@ -214,25 +242,3 @@ function uniqueTypes(types: GraphPropertyType[]): GraphPropertyType[] {
  * Use the source code to mapping them:
  * https://github.com/search?q=repo%3Aneo4j%2Fneo4j%20getTypeName&type=code
  */
-function convertType(type: string): GraphPropertyType {
-    if (type.endsWith("Array")) {
-        return "list"
-    }
-    switch (type) {
-        case "Integer":
-        case "Long":
-        case "Double":
-        case "Float":
-        case "Short":
-            return "number";
-        case "Boolean":
-            return "boolean";
-        case "List":
-            return "list"
-        case "Map":
-            return "map"
-        case "String":
-            return "string"
-    }
-    throw Error(`Unsupported type ${type}`)
-}

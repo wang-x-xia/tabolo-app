@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type {RowHeader, ViewData} from "./type";
+    import type {RowHeader, ViewData} from "./table-view";
     import {
         Button,
         Input,
@@ -24,7 +24,6 @@
                 name: key,
                 description: key,
                 key: key,
-                type: "auto"
             }
         });
         return {
@@ -44,8 +43,8 @@
 </script>
 
 <div>
-    <Input id="search" bind:value={query} placeholder="Query">
-        <Button slot="right" on:click={queryData}>Search</Button>
+    <Input bind:value={query} id="search" placeholder="Query">
+        <Button on:click={queryData} slot="right">Search</Button>
     </Input>
 </div>
 {#await dataAsync}
@@ -62,7 +61,7 @@
                 <TableBodyRow>
                     {#each data.headers as header }
                         <TableBodyCell>
-                            <Cell {header} data={row[header.key]}></Cell>
+                            <Cell data={row[header.key]}></Cell>
                         </TableBodyCell>
                     {/each}
                 </TableBodyRow>

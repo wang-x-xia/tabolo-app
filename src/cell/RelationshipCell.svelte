@@ -9,7 +9,7 @@
         TableHead,
         TableHeadCell
     } from "flowbite-svelte";
-    import PrimitiveCell from "./PrimitiveCell.svelte";
+    import PropertyValueCell from "./PropertyValueCell.svelte";
     import {idSelector, randomElementId} from "../util";
     import type {GraphRelationship} from "../data/graph";
 
@@ -30,7 +30,7 @@
                 <TableBodyRow>
                     <TableBodyCell>{key}</TableBodyCell>
                     <TableBodyCell>
-                        <PrimitiveCell data={value}></PrimitiveCell>
+                        <PropertyValueCell data={value}></PropertyValueCell>
                     </TableBodyCell>
                 </TableBodyRow>
             {/each}

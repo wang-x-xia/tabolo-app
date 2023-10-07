@@ -49,23 +49,23 @@
     }
 </script>
 
-<Modal title="Connect to Neo4j" open={true}>
-    <form on:submit|preventDefault={connect} class="space-y-6">
+<Modal open={true} title="Connect to Neo4j">
+    <form class="space-y-6" on:submit|preventDefault={connect}>
         <div>
             <Label for="uri">Neo4j URI</Label>
-            <Input id="uri" type="text" bind:value={data.uri}/>
+            <Input bind:value={data.uri} id="uri" type="text"/>
         </div>
         <div>
             <Label for="username">
                 <span class="label-text">Username</span>
             </Label>
-            <Input id="username" type="text" bind:value={data.username}/>
+            <Input bind:value={data.username} id="username" type="text"/>
         </div>
         <div>
             <Label for="password">
                 <span class="label-text">Password</span>
             </Label>
-            <Input id="password" type="password" bind:value={data.password}/>
+            <Input bind:value={data.password} id="password" type="password"/>
         </div>
         <div>
             <Checkbox bind:checked={data.remember}>Remember in Browser</Checkbox>
@@ -73,6 +73,6 @@
         <div>
             <Checkbox bind:checked={data.auto}>Auto Connected</Checkbox>
         </div>
-        <Button type="submit" disabled={isConnecting}>Submit</Button>
+        <Button disabled={isConnecting} type="submit">Submit</Button>
     </form>
 </Modal>

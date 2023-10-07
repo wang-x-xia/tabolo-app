@@ -16,6 +16,6 @@
 {/each}
 </span>
 
-<Modal title="Edit Node" bind:open={editModal}>
+<Modal bind:open={editModal} title="Edit Node">
     <NodeEdit {data}/>
 </Modal>

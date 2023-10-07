@@ -1,56 +1,69 @@
-import type {Config} from "../data/config";
-import type {Readable} from "svelte/store";
-import {asyncReadable} from "../util";
-import type {GraphMeta, GraphNode, GraphPropertyMeta} from "../data/graph";
+import type {GraphNode} from "../data/graph";
+import type {GraphPropertyEditHandler} from "./property-edit";
+import type {GraphEdit} from "./graph-edit";
 
-export interface NodeEditConfig extends Config {
-    labels: [string, PropertyMeta[]][],
+export interface GraphNodeEditHandler {
+    labels: string[];
+    remains: string[];
+    propertyHandlers: Record<string, GraphPropertyEditHandler>;
+
+    addLabel(label: string): Promise<this>;
+
+    addProperty(newKey: string): Promise<this>;
+
+    save(): Promise<this>
+
+    reset(): Promise<this>;
 }
 
-export function nodeEditConfig(labels: string[], meta: GraphMeta): Readable<NodeEditConfig> {
-    return asyncReadable<NodeEditConfig>({
-            provider: "default",
-            labels: labels.map(l => [l, []])
-        },
-        async function () {
-            const labelMetas = await Promise.all(labels.map(it => meta.getLabel(it)))
-            const sharedLabels = new Map<string, Set<string>>()
-            labelMetas.forEach(labelMeta => {
-                labelMeta.properties.forEach(p => {
-                    if (!sharedLabels.has(p.key)) {
-                        sharedLabels.set(p.key, new Set())
-                    }
-                    sharedLabels.get(p.key).add(labelMeta.label)
-                })
-            })
-            const results = labelMetas.map<[string, PropertyMeta[]]>(labelMeta => {
-                return [
-                    labelMeta.label,
-                    labelMeta.properties.map<PropertyMeta>(p => ({
-                        sharedLabels: Array.from(sharedLabels.get(p.key)).filter(it => it !== labelMeta.label),
-                        ...p
-                    }))]
-            })
-            return {
-                provider: "graph meta",
-                labels: results
+export class GraphNodeEditHandlerImpl implements GraphNodeEditHandler {
+
+    labels: string[];
+    propertyHandlers: Record<string, GraphPropertyEditHandler>;
+    remains: string[];
+    private data: GraphNode;
+    private edit: GraphEdit;
+
+    constructor(data: GraphNode, edit: GraphEdit) {
+        this.data = data
+        this.edit = edit
+        this._reset()
+    }
+
+    async addLabel(label: string): Promise<this> {
+        if (label in this.labels) {
+            return
+        }
+        this.data = await this.edit.addLabelToNode(this.data.id, label)
+        return this
+    }
+
+    async addProperty(newKey: string): Promise<this> {
+        if (this.propertyHandlers[newKey] === undefined) {
+            this.propertyHandlers = {
+                [newKey]: this.edit.nodePropertyEditHandler(this.data, newKey, null),
+                ...this.propertyHandlers,
             }
-        })
-}
+            this.remains = [...this.remains, newKey]
+        }
+        return this
+    }
 
+    async reset(): Promise<this> {
+        this._reset()
+        return this
+    }
 
-export function remainsProperties(configValue: NodeEditConfig, draft: GraphNode) {
-    const keys = new Set(Object.keys(draft.properties));
-    configValue.labels.forEach(([_, value]) => {
-        value.forEach(p => {
-            keys.delete(p.key)
-        })
-    })
-    let remains = Array.from(keys)
-    remains.sort()
-    return remains
-}
+    _reset() {
+        this.labels = [...this.data.labels]
+        this.remains = Object.keys(this.data.properties)
+        this.propertyHandlers = Object.fromEntries(Object.entries(this.data.properties).map(([key, value]) =>
+            [key, this.edit.nodePropertyEditHandler(this.data, key, value)]))
+    }
 
-export interface PropertyMeta extends GraphPropertyMeta {
-    sharedLabels: string[]
+    async save(): Promise<this> {
+        this.data = await this.edit.editNodeProperties(this.data, this.propertyHandlers)
+        this._reset()
+        return this
+    }
 }

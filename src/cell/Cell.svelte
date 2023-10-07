@@ -1,23 +1,16 @@
 <script lang="ts">
-    import type {RowHeader} from "../view/type";
     import NodeCell from "./NodeCell.svelte";
-    import PrimitiveCell from "./PrimitiveCell.svelte";
-    import {getType} from "../data/graph";
+    import PropertyValueCell from "./PropertyValueCell.svelte";
     import RelationshipCell from "./RelationshipCell.svelte";
+    import type {GraphValue} from "../data/graph";
 
-    export let header: RowHeader
-    export let data: any
-
-    const type = getType(data)
+    export let data: GraphValue
 </script>
 
-
-{#if (header.type === "auto")}
-    {#if (type === "node")}
-        <NodeCell {data}/>
-    {:else if (type === "relationship")}
-        <RelationshipCell {data}/>
-    {:else }
-        <PrimitiveCell {data}/>
-    {/if}
+{#if (data.type === "node")}
+    <NodeCell data={data.value}/>
+{:else if (data.type === "relationship")}
+    <RelationshipCell data={data.value}/>
+{:else }
+    <PropertyValueCell data={data.value}/>
 {/if}
