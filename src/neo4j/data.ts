@@ -8,7 +8,8 @@ import type {
     GraphPropertyMeta,
     GraphPropertyValue,
     GraphRelationship,
-    GraphValue
+    GraphValue,
+    Searcher
 } from "../data/graph";
 import type {Driver, Node, Record as Neo4jRecord, Relationship} from "neo4j-driver";
 import {isNode, isRelationship} from "neo4j-driver";
@@ -85,11 +86,16 @@ class Neo4jWrapper implements Graph, GraphEdit, GraphMeta, Cypher {
         return labels.records.map(it => it.get("label"))
     }
 
-    async searchNodes(): Promise<GraphNode[]> {
+    async searchNodes(searcher: Searcher): Promise<GraphNode[]> {
+        switch (searcher.type) {
+            case "null":
+                const result = await this.query("MATCH (n) RETURN n");
+                return result.records.map(it => (it["n"]).value as GraphNode)
+        }
         return [];
     }
 
-    async query(query: string, parameters: Record<string, any> | undefined): Promise<CypherQueryResult> {
+    async query(query: string, parameters?: Record<string, any>): Promise<CypherQueryResult> {
         const result = await this.driver.executeQuery(query, parameters);
         return {
             keys: result.keys,

@@ -12,7 +12,7 @@ export interface Graph {
 
     getNodes(id: string[]): Promise<Record<string, GraphNode>>
 
-    searchNodes(): Promise<GraphNode[]>
+    searchNodes(searcher: Searcher): Promise<GraphNode[]>
 }
 
 export interface GraphMeta {
@@ -75,4 +75,20 @@ export interface GraphNodeLabelMeta {
     label: string,
     properties: GraphPropertyMeta[],
     uniqueConstraints: string[][]
+}
+
+export interface NullSearcher {
+}
+
+
+export interface LabelSearcher {
+    labels: string[]
+}
+
+export type Searcher = {
+    type: "null",
+    value: NullSearcher,
+} | {
+    type: "label",
+    value: LabelSearcher,
 }

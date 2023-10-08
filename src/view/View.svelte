@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type {RowHeader, ViewData} from "./table-view";
+    import type {ViewData} from "./table-view";
     import {
         Button,
         Input,
@@ -11,24 +11,27 @@
         TableHeadCell
     } from "flowbite-svelte";
     import Cell from "../cell/Cell.svelte";
-    import {getCypher} from "../data/graph";
+    import {getCypher, getGraph} from "../data/graph";
 
     let cypher = getCypher()
+    let graph = getGraph()
 
     let query = "MATCH (n) RETURN n"
 
     async function _queryData(): Promise<ViewData> {
-        const queryResult = await cypher.query(query)
-        const headers: RowHeader[] = queryResult.keys.map(key => {
-            return {
-                name: key,
-                description: key,
-                key: key,
-            }
-        });
+        const nodes = await graph.searchNodes({
+            type: "null",
+            value: {},
+        })
         return {
-            headers: headers,
-            rows: queryResult.records
+            headers: [
+                {
+                    name: "Node",
+                    description: "Node",
+                    key: "n",
+                }
+            ],
+            rows: nodes.map(it => ({n: {type: "node", value: it}}))
         }
     }
 
