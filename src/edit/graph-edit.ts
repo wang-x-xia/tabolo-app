@@ -11,6 +11,12 @@ export interface GraphEdit {
     editNodeProperties(node: GraphNode, propertyHandlers: Record<string, GraphPropertyEditHandler>): Promise<GraphNode>
 
     addLabelToNode(id: string, label: string): Promise<GraphNode>;
+
+    removeLabelFromNode(id: string, label: string): Promise<GraphNode>;
+
+    newEmptyNode(): Promise<GraphNode>;
+
+    removeNode(id: string): Promise<void>;
 }
 
 export const [getGraphEdit, setGraphEdit] = defineInContext<GraphEdit>("GraphEdit")

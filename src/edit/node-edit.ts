@@ -9,6 +9,8 @@ export interface GraphNodeEditHandler {
 
     addLabel(label: string): Promise<this>;
 
+    removeLabel(label: string): Promise<this>;
+
     addProperty(newKey: string): Promise<this>;
 
     save(): Promise<this>
@@ -31,10 +33,20 @@ export class GraphNodeEditHandlerImpl implements GraphNodeEditHandler {
     }
 
     async addLabel(label: string): Promise<this> {
-        if (label in this.labels) {
-            return
+        if (this.labels.includes(label)) {
+            return this
         }
         this.data = await this.edit.addLabelToNode(this.data.id, label)
+        this.labels = [...this.data.labels]
+        return this
+    }
+
+    async removeLabel(label: string): Promise<this> {
+        if (!this.labels.includes(label)) {
+            return this
+        }
+        this.data = await this.edit.removeLabelFromNode(this.data.id, label)
+        this.labels = [...this.data.labels]
         return this
     }
 

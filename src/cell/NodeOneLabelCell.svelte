@@ -28,7 +28,11 @@
     {:else if $config.type === "ShowOneField"}
         <Button size="sm" outline>
             {`<${label}>`}
-            <PropertyValueCell data={data.properties[$config.key]}/>
+            {#if data.properties[$config.key]}
+                <PropertyValueCell data={data.properties[$config.key]}/>
+            {:else }
+                {"<Empty>"}
+            {/if}
         </Button>
     {/if}
 </span>

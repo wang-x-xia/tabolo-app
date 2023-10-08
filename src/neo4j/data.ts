@@ -11,7 +11,7 @@ import type {
     GraphValue,
     Searcher
 } from "../data/graph";
-import type {Driver, Node, Record as Neo4jRecord, Relationship} from "neo4j-driver";
+import type {Driver, EagerResult, Node, Record as Neo4jRecord, Relationship} from "neo4j-driver";
 import {isNode, isRelationship} from "neo4j-driver";
 import type {GraphEdit} from "../edit/graph-edit";
 import type {GraphNodeEditHandler} from "../edit/node-edit";
@@ -125,6 +125,15 @@ class Neo4jWrapper implements Graph, GraphEdit, GraphMeta, Cypher {
         }
     }
 
+    assertOneRow(result: EagerResult) {
+        if (result.records.length > 0) {
+            return result.records[0]
+        } else {
+            console.log(result)
+            throw new Error("Invalid result")
+        }
+    }
+
     async editNodeProperties(node: GraphNode, propertyHandlers: Record<string, GraphPropertyEditHandler>): Promise<GraphNode> {
         const old = Object.fromEntries(Object.entries(node.properties)
             .filter(([, value]) => (value as Neo4jGraphPropertyValue).editStr)
@@ -141,12 +150,7 @@ class Neo4jWrapper implements Graph, GraphEdit, GraphMeta, Cypher {
             "RETURN n", {
             id: node.id, old, properties,
         })
-        if (result.records.length > 0) {
-            return convertNode(result.records[0].get("n"))
-        } else {
-            console.log(result)
-            throw new Error("Invalid result")
-        }
+        return convertNode(this.assertOneRow(result).get("n"))
     }
 
     async addLabelToNode(id: string, label: string): Promise<GraphNode> {
@@ -158,12 +162,30 @@ class Neo4jWrapper implements Graph, GraphEdit, GraphMeta, Cypher {
             id: id,
             label: label
         })
-        if (result.records.length > 0) {
-            return convertNode(result.records[0].get("n"))
-        } else {
-            console.log(result)
-            throw new Error("Invalid result")
-        }
+        return convertNode(this.assertOneRow(result).get("n"))
+    }
+
+    async removeLabelFromNode(id: string, label: string): Promise<GraphNode> {
+        const result = await this.driver.executeQuery("MATCH (n) " +
+            "WHERE elementId(n) = $id " +
+            "CALL apoc.create.removeLabels(n, [$label]) " +
+            "YIELD node " +
+            "RETURN node as n", {
+            id: id,
+            label: label
+        })
+        return convertNode(this.assertOneRow(result).get("n"))
+    }
+
+    async newEmptyNode(): Promise<GraphNode> {
+        const result = await this.driver.executeQuery("CREATE (n) RETURN n")
+        return convertNode(result.records[0].get("n"))
+    }
+
+    async removeNode(id: string): Promise<void> {
+        await this.driver.executeQuery("MATCH (n) " +
+            "WHERE elementId(n) = $id " +
+            "DELETE n", {id})
     }
 }
 

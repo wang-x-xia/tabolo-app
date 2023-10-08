@@ -2,7 +2,7 @@
     import type {ViewData} from "./table-view";
     import {
         Button,
-        Input,
+        ButtonGroup,
         Table,
         TableBody,
         TableBodyCell,
@@ -11,12 +11,11 @@
         TableHeadCell
     } from "flowbite-svelte";
     import Cell from "../cell/Cell.svelte";
-    import {getCypher, getGraph} from "../data/graph";
+    import {getGraph} from "../data/graph";
+    import {getGraphEdit} from "../edit/graph-edit";
 
-    let cypher = getCypher()
     let graph = getGraph()
-
-    let query = "MATCH (n) RETURN n"
+    let graphEdit = getGraphEdit()
 
     async function _queryData(): Promise<ViewData> {
         const nodes = await graph.searchNodes({
@@ -41,15 +40,18 @@
         dataAsync = _queryData()
     }
 
+    async function addNode() {
+        await graphEdit.newEmptyNode()
+    }
+
     queryData()
 
 </script>
 
-<div>
-    <Input bind:value={query} id="search" placeholder="Query">
-        <Button on:click={queryData} slot="right">Search</Button>
-    </Input>
-</div>
+<ButtonGroup class="space-x-px">
+    <Button color="primary" on:click={queryData}>Refresh</Button>
+    <Button color="primary" on:click={addNode}>Add New Node</Button>
+</ButtonGroup>
 {#await dataAsync}
     Loading
 {:then data}

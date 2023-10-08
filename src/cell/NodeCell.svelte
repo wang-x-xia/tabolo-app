@@ -7,15 +7,21 @@
     export let data: GraphNode
 
     let editModal = false
+
+    function done() {
+        editModal = false
+    }
 </script>
 
 
 <span on:dblclick|preventDefault={() => (editModal = true)}>
 {#each data.labels as label}
     <NodeOneLabelCell {data} {label}></NodeOneLabelCell>
+{:else }
+    <NodeOneLabelCell {data} label="No Label"></NodeOneLabelCell>
 {/each}
 </span>
 
 <Modal bind:open={editModal} title="Edit Node">
-    <NodeEdit {data}/>
+    <NodeEdit {data} {done}/>
 </Modal>
