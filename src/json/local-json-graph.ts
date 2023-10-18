@@ -183,4 +183,31 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
             .index("label")
             .getAllKeys()) as string[];
     }
+
+    async exportAll() {
+        const nodes = await asPromise(this.db.transaction("node", "readonly").objectStore("node")
+            .getAll())
+        return {
+            node: nodes
+        }
+    }
+
+    async importAll(data: { node: GraphNode[] }) {
+        await this.cleanUp();
+        const tx = this.db.transaction("node", "readwrite")
+        const store = tx.objectStore("node");
+        data.node.forEach(n => {
+            store.put(n);
+        });
+        tx.commit();
+    }
+
+    async cleanUp() {
+        const tx = this.db.transaction("node", "readwrite")
+        const store = tx.objectStore("node");
+        (await asPromise(store.getAllKeys())).forEach(key => {
+            store.delete(key)
+        })
+        tx.commit();
+    }
 }
