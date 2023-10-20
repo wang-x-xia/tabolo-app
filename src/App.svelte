@@ -7,7 +7,7 @@
     setConfigLoader(DefaultConfigLoader)
 </script>
 
-<main>
+<main class="min-h-screen">
     <PrepareLocal>
         <View/>
     </PrepareLocal>

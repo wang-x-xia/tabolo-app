@@ -221,7 +221,7 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
         return {
             key: node.properties["key"].value,
             required: node.properties["required"]?.value == "true",
-            show: node.properties["show"]?.value == "true",
+            show: node.properties["show"]?.value,
         };
     }
 

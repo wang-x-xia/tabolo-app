@@ -4,15 +4,15 @@ import type {Config} from "../data/config";
 import {getConfigLoader} from "../data/config";
 import {getGraphMeta} from "../data/graph";
 
-export type NodeCellConfig = ShowLabel | ShowOneField
+export type NodeCellConfig = ShowLabel | ShowProperties
 
 export interface ShowLabel extends Config {
     type: "ShowLabel"
 }
 
-export interface ShowOneField extends Config {
-    type: "ShowOneField"
-    key: string
+export interface ShowProperties extends Config {
+    type: "ShowProperties"
+    keys: string[]
 }
 
 export function nodeCellConfig(label: string): Readable<NodeCellConfig> {
@@ -29,12 +29,13 @@ export function nodeCellConfig(label: string): Readable<NodeCellConfig> {
                 }
 
                 const meta = await graphMeta.getLabel(label)
-                const showProperty = meta.properties.find(v => v.show);
-                if (showProperty !== undefined) {
+                const showPropertied = meta.properties.filter(v => v.show);
+                if (showPropertied.length > 0) {
                     set({
                         provider: "Show Property",
-                        type: "ShowOneField",
-                        key: showProperty.key
+                        type: "ShowProperties",
+                        keys: showPropertied.sort((a, b) => a.show.localeCompare(b.show))
+                            .map(it => it.key)
                     })
                 }
             }

@@ -55,7 +55,7 @@
 {#await dataAsync}
     Loading
 {:then data}
-    <Table>
+    <Table divClass="min-h-max">
         <TableHead>
             {#each data.headers as header (header.key)}
                 <TableHeadCell>{header.name}</TableHeadCell>

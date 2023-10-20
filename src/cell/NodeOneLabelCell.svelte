@@ -1,6 +1,7 @@
 <script lang="ts">
     import {
         Button,
+        ButtonGroup,
         Popover,
         Table,
         TableBody,
@@ -25,15 +26,19 @@
 <span {id}>
     {#if $config.type === "ShowLabel"}
         <Button size="sm">{label}</Button>
-    {:else if $config.type === "ShowOneField"}
-        <Button size="sm" outline>
-            {`<${label}>`}
-            {#if data.properties[$config.key]}
-                <PropertyValueCell data={data.properties[$config.key]}/>
-            {:else }
-                {"<Empty>"}
-            {/if}
-        </Button>
+    {:else if $config.type === "ShowProperties"}
+        <ButtonGroup size="sm" outline>
+            <Button>{`<${label}>`}</Button>
+            {#each $config.keys as key }
+                {#if data.properties[key]}
+                    <Button>
+                        <PropertyValueCell data={data.properties[key]}/>
+                    </Button>
+                {:else }
+                    <Button>{key + "<Empty>"}</Button>
+                {/if}
+            {/each}
+        </ButtonGroup>
     {/if}
 </span>
 <Popover title={`${label} Properties`} triggeredBy={idSelector(id)}>

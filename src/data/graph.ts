@@ -69,7 +69,7 @@ export interface CypherQueryResult {
 export interface GraphPropertyMeta {
     key: string,
     required: boolean,
-    show?: boolean,
+    show?: string,
 }
 
 export interface GraphNodeLabelMeta {

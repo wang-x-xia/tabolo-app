@@ -12,6 +12,23 @@
       }
     },
     {
+      "id": "9bf34958-dbae-46fd-b855-ffddfbe08795",
+      "labels": [
+        "NodeProperty"
+      ],
+      "properties": {
+        "show": {
+          "value": "0"
+        },
+        "key": {
+          "value": "label"
+        },
+        "label": {
+          "value": "NodeProperty"
+        }
+      }
+    },
+    {
       "id": "c829fb4d-27a0-4f95-823e-6409996ea97e",
       "labels": [
         "NodeProperty"
@@ -41,7 +58,7 @@
           "value": "key"
         },
         "show": {
-          "value": "true"
+          "value": "1"
         }
       }
     }
