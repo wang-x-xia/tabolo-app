@@ -18,7 +18,7 @@
 {#each data.labels as label}
     <NodeOneLabelCell {data} {label}></NodeOneLabelCell>
 {:else }
-    <NodeOneLabelCell {data} label="No Label"></NodeOneLabelCell>
+    <NodeOneLabelCell {data} label="Null"></NodeOneLabelCell>
 {/each}
 </span>
 

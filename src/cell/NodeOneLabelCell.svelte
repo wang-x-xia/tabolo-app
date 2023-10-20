@@ -21,6 +21,8 @@
     const id = randomElementId("node-cell")
 
     const config = nodeCellConfig(label)
+
+    $: entries = Object.entries(data.properties).sort(([a,], [b,]) => a.localeCompare(b))
 </script>
 
 <span {id}>
@@ -48,7 +50,7 @@
             <TableHeadCell>Value</TableHeadCell>
         </TableHead>
         <TableBody>
-            {#each Object.entries(data.properties) as [key, value] }
+            {#each entries as [key, value] }
                 <TableBodyRow>
                     <TableBodyCell>{key}</TableBodyCell>
                     <TableBodyCell>

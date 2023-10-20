@@ -226,22 +226,12 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
     }
 
     async getLabels(): Promise<string[]> {
-        const cursorReq = this.db.transaction("node", "readonly")
-            .objectStore("node")
-            .index("labels")
-            .openKeyCursor();
-        return await new Promise<string[]>((resolve, reject) => {
-            let labels = []
-            cursorReq.onsuccess = _ => {
-                if (cursorReq.result == null) {
-                    resolve(labels);
-                } else {
-                    labels = [cursorReq.result.key, ...labels]
-                    cursorReq.result.continue();
-                }
-            }
-            cursorReq.onerror = _ => reject(cursorReq.error)
+        const nodes = await this.searchNodes({type: "null", value: {}});
+        const labels = new Set<string>();
+        nodes.forEach(node => {
+            node.labels.forEach(l => labels.add(l));
         });
+        return Array.from(labels).sort();
     }
 
     async exportAll() {
