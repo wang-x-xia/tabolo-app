@@ -26,7 +26,7 @@
     }
 </script>
 
-<SpeedDial defaultClass="absolute right-6 bottom-6">
+<SpeedDial defaultClass="absolute right-6 bottom-6 z-20">
     <Listgroup active>
         <ListgroupItem on:click={exportAll}>
             ExportAll
