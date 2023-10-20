@@ -11,17 +11,20 @@
         TableHeadCell
     } from "flowbite-svelte";
     import Cell from "../cell/Cell.svelte";
+    import type {NodeSearcher} from "../data/graph";
     import {getGraph} from "../data/graph";
     import {getGraphEdit} from "../edit/graph-edit";
+    import NodeSearch from "../search/NodeSearch.svelte";
 
     let graph = getGraph()
     let graphEdit = getGraphEdit()
+    let nodeSearcher: NodeSearcher = {
+        type: "null",
+        value: {}
+    }
 
     async function _queryData(): Promise<ViewData> {
-        const nodes = await graph.searchNodes({
-            type: "null",
-            value: {},
-        })
+        const nodes = await graph.searchNodes(nodeSearcher);
         return {
             headers: [
                 {
@@ -52,6 +55,7 @@
     <Button color="primary" on:click={queryData}>Refresh</Button>
     <Button color="primary" on:click={addNode}>Add New Node</Button>
 </ButtonGroup>
+<NodeSearch bind:data={nodeSearcher}/>
 {#await dataAsync}
     Loading
 {:then data}
