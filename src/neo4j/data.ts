@@ -9,7 +9,7 @@ import type {
     GraphPropertyValue,
     GraphRelationship,
     GraphValue,
-    Searcher
+    NodeSearcher
 } from "../data/graph";
 import type {Driver, EagerResult, Node, Record as Neo4jRecord, Relationship} from "neo4j-driver";
 import {isNode, isRelationship} from "neo4j-driver";
@@ -65,19 +65,9 @@ class Neo4jWrapper implements Graph, GraphEdit, GraphMeta, Cypher {
         })
         const properties = Array.from(map.values()).sort((l, r) =>
             l.key.localeCompare(r.key))
-        const uniqueConstraintsResult =
-            await this.driver.executeQuery("SHOW CONSTRAINTS " +
-                'WHERE type = "UNIQUENESS" ' +
-                "AND labelsOrTypes =[$label] " +
-                'AND entityType = "NODE"',
-                {label: label})
-        const uniqueConstraints = uniqueConstraintsResult.records.map(it => {
-            return it.get("properties") as string[]
-        })
         return {
             label: label,
             properties: properties,
-            uniqueConstraints: uniqueConstraints
         }
     }
 
@@ -86,7 +76,7 @@ class Neo4jWrapper implements Graph, GraphEdit, GraphMeta, Cypher {
         return labels.records.map(it => it.get("label"))
     }
 
-    async searchNodes(searcher: Searcher): Promise<GraphNode[]> {
+    async searchNodes(searcher: NodeSearcher): Promise<GraphNode[]> {
         switch (searcher.type) {
             case "null":
                 const result = await this.query("MATCH (n) RETURN n");

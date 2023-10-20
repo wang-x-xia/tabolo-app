@@ -29,12 +29,12 @@ export function nodeCellConfig(label: string): Readable<NodeCellConfig> {
                 }
 
                 const meta = await graphMeta.getLabel(label)
-                const oneKeyUniqueConstraint = meta.uniqueConstraints.filter(it => it.length === 1)
-                if (oneKeyUniqueConstraint.length == 1) {
+                const showProperty = meta.properties.find(v => v.show);
+                if (showProperty !== undefined) {
                     set({
-                        provider: "unique constraint",
+                        provider: "Show Property",
                         type: "ShowOneField",
-                        key: oneKeyUniqueConstraint[0][0]
+                        key: showProperty.key
                     })
                 }
             }

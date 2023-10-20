@@ -12,7 +12,7 @@ export interface Graph {
 
     getNodes(id: string[]): Promise<Record<string, GraphNode>>
 
-    searchNodes(searcher: Searcher): Promise<GraphNode[]>
+    searchNodes(searcher: NodeSearcher): Promise<GraphNode[]>
 }
 
 export interface GraphMeta {
@@ -69,12 +69,12 @@ export interface CypherQueryResult {
 export interface GraphPropertyMeta {
     key: string,
     required: boolean,
+    show?: boolean,
 }
 
 export interface GraphNodeLabelMeta {
     label: string,
     properties: GraphPropertyMeta[],
-    uniqueConstraints: string[][]
 }
 
 export interface NullSearcher {
@@ -82,13 +82,28 @@ export interface NullSearcher {
 
 
 export interface LabelSearcher {
-    labels: string[]
+    label: string
 }
 
-export type Searcher = {
+export interface PropertySearcher {
+    key: string,
+    value: GraphPropertyValue,
+}
+
+export interface MatchAllSearcher {
+    searchers: NodeSearcher[]
+}
+
+export type NodeSearcher = {
     type: "null",
     value: NullSearcher,
 } | {
     type: "label",
     value: LabelSearcher,
+} | {
+    type: "eq",
+    value: PropertySearcher,
+} | {
+    type: "and",
+    value: MatchAllSearcher,
 }

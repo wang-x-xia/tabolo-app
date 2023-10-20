@@ -1,0 +1,49 @@
+{
+  "node": [
+    {
+      "id": "6547e7b8-768a-426e-a40b-33e2af93848d",
+      "labels": [
+        "Application"
+      ],
+      "properties": {
+        "name": {
+          "value": "Tabolo"
+        }
+      }
+    },
+    {
+      "id": "c829fb4d-27a0-4f95-823e-6409996ea97e",
+      "labels": [
+        "NodeProperty"
+      ],
+      "properties": {
+        "show": {
+          "value": "true"
+        },
+        "key": {
+          "value": "name"
+        },
+        "label": {
+          "value": "Application"
+        }
+      }
+    },
+    {
+      "id": "f7ab2cae-7288-4258-b50f-404a9044ebf2",
+      "labels": [
+        "NodeProperty"
+      ],
+      "properties": {
+        "label": {
+          "value": "NodeProperty"
+        },
+        "key": {
+          "value": "key"
+        },
+        "show": {
+          "value": "true"
+        }
+      }
+    }
+  ]
+}

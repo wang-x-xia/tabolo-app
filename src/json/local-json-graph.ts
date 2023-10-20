@@ -1,4 +1,12 @@
-import type {Graph, GraphMeta, GraphNode, GraphNodeLabelMeta, GraphPropertyValue, Searcher} from "../data/graph";
+import type {
+    Graph,
+    GraphMeta,
+    GraphNode,
+    GraphNodeLabelMeta,
+    GraphPropertyMeta,
+    GraphPropertyValue,
+    NodeSearcher
+} from "../data/graph";
 import type {GraphEdit} from "../edit/graph-edit";
 import type {GraphPropertyEditHandler} from "../edit/property-edit";
 import type {GraphNodeEditHandler} from "../edit/node-edit";
@@ -70,14 +78,25 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
         return result
     }
 
-    async searchNodes(searcher: Searcher): Promise<GraphNode[]> {
+    async searchNodes(searcher: NodeSearcher): Promise<GraphNode[]> {
+        const nodes = await asPromise(this.db.transaction("node", "readonly")
+            .objectStore("node")
+            .getAll());
+        return nodes.filter(it => this.checkNode(it, searcher));
+    }
+
+    private checkNode(node: GraphNode, searcher: NodeSearcher) {
         switch (searcher.type) {
+            case "label":
+                return node.labels.includes(searcher.value.label);
+            case "eq":
+                const key = searcher.value.key
+                return key in node.properties && node.properties[key].value == searcher.value.value.value
+            case "and":
+                return searcher.value.searchers.every(s => this.checkNode(node, s))
             case "null":
-                return await asPromise(this.db.transaction("node", "readonly")
-                    .objectStore("node")
-                    .getAll())
+                return true;
         }
-        return [];
     }
 
     async changeNode(id: string, cdc: (node: GraphNode) => "abort" | "commit"): Promise<GraphNode> {
@@ -170,18 +189,59 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
     }
 
     async getLabel(label: string): Promise<GraphNodeLabelMeta> {
+        const nodes = await this.searchNodes({
+            type: "and",
+            value: {
+                searchers: [
+                    {
+                        type: "label",
+                        value: {
+                            label: "NodeProperty"
+                        }
+                    },
+                    {
+                        type: "eq",
+                        value: {
+                            key: "label",
+                            value: {
+                                value: label
+                            },
+                        }
+                    }
+                ]
+            }
+        });
         return {
             label,
-            properties: [],
-            uniqueConstraints: []
+            properties: nodes.map(it => this.createGraphPropertyMeta(it)),
         }
     }
 
+    private createGraphPropertyMeta(node: GraphNode): GraphPropertyMeta {
+        return {
+            key: node.properties["key"].value,
+            required: node.properties["required"]?.value == "true",
+            show: node.properties["show"]?.value == "true",
+        };
+    }
+
     async getLabels(): Promise<string[]> {
-        return await asPromise(this.db.transaction("node", "readonly")
+        const cursorReq = this.db.transaction("node", "readonly")
             .objectStore("node")
-            .index("label")
-            .getAllKeys()) as string[];
+            .index("labels")
+            .openKeyCursor();
+        return await new Promise<string[]>((resolve, reject) => {
+            let labels = []
+            cursorReq.onsuccess = _ => {
+                if (cursorReq.result == null) {
+                    resolve(labels);
+                } else {
+                    labels = [cursorReq.result.key, ...labels]
+                    cursorReq.result.continue();
+                }
+            }
+            cursorReq.onerror = _ => reject(cursorReq.error)
+        });
     }
 
     async exportAll() {
