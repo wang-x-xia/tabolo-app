@@ -9,6 +9,7 @@ import type {
 } from "../data/graph";
 import type {GraphEdit} from "../edit/graph-edit";
 import type {GraphPropertyEditHandler} from "../edit/property-edit";
+import {GraphPropertyEditHandlerImpl} from "../edit/property-edit";
 import type {GraphNodeEditHandler} from "../edit/node-edit";
 import {GraphNodeEditHandlerImpl} from "../edit/node-edit";
 
@@ -125,22 +126,20 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
         })
     }
 
-    async editNodeProperties(old: GraphNode, propertyHandlers: Record<string, GraphPropertyEditHandler>): Promise<GraphNode> {
-        return await this.changeNode(old.id, node => {
-            for (const key in propertyHandlers) {
-                const value = propertyHandlers[key]
-                if (!value.mutable) {
-                    continue
-                }
-                if (value.value) {
-                    node.properties[key] = {value: value.value}
-                } else {
-                    delete node.properties[key]
-                }
-            }
+    async editNodeProperty(id: string, key: string, value: GraphPropertyValue): Promise<GraphNode> {
+        return await this.changeNode(id, node => {
+            node.properties[key] = {value: value.value}
             return "commit";
         })
     }
+
+    async removeNodeProperty(id: string, key: string): Promise<GraphNode> {
+        return await this.changeNode(id, node => {
+            delete node.properties[key]
+            return "commit";
+        })
+    }
+
 
     async newEmptyNode(): Promise<GraphNode> {
         let id = window.crypto.randomUUID();
@@ -164,12 +163,7 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
     }
 
     nodePropertyEditHandler(data: GraphNode, key: string, value: GraphPropertyValue | null): GraphPropertyEditHandler {
-        return {
-            key,
-            mutable: true,
-            required: false,
-            value: value == null ? "" : value.value,
-        }
+        return new GraphPropertyEditHandlerImpl(data, key, value, true, true, this);
     }
 
     async removeLabelFromNode(id: string, label: string): Promise<GraphNode> {

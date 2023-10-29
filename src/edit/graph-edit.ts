@@ -8,7 +8,9 @@ export interface GraphEdit {
 
     nodePropertyEditHandler(data: GraphNode, key: string, value: GraphPropertyValue | null): GraphPropertyEditHandler;
 
-    editNodeProperties(node: GraphNode, propertyHandlers: Record<string, GraphPropertyEditHandler>): Promise<GraphNode>
+    editNodeProperty(id: string, key: string, value: GraphPropertyValue): Promise<GraphNode>
+
+    removeNodeProperty(id: string, key: string): Promise<GraphNode>
 
     addLabelToNode(id: string, label: string): Promise<GraphNode>;
 

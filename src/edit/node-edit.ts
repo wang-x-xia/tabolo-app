@@ -13,8 +13,6 @@ export interface GraphNodeEditHandler {
 
     addProperty(newKey: string): Promise<this>;
 
-    save(): Promise<this>
-
     reset(): Promise<this>;
 }
 
@@ -71,11 +69,5 @@ export class GraphNodeEditHandlerImpl implements GraphNodeEditHandler {
         this.remains = Object.keys(this.data.properties)
         this.propertyHandlers = Object.fromEntries(Object.entries(this.data.properties).map(([key, value]) =>
             [key, this.edit.nodePropertyEditHandler(this.data, key, value)]))
-    }
-
-    async save(): Promise<this> {
-        this.data = await this.edit.editNodeProperties(this.data, this.propertyHandlers)
-        this._reset()
-        return this
     }
 }

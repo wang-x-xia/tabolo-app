@@ -2,11 +2,23 @@
     import {Button, ButtonGroup, Input, Label} from "flowbite-svelte";
     import {randomElementId} from "../util";
     import type {GraphPropertyEditHandler} from "./property-edit";
-    import {CloseSolid} from "flowbite-svelte-icons";
+    import {CheckSolid, CloseSolid} from "flowbite-svelte-icons";
 
     export let data: GraphPropertyEditHandler
 
     const id = randomElementId("property-edit")
+
+    async function remove() {
+        data = await data.remove()
+    }
+
+    async function save() {
+        data = await data.save()
+    }
+
+    function reset() {
+        data = data
+    }
 </script>
 
 <div>
@@ -19,8 +31,14 @@
         </Label>
     </div>
     <ButtonGroup class="w-full">
-        <Input bind:value={data.value} disabled={!data.mutable} {id} required={data.required}/>
-        <Button color="primary" on:click={() => (data.value = null)}>
+        <Input bind:value={data.value} disabled={!data.mutable} {id} on:change={reset}
+               required={data.required}/>
+        {#if data.dirty}
+            <Button color="primary" on:click={save}>
+                <CheckSolid size="sm"/>
+            </Button>
+        {/if}
+        <Button color="primary" on:click={remove}>
             <CloseSolid size="sm"/>
         </Button>
     </ButtonGroup>
