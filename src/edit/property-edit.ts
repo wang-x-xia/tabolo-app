@@ -7,6 +7,7 @@ export interface GraphPropertyEditHandler {
     required: boolean,
     value: string,
     dirty: boolean,
+    origin: GraphPropertyValue | null,
 
     save(): Promise<this>,
 
@@ -19,8 +20,8 @@ export class GraphPropertyEditHandlerImpl implements GraphPropertyEditHandler {
     readonly key: string;
     readonly mutable: boolean;
     readonly required: boolean;
+    readonly origin: GraphPropertyValue | null;
     private node: GraphNode;
-    private origin: GraphPropertyValue | null;
     private edit: GraphEdit;
 
     constructor(data: GraphNode, key: string, value: GraphPropertyValue | null,

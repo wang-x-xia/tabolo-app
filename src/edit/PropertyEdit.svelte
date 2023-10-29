@@ -38,8 +38,10 @@
                 <CheckSolid size="sm"/>
             </Button>
         {/if}
-        <Button color="primary" on:click={remove}>
-            <CloseSolid size="sm"/>
-        </Button>
+        {#if data.origin}
+            <Button color="primary" on:click={remove}>
+                <CloseSolid size="sm"/>
+            </Button>
+        {/if}
     </ButtonGroup>
 </div>
