@@ -19,6 +19,8 @@ export interface GraphEdit {
     newEmptyNode(): Promise<GraphNode>;
 
     removeNode(id: string): Promise<void>;
+
+    copyNode(id: string): Promise<GraphNode>;
 }
 
 export const [getGraphEdit, setGraphEdit] = defineInContext<GraphEdit>("GraphEdit")

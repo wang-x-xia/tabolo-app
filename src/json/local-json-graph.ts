@@ -182,6 +182,16 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
         transaction.commit();
     }
 
+    async copyNode(id: string): Promise<GraphNode> {
+        const oldNode = await this.getNode(id);
+        const newNode = await this.newEmptyNode();
+        oldNode.labels.forEach(l => this.addLabelToNode(newNode.id, l));
+        Object.entries(oldNode.properties).forEach(([key, value]) => {
+            this.editNodeProperty(newNode.id, key, value);
+        });
+        return await this.getNode(newNode.id);
+    }
+
     async getLabel(label: string): Promise<GraphNodeLabelMeta> {
         const nodes = await this.searchNodes({
             type: "and",

@@ -35,6 +35,10 @@
         handler = await handler.reset()
     }
 
+    async function copy() {
+        await graphEdit.copyNode(data.id);
+    }
+
     let newKey = ""
 
     async function addProperty() {
@@ -86,7 +90,8 @@
     {/each}
 </div>
 <div class="space-x-4">
-    <Button color="alternative" on:click={reset} type="button">Reset</Button>
+    <Button color="alternative" on:click={reset}>Reset</Button>
+    <Button on:click={copy}>Copy</Button>
 </div>
 <Modal bind:open={showAddLabel} title="Select Label">
     <LabelSelect on:addLabel={e =>addLabel(e.detail)}/>
