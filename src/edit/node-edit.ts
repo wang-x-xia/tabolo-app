@@ -65,8 +65,8 @@ export class GraphNodeEditHandlerImpl implements GraphNodeEditHandler {
     }
 
     _reset() {
-        this.labels = [...this.data.labels]
-        this.remains = Object.keys(this.data.properties)
+        this.labels = [...this.data.labels].sort();
+        this.remains = Object.keys(this.data.properties).sort();
         this.propertyHandlers = Object.fromEntries(Object.entries(this.data.properties).map(([key, value]) =>
             [key, this.edit.nodePropertyEditHandler(this.data, key, value)]))
     }
