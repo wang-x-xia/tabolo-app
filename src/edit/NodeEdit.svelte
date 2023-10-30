@@ -4,15 +4,16 @@
     import {Button, ButtonGroup, Input, Label, Modal} from "flowbite-svelte";
     import {CloseSolid, PlusSolid} from "flowbite-svelte-icons";
     import LabelSelect from "./LabelSelect.svelte";
-    import {getGraphEdit} from "./graph-edit";
+    import {getGraphEdit, getGraphEditHandler} from "./graph-edit";
     import type {GraphNodeEditHandler} from "./node-edit";
 
     const graphEdit = getGraphEdit()
+    const graphEditHandler = getGraphEditHandler()
 
     export let data: GraphNode
     export let done: () => void
 
-    let handler: GraphNodeEditHandler = graphEdit.nodeEditHandler(data)
+    let handler: GraphNodeEditHandler = graphEditHandler.node(data, graphEdit)
     $:({labels, remains, propertyHandlers} = handler)
 
     let showAddLabel = false
@@ -32,7 +33,7 @@
     }
 
     async function reset() {
-        handler = await handler.reset()
+        handler = await handler.reset(data)
     }
 
     async function copy() {

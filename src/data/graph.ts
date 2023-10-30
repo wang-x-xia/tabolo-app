@@ -1,5 +1,5 @@
 import {defineInContext} from "../util";
-import type {Extendable} from "./base";
+import type {Extendable, ExtendableValue} from "./base";
 
 /**
  * An abstraction of Neo4j.
@@ -10,9 +10,9 @@ import type {Extendable} from "./base";
 export interface Graph {
     getNode(id: string): Promise<GraphNode | null>
 
-    getNodes(id: string[]): Promise<Record<string, GraphNode>>
+    getNodes(id: string[]): Promise<ExtendableValue<Record<string, GraphNode>>>
 
-    searchNodes(searcher: NodeSearcher): Promise<GraphNode[]>
+    searchNodes(searcher: NodeSearcher): Promise<ExtendableValue<GraphNode[]>>
 }
 
 export interface GraphMeta {
@@ -106,4 +106,19 @@ export type NodeSearcher = {
 } | {
     type: "and",
     value: MatchAllSearcher,
+}
+
+
+export function checkNode(node: GraphNode, searcher: NodeSearcher): boolean {
+    switch (searcher.type) {
+        case "label":
+            return node.labels.includes(searcher.value.label);
+        case "eq":
+            const key = searcher.value.key
+            return key in node.properties && node.properties[key].value == searcher.value.value.value
+        case "and":
+            return searcher.value.searchers.every(s => checkNode(node, s))
+        case "null":
+            return true;
+    }
 }
