@@ -1,8 +1,9 @@
 <script lang="ts">
-    import type {MatchAllSearcher, NodeSearcher} from "../data/graph";
     import {Button, Listgroup, ListgroupItem} from "flowbite-svelte";
     import NodeSearch from "./NodeSearch.svelte";
     import {CloseSolid, PlusSolid} from "flowbite-svelte-icons";
+    import type {MatchAllSearcher, NodeSearcher} from "../data/node-searcher";
+    import {emptySearcher} from "../data/searcher";
 
     export let data: MatchAllSearcher
 
@@ -11,7 +12,7 @@
     }
 
     function addNew() {
-        data.searchers = [...data.searchers, {type: "null", value: {}}]
+        data.searchers = [...data.searchers, emptySearcher()]
     }
 </script>
 

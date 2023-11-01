@@ -1,9 +1,10 @@
-import type {Graph, GraphNode, NodeSearcher} from "../data/graph";
+import type {Graph, GraphNode} from "../data/graph";
 import type {GraphEdit} from "../edit/graph-edit";
 import type {ExtendableValue} from "../data/base";
 import {extendSubscribable} from "../data/subscribe";
 import {createNodeIdMonitor} from "./node-id-monitor";
 import {createNodeSearchMonitor} from "./node-search-monitor";
+import type {NodeSearcher} from "../data/node-searcher";
 
 
 export function localSubscribeMonitor(p: { graph: Graph, edit: GraphEdit }): { graph: Graph, edit: GraphEdit } {
@@ -27,16 +28,15 @@ export function localSubscribeMonitor(p: { graph: Graph, edit: GraphEdit }): { g
             getNode: async function (id: string): Promise<GraphNode | null> {
                 return extendSubscribable(await graph.getNode(id), nodeIdMonitor.createHandler(id));
             },
-
             getNodes: async function (ids: string[]): Promise<ExtendableValue<Record<string, GraphNode>>> {
                 // TODO
                 return await graph.getNodes(ids);
             },
-
             searchNodes: async function (searcher: NodeSearcher): Promise<ExtendableValue<GraphNode[]>> {
                 const result = await graph.searchNodes(searcher);
                 return extendSubscribable(result, nodeSearchMonitor.createHandler(searcher, result));
-            }
+            },
+            searchRelationships: graph.searchRelationships.bind(graph),
         },
         edit: {
             addLabelToNode: decoratorNodeChange(edit.addLabelToNode.bind(edit)),

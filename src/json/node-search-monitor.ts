@@ -1,9 +1,10 @@
 import type {Callback, SubscribableHandler, SubscribeResult} from "../data/subscribe";
 import {createEmptyHandler} from "../data/subscribe";
-import type {Graph, GraphNode, NodeSearcher} from "../data/graph";
-import {checkNode} from "../data/graph";
+import type {Graph, GraphNode} from "../data/graph";
 import type {ExtendableValue} from "../data/base";
 import {randomElementId} from "../util";
+import type {NodeSearcher} from "../data/node-searcher";
+import {checkNode} from "../data/node-searcher";
 
 export interface NodeSearchMonitor {
     createHandler(searcher: NodeSearcher, result: ExtendableValue<GraphNode[]>): SubscribableHandler<ExtendableValue<GraphNode[]>>

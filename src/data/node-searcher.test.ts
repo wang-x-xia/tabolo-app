@@ -1,6 +1,7 @@
 import {expect, test} from "vitest";
 import type {GraphNode} from "./graph";
-import {checkNode} from "./graph";
+import {checkNode} from "./node-searcher";
+import {emptySearcher} from "./searcher";
 
 const node: GraphNode = {
     id: "test",
@@ -16,5 +17,5 @@ const node: GraphNode = {
 }
 
 test("Match Node with Null Matcher", () => {
-    expect(checkNode(node, {type: "null", value: {}})).toBe(true);
+    expect(checkNode(node, emptySearcher())).toBe(true);
 })

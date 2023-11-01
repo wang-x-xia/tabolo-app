@@ -1,8 +1,8 @@
 <script lang="ts">
-    import type {LabelSearcher} from "../data/graph";
     import {Button, ButtonGroup, Modal} from "flowbite-svelte";
     import LabelSelect from "../edit/LabelSelect.svelte";
     import {SearchOutline} from "flowbite-svelte-icons";
+    import type {LabelSearcher} from "../data/node-searcher";
 
     export let data: LabelSearcher
 

@@ -5,11 +5,15 @@ import type {
     GraphNodeLabelMeta,
     GraphPropertyMeta,
     GraphPropertyValue,
-    NodeSearcher
+    GraphRelationship
 } from "../data/graph";
-import {checkNode} from "../data/graph";
 import type {GraphEdit} from "../edit/graph-edit";
 import type {ExtendableValue} from "../data/base";
+import type {NodeSearcher} from "../data/node-searcher";
+import {checkNode} from "../data/node-searcher";
+import {emptySearcher} from "../data/searcher";
+import type {RelationshipSearcher} from "../data/relationship-searcher";
+import {checkRelationship} from "../data/relationship-searcher";
 
 function asPromise<T>(request: IDBRequest<T>): Promise<T> {
     return new Promise<T>((resolve, reject) => {
@@ -82,6 +86,13 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
             .objectStore("node")
             .getAll());
         return {value: nodes.filter(it => checkNode(it, searcher))};
+    }
+
+    async searchRelationships(searcher: RelationshipSearcher): Promise<ExtendableValue<GraphRelationship[]>> {
+        const relationships = await asPromise(this.db.transaction("relationship", "readonly")
+            .objectStore("relationship")
+            .getAll());
+        return {value: relationships.filter(it => checkRelationship(it, searcher))};
     }
 
     async changeNode(id: string, cdc: (node: GraphNode) => "abort" | "commit"): Promise<GraphNode> {
@@ -171,25 +182,19 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
     async getLabel(label: string): Promise<GraphNodeLabelMeta> {
         const nodes = (await this.searchNodes({
             type: "and",
-            value: {
-                searchers: [
-                    {
-                        type: "label",
-                        value: {
-                            label: "NodeProperty"
-                        }
-                    },
-                    {
-                        type: "eq",
-                        value: {
-                            key: "label",
-                            value: {
-                                value: label
-                            },
-                        }
+            searchers: [
+                {
+                    type: "label",
+                    label: "NodeProperty"
+                },
+                {
+                    type: "eq",
+                    key: "label",
+                    value: {
+                        value: label
                     }
-                ]
-            }
+                }
+            ]
         })).value;
         return {
             label,
@@ -198,7 +203,7 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
     }
 
     async getLabels(): Promise<string[]> {
-        const nodes = await this.searchNodes({type: "null", value: {}});
+        const nodes = await this.searchNodes(emptySearcher());
         const labels = new Set<string>();
         nodes.value.forEach(node => {
             node.labels.forEach(l => labels.add(l));

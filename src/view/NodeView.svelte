@@ -9,7 +9,7 @@
         TableHead,
         TableHeadCell
     } from "flowbite-svelte";
-    import type {GraphNode, NodeSearcher} from "../data/graph";
+    import type {GraphNode} from "../data/graph";
     import {getGraph} from "../data/graph";
     import {getGraphEdit} from "../edit/graph-edit";
     import NodeSearch from "../search/NodeSearch.svelte";
@@ -17,13 +17,12 @@
     import type {ExtendableValue} from "../data/base";
     import {asSvelteReadable} from "../data/subscribe-svelte";
     import NodeCell from "../cell/NodeCell.svelte";
+    import type {NodeSearcher} from "../data/node-searcher";
+    import {emptySearcher} from "../data/searcher";
 
     let graph = getGraph()
     let graphEdit = getGraphEdit()
-    let nodeSearcher: NodeSearcher = {
-        type: "null",
-        value: {}
-    }
+    let nodeSearcher: NodeSearcher = emptySearcher()
 
     let result: Readable<ExtendableValue<GraphNode[]>> | undefined
 

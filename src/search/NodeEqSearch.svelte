@@ -1,6 +1,6 @@
 <script lang="ts">
-    import type {PropertySearcher} from "../data/graph";
     import {ButtonGroup, Input, InputAddon} from "flowbite-svelte";
+    import type {PropertySearcher} from "../data/node-searcher";
 
     export let data: PropertySearcher
 

@@ -1,5 +1,7 @@
 import {defineInContext} from "../util";
 import type {Extendable, ExtendableValue} from "./base";
+import type {RelationshipSearcher} from "./relationship-searcher";
+import type {NodeSearcher} from "./node-searcher";
 
 /**
  * An abstraction of Neo4j.
@@ -13,6 +15,8 @@ export interface Graph {
     getNodes(id: string[]): Promise<ExtendableValue<Record<string, GraphNode>>>
 
     searchNodes(searcher: NodeSearcher): Promise<ExtendableValue<GraphNode[]>>
+
+    searchRelationships(searcher: RelationshipSearcher): Promise<ExtendableValue<GraphRelationship[]>>
 }
 
 export interface GraphMeta {
@@ -75,50 +79,4 @@ export interface GraphPropertyMeta {
 export interface GraphNodeLabelMeta {
     label: string,
     properties: GraphPropertyMeta[],
-}
-
-export interface NullSearcher {
-}
-
-
-export interface LabelSearcher {
-    label: string
-}
-
-export interface PropertySearcher {
-    key: string,
-    value: GraphPropertyValue,
-}
-
-export interface MatchAllSearcher {
-    searchers: NodeSearcher[]
-}
-
-export type NodeSearcher = {
-    type: "null",
-    value: NullSearcher,
-} | {
-    type: "label",
-    value: LabelSearcher,
-} | {
-    type: "eq",
-    value: PropertySearcher,
-} | {
-    type: "and",
-    value: MatchAllSearcher,
-}
-
-
-export function checkNode(node: GraphNode, searcher: NodeSearcher): boolean {
-    switch (searcher.type) {
-        case "label":
-            return node.labels.includes(searcher.value.label);
-        case "eq":
-            const key = searcher.value.key
-            return key in node.properties && node.properties[key].value == searcher.value.value.value
-        case "and":
-            return searcher.value.searchers.every(s => checkNode(node, s))
-        case "null":
-            return true;
-    }
 }
