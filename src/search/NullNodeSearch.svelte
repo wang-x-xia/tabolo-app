@@ -1,6 +1,6 @@
 <script lang="ts">
-    import type {NullSearcher} from "../data/graph";
+    import type {EmptySearcher} from "../data/searcher";
 
-    export let data: NullSearcher
+    export let data: EmptySearcher
 </script>
 
