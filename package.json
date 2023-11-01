@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json"
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "test": "vitest"
   },
   "devDependencies": {
     "@floating-ui/dom": "^1.5.1",
@@ -24,7 +25,8 @@
     "tailwindcss": "^3.3.3",
     "tslib": "^2.6.0",
     "typescript": "^5.0.2",
-    "vite": "^4.4.5"
+    "vite": "^4.4.5",
+    "vitest": "^0.34.6"
   },
   "dependencies": {
     "neo4j-driver": "^5.11.0"

@@ -1,6 +1,28 @@
 {
   "node": [
     {
+      "id": "16c27147-a0b2-4559-b0c0-d31a6c4ff996",
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "name": {
+          "value": "Node"
+        }
+      }
+    },
+    {
+      "id": "22a89691-6687-4c20-bc5f-8a580620e6fd",
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "name": {
+          "value": "Relationship"
+        }
+      }
+    },
+    {
       "id": "6547e7b8-768a-426e-a40b-33e2af93848d",
       "labels": [
         "Application"
@@ -8,6 +30,9 @@
       "properties": {
         "name": {
           "value": "Tabolo"
+        },
+        "description": {
+          "value": "Tabolo is an application to view the Graph data."
         }
       }
     },
@@ -59,6 +84,23 @@
         },
         "show": {
           "value": "1"
+        }
+      }
+    },
+    {
+      "id": "fe464ad7-cb47-4c82-87f8-fd997752851a",
+      "labels": [
+        "NodeProperty"
+      ],
+      "properties": {
+        "show": {
+          "value": "0"
+        },
+        "key": {
+          "value": "name"
+        },
+        "label": {
+          "value": "Concept"
         }
       }
     }
