@@ -57,13 +57,24 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
         this.db = db
     }
 
-    async getValue(store: string, id: string): Promise<any | null> {
-        let transaction = this.db.transaction(store, "readonly");
-        let key = await asPromise(transaction.objectStore(store).getKey(id));
+    private read(store: "node" | "relationship") {
+        return this.db.transaction(store, "readonly").objectStore(store);
+    }
+
+    private write(store: "node" | "relationship"): [IDBTransaction, IDBObjectStore] {
+        const transaction = this.db.transaction(store, "readwrite");
+        const objectStore = transaction.objectStore(store)
+        return [transaction, objectStore]
+    }
+
+
+    async getValue(store: "node" | "relationship", id: string): Promise<any | null> {
+        const objectStore = this.read(store);
+        let key = await asPromise(objectStore.getKey(id));
         if (key === undefined) {
             return null
         }
-        return await asPromise(transaction.objectStore(store).get(id))
+        return await asPromise(objectStore.get(id))
     }
 
     async getNode(id: string): Promise<GraphNode | null> {
@@ -82,25 +93,21 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
     }
 
     async searchNodes(searcher: NodeSearcher): Promise<ExtendableValue<GraphNode[]>> {
-        const nodes = await asPromise(this.db.transaction("node", "readonly")
-            .objectStore("node")
-            .getAll());
+        const nodes = await asPromise(this.read("node").getAll());
         return {value: nodes.filter(it => checkNode(it, searcher))};
     }
 
     async searchRelationships(searcher: RelationshipSearcher): Promise<ExtendableValue<GraphRelationship[]>> {
-        const relationships = await asPromise(this.db.transaction("relationship", "readonly")
-            .objectStore("relationship")
-            .getAll());
+        const relationships = await asPromise(this.read("relationship").getAll());
         return {value: relationships.filter(it => checkRelationship(it, searcher))};
     }
 
     async changeNode(id: string, cdc: (node: GraphNode) => "abort" | "commit"): Promise<GraphNode> {
-        let transaction = this.db.transaction("node", "readwrite");
-        let node = await asPromise(transaction.objectStore("node").get(id)) as GraphNode;
+        const [transaction, store] = this.write("node")
+        let node = await asPromise(store.get(id)) as GraphNode;
         try {
             if (cdc(node) == "commit") {
-                await asPromise(transaction.objectStore("node").put(node))
+                await asPromise(store.put(node))
                 transaction.commit();
             } else {
                 transaction.abort()
@@ -142,13 +149,13 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
             // generate node id until not find
             id = window.crypto.randomUUID();
         }
-        let transaction = this.db.transaction("node", "readwrite");
-        let node: GraphNode = {
+        const [transaction, store] = this.write("node")
+        const node: GraphNode = {
             id,
             labels: [],
             properties: {}
         }
-        await asPromise(transaction.objectStore("node").add(node));
+        await asPromise(store.add(node));
         transaction.commit();
         return node;
     }
@@ -164,8 +171,8 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
     }
 
     async removeNode(id: string): Promise<void> {
-        let transaction = this.db.transaction("node", "readwrite");
-        await asPromise(transaction.objectStore("node").delete(id));
+        const [transaction, store] = this.write("node")
+        await asPromise(store.delete(id));
         transaction.commit();
     }
 
@@ -212,30 +219,33 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
     }
 
     async exportAll() {
-        const nodes = await asPromise(this.db.transaction("node", "readonly").objectStore("node")
-            .getAll())
+        const nodes = await asPromise(this.read("node").getAll());
+        const relationships = await asPromise(this.read("relationship").getAll());
         return {
-            node: nodes
+            node: nodes,
+            relationship: relationships,
         }
     }
 
-    async importAll(data: { node: GraphNode[] }) {
+    async importAll(data: { node: GraphNode[], relationship: GraphRelationship[] }) {
         await this.cleanUp();
-        const tx = this.db.transaction("node", "readwrite")
-        const store = tx.objectStore("node");
-        data.node.forEach(n => {
-            store.put(n);
-        });
-        tx.commit();
+        for (const table of ["node", "relationship"] as ("node" | "relationship")[]) {
+            const [transaction, store] = this.write(table)
+            data[table].forEach((n: any) => {
+                store.put(n);
+            });
+            transaction.commit();
+        }
     }
 
     async cleanUp() {
-        const tx = this.db.transaction("node", "readwrite")
-        const store = tx.objectStore("node");
-        (await asPromise(store.getAllKeys())).forEach(key => {
-            store.delete(key)
-        })
-        tx.commit();
+        for (const table of ["node", "relationship"] as ("node" | "relationship")[]) {
+            const [transaction, store] = this.write(table);
+            (await asPromise(store.getAllKeys())).forEach(key => {
+                store.delete(key)
+            })
+            transaction.commit();
+        }
     }
 
     private createGraphPropertyMeta(node: GraphNode): GraphPropertyMeta {

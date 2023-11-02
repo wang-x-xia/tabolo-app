@@ -23,6 +23,17 @@
       }
     },
     {
+      "id": "2b636514-cead-4b41-a293-85aedd805f80",
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "name": {
+          "value": "Key"
+        }
+      }
+    },
+    {
       "id": "6547e7b8-768a-426e-a40b-33e2af93848d",
       "labels": [
         "Application"
@@ -33,6 +44,28 @@
         },
         "description": {
           "value": "Tabolo is an application to view the Graph data."
+        }
+      }
+    },
+    {
+      "id": "74fbb9b0-b211-4a47-b165-5f6dbda1cb34",
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "name": {
+          "value": "Property Value"
+        }
+      }
+    },
+    {
+      "id": "95a25ed8-d949-465a-8df7-876bf9cc5584",
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "name": {
+          "value": "Property Key"
         }
       }
     },
@@ -104,5 +137,6 @@
         }
       }
     }
-  ]
+  ],
+  "relationship": []
 }

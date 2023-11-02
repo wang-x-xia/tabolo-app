@@ -29,6 +29,10 @@
         importAllValue = "";
         importAllModal = false;
     }
+
+    async function reset() {
+        await jsonDb.importAll(await import("../assets/Tabolo.json"));
+    }
 </script>
 
 <SpeedDial defaultClass="absolute right-6 bottom-6 z-20">
@@ -38,6 +42,9 @@
         </ListgroupItem>
         <ListgroupItem on:click={() => importAllModal = true}>
             ImportAll
+        </ListgroupItem>
+        <ListgroupItem on:click={reset}>
+            ResetData
         </ListgroupItem>
     </Listgroup>
 </SpeedDial>
