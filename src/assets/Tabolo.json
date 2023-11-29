@@ -12,6 +12,17 @@
       }
     },
     {
+      "id": "21eebf99-7ea6-4f48-a144-ddafce2268a4",
+      "labels": [
+        "Label"
+      ],
+      "properties": {
+        "name": {
+          "value": "Concept"
+        }
+      }
+    },
+    {
       "id": "22a89691-6687-4c20-bc5f-8a580620e6fd",
       "labels": [
         "Concept"
@@ -19,6 +30,17 @@
       "properties": {
         "name": {
           "value": "Relationship"
+        }
+      }
+    },
+    {
+      "id": "25ee50d0-68cc-4daa-9edb-e520cf49b4b5",
+      "labels": [
+        "Label"
+      ],
+      "properties": {
+        "name": {
+          "value": "NodeProperty"
         }
       }
     },
@@ -70,36 +92,38 @@
       }
     },
     {
-      "id": "9bf34958-dbae-46fd-b855-ffddfbe08795",
+      "id": "9aac33f5-3016-42cd-af5e-e7255d0a7c0a",
       "labels": [
         "NodeProperty"
       ],
       "properties": {
+        "key": {
+          "value": "name"
+        },
         "show": {
           "value": "0"
-        },
-        "key": {
-          "value": "label"
-        },
-        "label": {
-          "value": "NodeProperty"
         }
       }
     },
     {
-      "id": "c829fb4d-27a0-4f95-823e-6409996ea97e",
+      "id": "ab09b4be-83d6-4365-a8f7-caf6e43795ef",
       "labels": [
-        "NodeProperty"
+        "Label"
       ],
       "properties": {
-        "show": {
-          "value": "true"
-        },
-        "key": {
-          "value": "name"
-        },
-        "label": {
+        "name": {
           "value": "Application"
+        }
+      }
+    },
+    {
+      "id": "b826596d-86b2-4ac6-8934-7f69b4495474",
+      "labels": [
+        "Label"
+      ],
+      "properties": {
+        "name": {
+          "value": "Label"
         }
       }
     },
@@ -109,9 +133,6 @@
         "NodeProperty"
       ],
       "properties": {
-        "label": {
-          "value": "NodeProperty"
-        },
         "key": {
           "value": "key"
         },
@@ -119,24 +140,36 @@
           "value": "1"
         }
       }
-    },
-    {
-      "id": "fe464ad7-cb47-4c82-87f8-fd997752851a",
-      "labels": [
-        "NodeProperty"
-      ],
-      "properties": {
-        "show": {
-          "value": "0"
-        },
-        "key": {
-          "value": "name"
-        },
-        "label": {
-          "value": "Concept"
-        }
-      }
     }
   ],
-  "relationship": []
+  "relationship": [
+    {
+      "id": "03ca6bb0-d31b-4c0a-a06e-15e8e3e0404d",
+      "type": "Has",
+      "startNodeId": "b826596d-86b2-4ac6-8934-7f69b4495474",
+      "endNodeId": "9aac33f5-3016-42cd-af5e-e7255d0a7c0a",
+      "properties": {}
+    },
+    {
+      "id": "4018dc04-3876-42a2-91a2-e6ef8bbc2d44",
+      "type": "Has",
+      "startNodeId": "ab09b4be-83d6-4365-a8f7-caf6e43795ef",
+      "endNodeId": "9aac33f5-3016-42cd-af5e-e7255d0a7c0a",
+      "properties": {}
+    },
+    {
+      "id": "8d5107d2-8d72-453f-849a-d5f87b09e800",
+      "type": "Has",
+      "startNodeId": "21eebf99-7ea6-4f48-a144-ddafce2268a4",
+      "endNodeId": "9aac33f5-3016-42cd-af5e-e7255d0a7c0a",
+      "properties": {}
+    },
+    {
+      "id": "ec3c9ec9-825b-475b-9555-002c311f32ce",
+      "type": "Has",
+      "startNodeId": "25ee50d0-68cc-4daa-9edb-e520cf49b4b5",
+      "endNodeId": "f7ab2cae-7288-4258-b50f-404a9044ebf2",
+      "properties": {}
+    }
+  ]
 }

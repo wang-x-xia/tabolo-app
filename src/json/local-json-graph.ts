@@ -67,7 +67,6 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
         return [transaction, objectStore]
     }
 
-
     async getValue(store: "node" | "relationship", id: string): Promise<any | null> {
         const objectStore = this.read(store);
         let key = await asPromise(objectStore.getKey(id));
@@ -142,7 +141,6 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
         })
     }
 
-
     async newEmptyNode(): Promise<GraphNode> {
         let id = window.crypto.randomUUID();
         while (await this.getNode(id) != null) {
@@ -187,25 +185,55 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
     }
 
     async getLabel(label: string): Promise<GraphNodeLabelMeta> {
-        const nodes = (await this.searchNodes({
+        let properties: GraphPropertyMeta[]
+        const labelNodes = (await this.searchNodes({
             type: "and",
             searchers: [
                 {
                     type: "label",
-                    label: "NodeProperty"
+                    label: "Label"
                 },
                 {
                     type: "eq",
-                    key: "label",
+                    key: "name",
                     value: {
                         value: label
                     }
                 }
             ]
         })).value;
+        if (labelNodes.length != 1) {
+            properties = []
+        } else {
+            function createGraphPropertyMeta(node: GraphNode): GraphPropertyMeta {
+                return {
+                    key: node.properties["key"].value,
+                    required: node.properties["required"]?.value == "true",
+                    show: node.properties["show"]?.value,
+                };
+            }
+
+            let relationships = (await this.searchRelationships({
+                type: "and",
+                searchers: [
+                    {
+                        type: "type",
+                        value: "Has"
+                    },
+                    {
+                        type: "node",
+                        nodeId: labelNodes[0].id,
+                        match: "start"
+                    }
+                ]
+            })).value;
+
+            let nodes = await Promise.all(relationships.map(r => this.getNode(r.endNodeId)))
+            properties = nodes.map(n => createGraphPropertyMeta(n))
+        }
         return {
             label,
-            properties: nodes.map(it => this.createGraphPropertyMeta(it)),
+            properties,
         }
     }
 
@@ -248,11 +276,4 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
         }
     }
 
-    private createGraphPropertyMeta(node: GraphNode): GraphPropertyMeta {
-        return {
-            key: node.properties["key"].value,
-            required: node.properties["required"]?.value == "true",
-            show: node.properties["show"]?.value,
-        };
-    }
 }

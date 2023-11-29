@@ -1,7 +1,7 @@
 import type {EmptySearcher} from "./searcher";
 import type {GraphRelationship} from "./graph";
 
-export type RelationshipSearcher = EmptySearcher | TypeSearcher | RelationshipNodeSearcher
+export type RelationshipSearcher = EmptySearcher | TypeSearcher | RelationshipNodeSearcher | MatchAllSearcher
 
 export interface TypeSearcher {
     type: "type",
@@ -12,6 +12,11 @@ export interface RelationshipNodeSearcher {
     type: "node",
     nodeId: string,
     match: "start" | "end" | "both",
+}
+
+export interface MatchAllSearcher {
+    type: "and",
+    searchers: RelationshipSearcher[],
 }
 
 export function checkRelationship(relationship: GraphRelationship, searcher: RelationshipSearcher): boolean {
@@ -28,6 +33,10 @@ export function checkRelationship(relationship: GraphRelationship, searcher: Rel
                     return relationship.endNodeId == searcher.nodeId;
                 case "both":
                     return relationship.startNodeId == searcher.nodeId || relationship.endNodeId == searcher.nodeId;
+                default:
+                    throw Error()
             }
+        case "and":
+            return searcher.searchers.every(s => checkRelationship(relationship, s))
     }
 }
