@@ -8,7 +8,7 @@
     setConfigLoader(DefaultConfigLoader)
 </script>
 
-<main class="min-h-screen">
+<main class="min-h-screen max-h-screen overflow-auto">
     <PrepareLocal>
         <NodeView/>
         <RelationshipView/>
