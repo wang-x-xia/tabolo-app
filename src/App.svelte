@@ -1,11 +1,8 @@
 <script lang="ts">
-    import {DefaultConfigLoader, setConfigLoader} from "./data/config";
     import PrepareLocal from "./json/PrepareLocal.svelte";
     import {Footer, FooterCopyright} from "flowbite-svelte";
     import NodeView from "./view/NodeView.svelte";
     import RelationshipView from "./view/RelationshipView.svelte";
-
-    setConfigLoader(DefaultConfigLoader)
 </script>
 
 <main class="min-h-screen max-h-screen overflow-auto">
