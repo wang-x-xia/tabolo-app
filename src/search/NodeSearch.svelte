@@ -1,6 +1,6 @@
 <script lang="ts">
     import NullNodeSearch from "./NullNodeSearch.svelte";
-    import NodeLabelSearch from "./NodeLabelSearch.svelte";
+    import NodeTypeSearch from "./NodeTypeSearch.svelte";
     import NodeEqSearch from "./NodeEqSearch.svelte";
     import NodeMatchAllSearch from "./NodeMatchAllSearch.svelte";
     import {Select} from "flowbite-svelte";
@@ -13,7 +13,7 @@
 
     let types = [
         {value: "empty", name: "Search All"},
-        {value: "label", name: "Match Label"},
+        {value: "type", name: "Match Type"},
         {value: "eq", name: "Match Property"},
         {value: "and", name: "All Match"},
     ];
@@ -26,8 +26,8 @@
             case "empty":
                 data = emptySearcher();
                 break
-            case "label":
-                data = {type: "label", label: undefined};
+            case "type":
+                data = {type: "type", value: undefined};
                 break
             case "eq":
                 data = {type: "eq", key: undefined, value: {value: undefined}};
@@ -42,8 +42,8 @@
 <div class="flex items-end space-x-2">
     {#if data.type === "empty"}
         <NullNodeSearch {data}/>
-    {:else if data.type === "label"}
-        <NodeLabelSearch {data}/>
+    {:else if data.type === "type"}
+        <NodeTypeSearch {data}/>
     {:else if data.type === "eq"}
         <NodeEqSearch {data}/>
     {:else if data.type === "and"}

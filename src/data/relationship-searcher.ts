@@ -1,12 +1,7 @@
-import type {EmptySearcher} from "./searcher";
+import type {EmptySearcher, TypeSearcher} from "./searcher";
 import type {GraphRelationship} from "./graph";
 
 export type RelationshipSearcher = EmptySearcher | TypeSearcher | RelationshipNodeSearcher | MatchAllSearcher
-
-export interface TypeSearcher {
-    type: "type",
-    value: string,
-}
 
 export interface RelationshipNodeSearcher {
     type: "node",

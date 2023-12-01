@@ -1,11 +1,6 @@
-import type {EmptySearcher} from "./searcher";
+import type {EmptySearcher, TypeSearcher} from "./searcher";
 import type {GraphNode, GraphPropertyValue} from "./graph";
 
-
-export interface LabelSearcher {
-    type: "label",
-    label: string
-}
 
 export interface PropertySearcher {
     type: "eq",
@@ -19,12 +14,12 @@ export interface MatchAllSearcher {
 }
 
 
-export type NodeSearcher = EmptySearcher | LabelSearcher | PropertySearcher | MatchAllSearcher
+export type NodeSearcher = EmptySearcher | TypeSearcher | PropertySearcher | MatchAllSearcher
 
 export function checkNode(node: GraphNode, searcher: NodeSearcher): boolean {
     switch (searcher.type) {
-        case "label":
-            return node.labels.includes(searcher.label);
+        case "type":
+            return node.type === searcher.value;
         case "eq":
             const key = searcher.key
             return key in node.properties && node.properties[key].value == searcher.value.value

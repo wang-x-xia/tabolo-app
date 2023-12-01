@@ -3,7 +3,7 @@
     import PropertyEdit from "./PropertyEdit.svelte";
     import {Button, ButtonGroup, Input, Label, Modal} from "flowbite-svelte";
     import {CloseSolid, PlusSolid} from "flowbite-svelte-icons";
-    import LabelSelect from "./LabelSelect.svelte";
+    import NodeTypeSelect from "./NodeTypeSelect.svelte";
     import {getGraphEdit, getGraphEditHandler} from "./graph-edit";
     import type {GraphNodeEditHandler} from "./node-edit";
 
@@ -14,17 +14,13 @@
     export let done: () => void
 
     let handler: GraphNodeEditHandler = graphEditHandler.node(data, graphEdit)
-    $:({labels, remains, propertyHandlers} = handler)
+    $:({remains, propertyHandlers} = handler)
 
-    let showAddLabel = false
+    let showSelectType = false
 
-    async function addLabel(label: string) {
-        handler = await handler.addLabel(label)
-        showAddLabel = false
-    }
-
-    async function removeLabel(label: string) {
-        handler = await handler.removeLabel(label)
+    async function setType(type: string) {
+        handler = await handler.setType(type)
+        showSelectType = false
     }
 
     async function removeNode() {
@@ -61,17 +57,10 @@
     </ButtonGroup>
 </div>
 <div>
-    <Label class="mb-2">Labels</Label>
+    <Label class="mb-2">Type</Label>
     <div class="flex space-x-2">
-        {#each labels as label}
-            <ButtonGroup class="space-x-px">
-                <Button color="primary">{label}</Button>
-                <Button color="primary" on:click={() => removeLabel(label)}>
-                    <CloseSolid size="sm"/>
-                </Button>
-            </ButtonGroup>
-        {/each}
-        <Button on:click={() => (showAddLabel = true)}>
+        <Button color="primary">{data.type}</Button>
+        <Button on:click={() => (showSelectType = true)}>
             <PlusSolid size="sm"/>
         </Button>
     </div>
@@ -94,6 +83,6 @@
     <Button color="alternative" on:click={reset}>Reset</Button>
     <Button on:click={copy}>Copy</Button>
 </div>
-<Modal bind:open={showAddLabel} title="Select Label">
-    <LabelSelect on:addLabel={e =>addLabel(e.detail)}/>
+<Modal bind:open={showSelectType} title="Select Node Type">
+    <NodeTypeSelect on:type={e =>setType(e.detail)}/>
 </Modal>

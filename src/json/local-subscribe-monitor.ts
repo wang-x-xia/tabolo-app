@@ -39,11 +39,10 @@ export function localSubscribeMonitor(p: { graph: Graph, edit: GraphEdit }): { g
             searchRelationships: graph.searchRelationships.bind(graph),
         },
         edit: {
-            addLabelToNode: decoratorNodeChange(edit.addLabelToNode.bind(edit)),
+            editNodeType: decoratorNodeChange(edit.editNodeType.bind(edit)),
             copyNode: decoratorNodeChange(edit.copyNode.bind(edit)),
             editNodeProperty: decoratorNodeChange(edit.editNodeProperty.bind(edit)),
             newEmptyNode: decoratorNodeChange(edit.newEmptyNode.bind(edit)),
-            removeLabelFromNode: decoratorNodeChange(edit.removeLabelFromNode.bind(edit)),
             removeNode: async function (id: string): Promise<void> {
                 await edit.removeNode(id);
                 nodeIdMonitor.notifyChange(id, null);

@@ -21,7 +21,6 @@ function node(node: GraphNode, edit: GraphEdit): GraphNodeEditHandler {
 
 export class GraphNodeEditHandlerImpl implements GraphNodeEditHandler {
 
-    labels: string[];
     propertyHandlers: Record<string, GraphPropertyEditHandler>;
     remains: string[];
     private data: GraphNode;
@@ -33,21 +32,8 @@ export class GraphNodeEditHandlerImpl implements GraphNodeEditHandler {
         this._reset()
     }
 
-    async addLabel(label: string): Promise<this> {
-        if (this.labels.includes(label)) {
-            return this
-        }
-        this.data = await this.edit.addLabelToNode(this.data.id, label)
-        this.labels = [...this.data.labels]
-        return this
-    }
-
-    async removeLabel(label: string): Promise<this> {
-        if (!this.labels.includes(label)) {
-            return this
-        }
-        this.data = await this.edit.removeLabelFromNode(this.data.id, label)
-        this.labels = [...this.data.labels]
+    async setType(type: string): Promise<this> {
+        this.data = await this.edit.editNodeType(this.data.id, type)
         return this
     }
 
@@ -69,7 +55,6 @@ export class GraphNodeEditHandlerImpl implements GraphNodeEditHandler {
     }
 
     _reset() {
-        this.labels = [...this.data.labels].sort();
         this.remains = Object.keys(this.data.properties).sort();
         this.propertyHandlers = Object.fromEntries(Object.entries(this.data.properties).map(([key, value]) =>
             [key, nodeProperty(this.data, key, value, this.edit)]))

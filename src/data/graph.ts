@@ -20,9 +20,9 @@ export interface Graph {
 }
 
 export interface GraphMeta {
-    getLabel(label: string): Promise<GraphNodeLabelMeta>
+    getNodeMeta(type: string): Promise<GraphNodeMeta>
 
-    getLabels(): Promise<string[]>
+    getNodeTypes(): Promise<string[]>
 }
 
 export interface Cypher extends Graph {
@@ -42,7 +42,7 @@ export interface GraphPropertyValue extends Extendable {
 
 export interface GraphNode extends Extendable {
     id: string;
-    labels: string[];
+    type: string;
     properties: Record<string, GraphPropertyValue>;
 }
 
@@ -76,7 +76,7 @@ export interface GraphPropertyMeta {
     show?: string,
 }
 
-export interface GraphNodeLabelMeta {
-    label: string,
+export interface GraphNodeMeta {
+    type: string,
     properties: GraphPropertyMeta[],
 }

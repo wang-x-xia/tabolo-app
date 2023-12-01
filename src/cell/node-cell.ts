@@ -3,10 +3,10 @@ import {readable} from "svelte/store";
 import {getGraphMeta} from "../data/graph";
 import type {Extendable} from "../data/base";
 
-export type NodeCellConfig = ShowLabel | ShowProperties
+export type NodeCellConfig = ShowType | ShowProperties
 
-export interface ShowLabel extends Extendable {
-    type: "ShowLabel"
+export interface ShowType extends Extendable {
+    type: "ShowType"
 }
 
 export interface ShowProperties extends Extendable {
@@ -14,12 +14,12 @@ export interface ShowProperties extends Extendable {
     keys: string[]
 }
 
-export function nodeCellConfig(label: string): Readable<NodeCellConfig> {
+export function nodeCellConfig(type: string): Readable<NodeCellConfig> {
     let graphMeta = getGraphMeta();
-    let defaultValue: ShowLabel = {type: "ShowLabel", provider: "default"}
+    let defaultValue: ShowType = {type: "ShowType", provider: "default"}
     return readable<NodeCellConfig>(defaultValue, (set) => {
             async function _() {
-                const meta = await graphMeta.getLabel(label)
+                const meta = await graphMeta.getNodeMeta(type)
                 const showPropertied = meta.properties.filter(v => v.show);
                 if (showPropertied.length > 0) {
                     set({

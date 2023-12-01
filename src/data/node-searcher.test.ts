@@ -5,7 +5,7 @@ import {emptySearcher} from "./searcher";
 
 const node: GraphNode = {
     id: "test",
-    labels: ["test1", "test2"],
+    type: "type",
     properties: {
         key1: {
             value: "1"

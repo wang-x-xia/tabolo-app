@@ -7,3 +7,16 @@ export function emptySearcher(): EmptySearcher {
         type: "empty",
     }
 }
+
+
+export interface TypeSearcher {
+    type: "type",
+    value: string,
+}
+
+export function typeSearcher(type: string): TypeSearcher {
+    return {
+        type: "type",
+        value: type,
+    }
+}

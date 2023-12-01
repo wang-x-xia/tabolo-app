@@ -9,9 +9,7 @@ export interface GraphEdit {
 
     removeNodeProperty(id: string, key: string): Promise<GraphNode>
 
-    addLabelToNode(id: string, label: string): Promise<GraphNode>;
-
-    removeLabelFromNode(id: string, label: string): Promise<GraphNode>;
+    editNodeType(id: string, type: string): Promise<GraphNode>;
 
     newEmptyNode(): Promise<GraphNode>;
 

@@ -2,7 +2,7 @@ import type {
     Graph,
     GraphMeta,
     GraphNode,
-    GraphNodeLabelMeta,
+    GraphNodeMeta,
     GraphPropertyMeta,
     GraphPropertyValue,
     GraphRelationship
@@ -11,7 +11,7 @@ import type {GraphEdit} from "../edit/graph-edit";
 import type {ExtendableValue} from "../data/base";
 import type {NodeSearcher} from "../data/node-searcher";
 import {checkNode} from "../data/node-searcher";
-import {emptySearcher} from "../data/searcher";
+import {typeSearcher} from "../data/searcher";
 import type {RelationshipSearcher} from "../data/relationship-searcher";
 import {checkRelationship} from "../data/relationship-searcher";
 
@@ -38,7 +38,7 @@ export async function createJsonKv(name: string) {
 function createNodeStore(db: IDBDatabase) {
     if (!db.objectStoreNames.contains("node")) {
         db.createObjectStore("node", {keyPath: "id"})
-            .createIndex("labels", "labels", {multiEntry: true, unique: false})
+            .createIndex("type", "type", {multiEntry: true, unique: false})
     }
 }
 
@@ -55,16 +55,6 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
 
     constructor(db: IDBDatabase) {
         this.db = db
-    }
-
-    private read(store: "node" | "relationship") {
-        return this.db.transaction(store, "readonly").objectStore(store);
-    }
-
-    private write(store: "node" | "relationship"): [IDBTransaction, IDBObjectStore] {
-        const transaction = this.db.transaction(store, "readwrite");
-        const objectStore = transaction.objectStore(store)
-        return [transaction, objectStore]
     }
 
     async getValue(store: "node" | "relationship", id: string): Promise<any | null> {
@@ -117,12 +107,12 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
         return node;
     }
 
-    async addLabelToNode(id: string, label: string): Promise<GraphNode> {
+    async editNodeType(id: string, type: string): Promise<GraphNode> {
         return await this.changeNode(id, node => {
-            if (node.labels.includes(label)) {
+            if (node.type === type) {
                 return "abort";
             }
-            node.labels = [label, ...node.labels];
+            node.type = type;
             return "commit";
         })
     }
@@ -150,22 +140,12 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
         const [transaction, store] = this.write("node")
         const node: GraphNode = {
             id,
-            labels: [],
+            type: "New",
             properties: {}
         }
         await asPromise(store.add(node));
         transaction.commit();
         return node;
-    }
-
-    async removeLabelFromNode(id: string, label: string): Promise<GraphNode> {
-        return await this.changeNode(id, node => {
-            if (!node.labels.includes(label)) {
-                return "abort";
-            }
-            node.labels = node.labels.filter(it => it != label);
-            return "commit";
-        })
     }
 
     async removeNode(id: string): Promise<void> {
@@ -177,32 +157,32 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
     async copyNode(id: string): Promise<GraphNode> {
         const oldNode = await this.getNode(id);
         const newNode = await this.newEmptyNode();
-        oldNode.labels.forEach(l => this.addLabelToNode(newNode.id, l));
-        Object.entries(oldNode.properties).forEach(([key, value]) => {
-            this.editNodeProperty(newNode.id, key, value);
-        });
+        await this.editNodeType(newNode.id, oldNode.type);
+        for (const [key, value] of Object.entries(oldNode.properties)) {
+            await this.editNodeProperty(newNode.id, key, value);
+        }
         return await this.getNode(newNode.id);
     }
 
-    async getLabel(label: string): Promise<GraphNodeLabelMeta> {
+    async getNodeMeta(type: string): Promise<GraphNodeMeta> {
         let properties: GraphPropertyMeta[]
-        const labelNodes = (await this.searchNodes({
+        const typeNodes = (await this.searchNodes({
             type: "and",
             searchers: [
                 {
-                    type: "label",
-                    label: "Label"
+                    type: "type",
+                    value: "NodeType"
                 },
                 {
                     type: "eq",
                     key: "name",
                     value: {
-                        value: label
+                        value: type
                     }
                 }
             ]
         })).value;
-        if (labelNodes.length != 1) {
+        if (typeNodes.length != 1) {
             properties = []
         } else {
             function createGraphPropertyMeta(node: GraphNode): GraphPropertyMeta {
@@ -222,7 +202,7 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
                     },
                     {
                         type: "node",
-                        nodeId: labelNodes[0].id,
+                        nodeId: typeNodes[0].id,
                         match: "start"
                     }
                 ]
@@ -232,18 +212,18 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
             properties = nodes.map(n => createGraphPropertyMeta(n))
         }
         return {
-            label,
+            type: type,
             properties,
         }
     }
 
-    async getLabels(): Promise<string[]> {
-        const nodes = await this.searchNodes(emptySearcher());
-        const labels = new Set<string>();
+    async getNodeTypes(): Promise<string[]> {
+        const nodes = await this.searchNodes(typeSearcher("NodeType"));
+        const types = new Set<string>();
         nodes.value.forEach(node => {
-            node.labels.forEach(l => labels.add(l));
+            types.add(node.properties["name"].value);
         });
-        return Array.from(labels).sort();
+        return Array.from(types).sort();
     }
 
     async exportAll() {
@@ -274,6 +254,16 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
             })
             transaction.commit();
         }
+    }
+
+    private read(store: "node" | "relationship") {
+        return this.db.transaction(store, "readonly").objectStore(store);
+    }
+
+    private write(store: "node" | "relationship"): [IDBTransaction, IDBObjectStore] {
+        const transaction = this.db.transaction(store, "readwrite");
+        const objectStore = transaction.objectStore(store)
+        return [transaction, objectStore]
     }
 
 }

@@ -6,23 +6,23 @@
     import {createEventDispatcher} from "svelte";
 
 
-    const dispatch = createEventDispatcher<{ "addLabel": string }>();
+    const dispatch = createEventDispatcher<{ "type": string }>();
     const graphMeta = getGraphMeta()
 
-    const labels: Readable<string[]> = asyncReadable([], () => graphMeta.getLabels())
+    const types: Readable<string[]> = asyncReadable([], () => graphMeta.getNodeTypes())
 
     let search = ""
 
-    $: filteredLabels = $labels.filter(it => it.includes(search))
+    $: filteredTypes = $types.filter(it => it.includes(search))
 
-    function selectLabel(label: string) {
-        dispatch("addLabel", label)
+    function selectType(type: string) {
+        dispatch("type", type)
     }
 </script>
 
 <Search bind:value={search}></Search>
 <div class="flex flex-wrap space-x-2">
-    {#each filteredLabels as label}
-        <Button on:click={() => selectLabel(label)} size="sm">{label}</Button>
+    {#each filteredTypes as type}
+        <Button on:click={() => selectType(type)} size="sm">{type}</Button>
     {/each}
 </div>
