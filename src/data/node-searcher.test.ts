@@ -7,15 +7,15 @@ const node: GraphNode = {
     id: "test",
     type: "type",
     properties: {
-        key1: {
-            value: "1"
-        },
-        key2: {
-            value: "2"
-        }
+        key1: "1",
+        key2: "2"
     }
 }
 
 test("Match Node with Null Matcher", () => {
     expect(checkNode(node, emptySearcher())).toBe(true);
+})
+
+test("Match Node with Eq Matcher", () => {
+    expect(checkNode(node, {type: "eq", jsonPath: "$.key1", value: "1"})).toBe(true);
 })

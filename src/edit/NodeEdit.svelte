@@ -1,25 +1,27 @@
 <script lang="ts">
     import type {GraphNode} from "../data/graph";
-    import PropertyEdit from "./PropertyEdit.svelte";
-    import {Button, ButtonGroup, Input, Label, Modal} from "flowbite-svelte";
+    import {Button, ButtonGroup, Input, Label, Modal, Textarea} from "flowbite-svelte";
     import {CloseSolid, PlusSolid} from "flowbite-svelte-icons";
     import NodeTypeSelect from "./NodeTypeSelect.svelte";
-    import {getGraphEdit, getGraphEditHandler} from "./graph-edit";
-    import type {GraphNodeEditHandler} from "./node-edit";
+    import {getGraphEdit} from "./graph-edit";
 
     const graphEdit = getGraphEdit()
-    const graphEditHandler = getGraphEditHandler()
 
     export let data: GraphNode
     export let done: () => void
 
-    let handler: GraphNodeEditHandler = graphEditHandler.node(data, graphEdit)
-    $:({remains, propertyHandlers} = handler)
+    let property: string
+
+    async function reset() {
+        property = JSON.stringify(data.properties)
+    }
+
+    reset()
 
     let showSelectType = false
 
     async function setType(type: string) {
-        handler = await handler.setType(type)
+        data = await graphEdit.editNodeType(data.id, type)
         showSelectType = false
     }
 
@@ -28,22 +30,12 @@
         done()
     }
 
-    async function reset() {
-        handler = await handler.reset(data)
-    }
-
     async function copy() {
         await graphEdit.copyNode(data.id);
     }
 
-    let newKey = ""
-
-    async function addProperty() {
-        if (newKey == "") {
-            return
-        }
-        handler = await handler.addProperty(newKey)
-        newKey = ""
+    async function save() {
+        data = await graphEdit.editNodeProperty(data.id, JSON.parse(property))
     }
 </script>
 
@@ -65,21 +57,14 @@
         </Button>
     </div>
 </div>
-<div class="space-y-6">
-    <div>
-        <Label class="mb-2">New Key</Label>
-        <ButtonGroup class="w-full">
-            <Input bind:value={newKey}/>
-            <Button color="primary" on:click={addProperty}>
-                <PlusSolid size="sm"/>
-            </Button>
-        </ButtonGroup>
-    </div>
-    {#each remains as key}
-        <PropertyEdit data={propertyHandlers[key]}/>
-    {/each}
+<div>
+    <Label class="mb-2">Property</Label>
+    <ButtonGroup class="w-full">
+        <Textarea bind:value={property}/>
+    </ButtonGroup>
 </div>
 <div class="space-x-4">
+    <Button color="primary" on:click={save}>Save</Button>
     <Button color="alternative" on:click={reset}>Reset</Button>
     <Button on:click={copy}>Copy</Button>
 </div>

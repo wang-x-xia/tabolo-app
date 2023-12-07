@@ -1,11 +1,12 @@
 import type {EmptySearcher, TypeSearcher} from "./searcher";
-import type {GraphNode, GraphPropertyValue} from "./graph";
+import type {GraphNode} from "./graph";
+import {JSONPath} from "jsonpath-plus";
 
 
 export interface PropertySearcher {
     type: "eq",
-    key: string,
-    value: GraphPropertyValue,
+    jsonPath: string,
+    value: any,
 }
 
 export interface MatchAllSearcher {
@@ -21,8 +22,13 @@ export function checkNode(node: GraphNode, searcher: NodeSearcher): boolean {
         case "type":
             return node.type === searcher.value;
         case "eq":
-            const key = searcher.key
-            return key in node.properties && node.properties[key].value == searcher.value.value
+            const path = searcher.jsonPath
+            const value = JSON.stringify(JSONPath({
+                path,
+                json: node.properties,
+                wrap: false
+            }))
+            return value === JSON.stringify(searcher.value)
         case "and":
             return searcher.searchers.every(s => checkNode(node, s))
         case "empty":

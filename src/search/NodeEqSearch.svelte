@@ -7,7 +7,7 @@
 </script>
 
 <ButtonGroup size="sm">
-    <Input bind:value={data.key} placeholder="key"/>
+    <Input bind:value={data.jsonPath} placeholder="JsonPath"/>
     <InputAddon>=</InputAddon>
-    <Input bind:value={data.value.value} placeholder="value"/>
+    <Input bind:value={data.value} placeholder="value"/>
 </ButtonGroup>

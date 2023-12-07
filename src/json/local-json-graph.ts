@@ -1,12 +1,4 @@
-import type {
-    Graph,
-    GraphMeta,
-    GraphNode,
-    GraphNodeMeta,
-    GraphPropertyMeta,
-    GraphPropertyValue,
-    GraphRelationship
-} from "../data/graph";
+import type {Graph, GraphMeta, GraphNode, GraphNodeMeta, GraphRelationship} from "../data/graph";
 import type {GraphEdit} from "../edit/graph-edit";
 import type {ExtendableValue} from "../data/base";
 import type {NodeSearcher} from "../data/node-searcher";
@@ -117,16 +109,9 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
         })
     }
 
-    async editNodeProperty(id: string, key: string, value: GraphPropertyValue): Promise<GraphNode> {
+    async editNodeProperty(id: string, properties: any): Promise<GraphNode> {
         return await this.changeNode(id, node => {
-            node.properties[key] = {value: value.value}
-            return "commit";
-        })
-    }
-
-    async removeNodeProperty(id: string, key: string): Promise<GraphNode> {
-        return await this.changeNode(id, node => {
-            delete node.properties[key]
+            node.properties = properties
             return "commit";
         })
     }
@@ -158,70 +143,37 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
         const oldNode = await this.getNode(id);
         const newNode = await this.newEmptyNode();
         await this.editNodeType(newNode.id, oldNode.type);
-        for (const [key, value] of Object.entries(oldNode.properties)) {
-            await this.editNodeProperty(newNode.id, key, value);
-        }
+        await this.editNodeProperty(newNode.id, oldNode.properties);
         return await this.getNode(newNode.id);
     }
 
     async getNodeMeta(type: string): Promise<GraphNodeMeta> {
-        let properties: GraphPropertyMeta[]
         const typeNodes = (await this.searchNodes({
             type: "and",
             searchers: [
-                {
-                    type: "type",
-                    value: "NodeType"
-                },
+                typeSearcher("NodeType"),
                 {
                     type: "eq",
-                    key: "name",
-                    value: {
-                        value: type
-                    }
+                    jsonPath: "$.name",
+                    value: type
                 }
             ]
         })).value;
+        let meta: GraphNodeMeta = {name: type}
         if (typeNodes.length != 1) {
-            properties = []
-        } else {
-            function createGraphPropertyMeta(node: GraphNode): GraphPropertyMeta {
-                return {
-                    key: node.properties["key"].value,
-                    required: node.properties["required"]?.value == "true",
-                    show: node.properties["show"]?.value,
-                };
-            }
-
-            let relationships = (await this.searchRelationships({
-                type: "and",
-                searchers: [
-                    {
-                        type: "type",
-                        value: "Has"
-                    },
-                    {
-                        type: "node",
-                        nodeId: typeNodes[0].id,
-                        match: "start"
-                    }
-                ]
-            })).value;
-
-            let nodes = await Promise.all(relationships.map(r => this.getNode(r.endNodeId)))
-            properties = nodes.map(n => createGraphPropertyMeta(n))
+            console.log("Multiple node with type", typeNodes, type)
+            throw Error("Multiple nodes")
+        } else if (typeNodes.length == 1) {
+            meta = typeNodes[0].properties
         }
-        return {
-            type: type,
-            properties,
-        }
+        return meta
     }
 
     async getNodeTypes(): Promise<string[]> {
         const nodes = await this.searchNodes(typeSearcher("NodeType"));
         const types = new Set<string>();
         nodes.value.forEach(node => {
-            types.add(node.properties["name"].value);
+            types.add(node.properties["name"]);
         });
         return Array.from(types).sort();
     }

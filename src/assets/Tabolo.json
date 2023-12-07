@@ -4,148 +4,55 @@
       "id": "16c27147-a0b2-4559-b0c0-d31a6c4ff996",
       "type": "Concept",
       "properties": {
-        "name": {
-          "value": "Node"
-        }
+        "name": "Node"
       }
     },
     {
       "id": "21eebf99-7ea6-4f48-a144-ddafce2268a4",
       "type": "NodeType",
       "properties": {
-        "name": {
-          "value": "Concept"
-        }
+        "name": "Concept",
+        "showJsonPath": "$.name"
       }
     },
     {
       "id": "22a89691-6687-4c20-bc5f-8a580620e6fd",
       "type": "Concept",
       "properties": {
-        "name": {
-          "value": "Relationship"
-        }
-      }
-    },
-    {
-      "id": "25ee50d0-68cc-4daa-9edb-e520cf49b4b5",
-      "type": "NodeType",
-      "properties": {
-        "name": {
-          "value": "NodeProperty"
-        }
+        "name": "Relationship"
       }
     },
     {
       "id": "2b636514-cead-4b41-a293-85aedd805f80",
       "type": "Concept",
       "properties": {
-        "name": {
-          "value": "Key"
-        }
+        "name": "Key"
       }
     },
     {
       "id": "6547e7b8-768a-426e-a40b-33e2af93848d",
       "type": "Application",
       "properties": {
-        "name": {
-          "value": "Tabolo"
-        },
-        "description": {
-          "value": "Tabolo is an application to view the Graph data."
-        }
-      }
-    },
-    {
-      "id": "74fbb9b0-b211-4a47-b165-5f6dbda1cb34",
-      "type": "Concept",
-      "properties": {
-        "name": {
-          "value": "Property Value"
-        }
-      }
-    },
-    {
-      "id": "95a25ed8-d949-465a-8df7-876bf9cc5584",
-      "type": "Concept",
-      "properties": {
-        "name": {
-          "value": "Property Key"
-        }
-      }
-    },
-    {
-      "id": "9aac33f5-3016-42cd-af5e-e7255d0a7c0a",
-      "type": "NodeProperty",
-      "properties": {
-        "key": {
-          "value": "name"
-        },
-        "show": {
-          "value": "0"
-        }
+        "name": "Tabolo",
+        "description": "Tabolo is an application to view the Graph data."
       }
     },
     {
       "id": "ab09b4be-83d6-4365-a8f7-caf6e43795ef",
       "type": "NodeType",
       "properties": {
-        "name": {
-          "value": "Application"
-        }
+        "name": "Application",
+        "showJsonPath": "$.name"
       }
     },
     {
       "id": "b826596d-86b2-4ac6-8934-7f69b4495474",
       "type": "NodeType",
       "properties": {
-        "name": {
-          "value": "NodeType"
-        }
-      }
-    },
-    {
-      "id": "f7ab2cae-7288-4258-b50f-404a9044ebf2",
-      "type": "NodeProperty",
-      "properties": {
-        "key": {
-          "value": "key"
-        },
-        "show": {
-          "value": "1"
-        }
+        "name": "NodeType",
+        "showJsonPath": "$.name"
       }
     }
   ],
-  "relationship": [
-    {
-      "id": "03ca6bb0-d31b-4c0a-a06e-15e8e3e0404d",
-      "type": "Has",
-      "startNodeId": "b826596d-86b2-4ac6-8934-7f69b4495474",
-      "endNodeId": "9aac33f5-3016-42cd-af5e-e7255d0a7c0a",
-      "properties": {}
-    },
-    {
-      "id": "4018dc04-3876-42a2-91a2-e6ef8bbc2d44",
-      "type": "Has",
-      "startNodeId": "ab09b4be-83d6-4365-a8f7-caf6e43795ef",
-      "endNodeId": "9aac33f5-3016-42cd-af5e-e7255d0a7c0a",
-      "properties": {}
-    },
-    {
-      "id": "8d5107d2-8d72-453f-849a-d5f87b09e800",
-      "type": "Has",
-      "startNodeId": "21eebf99-7ea6-4f48-a144-ddafce2268a4",
-      "endNodeId": "9aac33f5-3016-42cd-af5e-e7255d0a7c0a",
-      "properties": {}
-    },
-    {
-      "id": "ec3c9ec9-825b-475b-9555-002c311f32ce",
-      "type": "Has",
-      "startNodeId": "25ee50d0-68cc-4daa-9edb-e520cf49b4b5",
-      "endNodeId": "f7ab2cae-7288-4258-b50f-404a9044ebf2",
-      "properties": {}
-    }
-  ]
+  "relationship": []
 }

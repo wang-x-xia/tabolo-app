@@ -1,10 +1,9 @@
 <script lang="ts">
     import {setGraph, setGraphMeta} from "../data/graph";
-    import {setGraphEdit, setGraphEditHandler} from "../edit/graph-edit";
+    import {setGraphEdit} from "../edit/graph-edit";
     import {LocalJsonGraph} from "./local-json-graph";
     import {Button, Label, Listgroup, ListgroupItem, Modal, SpeedDial, Textarea} from "flowbite-svelte";
     import {localSubscribeMonitor} from "./local-subscribe-monitor";
-    import {createEditHandler} from "./local-edit-handler";
 
     export let jsonDb: LocalJsonGraph;
 
@@ -13,7 +12,6 @@
     setGraph(graph)
     setGraphMeta(jsonDb)
     setGraphEdit(edit)
-    setGraphEditHandler(createEditHandler())
 
     async function exportAll() {
         const result = await jsonDb.exportAll();

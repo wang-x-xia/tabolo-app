@@ -25,31 +25,19 @@ export interface GraphMeta {
     getNodeTypes(): Promise<string[]>
 }
 
-export interface Cypher extends Graph {
-    query(query: string, parameters?: Record<string, any>): Promise<CypherQueryResult>;
-}
-
 export const [getGraph, setGraph] = defineInContext<Graph>("Graph")
 export const [getGraphMeta, setGraphMeta] = defineInContext<GraphMeta>("GraphMeta")
-export const [getCypher, setCypher] = defineInContext<Cypher>("Cypher")
-
-/**
- * Build root class for graph value
- */
-export interface GraphPropertyValue extends Extendable {
-    value: string
-}
 
 export interface GraphNode extends Extendable {
     id: string;
     type: string;
-    properties: Record<string, GraphPropertyValue>;
+    properties: any;
 }
 
 export interface GraphRelationship extends Extendable {
     id: string;
     type: string;
-    properties: Record<string, GraphPropertyValue>;
+    properties: any;
     startNodeId: string;
     endNodeId: string;
 }
@@ -60,9 +48,6 @@ export type GraphValue = {
 } | {
     type: "relationship",
     value: GraphRelationship,
-} | {
-    type: "property",
-    value: GraphPropertyValue,
 }
 
 export interface CypherQueryResult {
@@ -70,13 +55,8 @@ export interface CypherQueryResult {
     records: Record<string, GraphValue>[];
 }
 
-export interface GraphPropertyMeta {
-    key: string,
-    required: boolean,
-    show?: string,
-}
 
 export interface GraphNodeMeta {
-    type: string,
-    properties: GraphPropertyMeta[],
+    name: string,
+    showJsonPath?: string | null,
 }

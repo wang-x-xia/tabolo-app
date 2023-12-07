@@ -3,15 +3,15 @@ import {readable} from "svelte/store";
 import {getGraphMeta} from "../data/graph";
 import type {Extendable} from "../data/base";
 
-export type NodeCellConfig = ShowType | ShowProperties
+export type NodeCellConfig = ShowType | ShowJsonPath
 
 export interface ShowType extends Extendable {
     type: "ShowType"
 }
 
-export interface ShowProperties extends Extendable {
-    type: "ShowProperties"
-    keys: string[]
+export interface ShowJsonPath extends Extendable {
+    type: "ShowJsonPath"
+    jsonPath: string
 }
 
 export function nodeCellConfig(type: string): Readable<NodeCellConfig> {
@@ -20,13 +20,11 @@ export function nodeCellConfig(type: string): Readable<NodeCellConfig> {
     return readable<NodeCellConfig>(defaultValue, (set) => {
             async function _() {
                 const meta = await graphMeta.getNodeMeta(type)
-                const showPropertied = meta.properties.filter(v => v.show);
-                if (showPropertied.length > 0) {
+                if (meta.showJsonPath) {
                     set({
-                        provider: "Show Property",
-                        type: "ShowProperties",
-                        keys: showPropertied.sort((a, b) => a.show.localeCompare(b.show))
-                            .map(it => it.key)
+                        provider: "Node Meta",
+                        type: "ShowJsonPath",
+                        jsonPath: meta.showJsonPath
                     })
                 }
             }

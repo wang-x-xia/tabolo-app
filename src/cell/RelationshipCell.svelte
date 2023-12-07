@@ -1,15 +1,5 @@
 <script lang="ts">
-    import {
-        Button,
-        Popover,
-        Table,
-        TableBody,
-        TableBodyCell,
-        TableBodyRow,
-        TableHead,
-        TableHeadCell
-    } from "flowbite-svelte";
-    import PropertyValueCell from "./PropertyValueCell.svelte";
+    import {Button, Popover} from "flowbite-svelte";
     import {idSelector, randomElementId} from "../util";
     import type {GraphRelationship} from "../data/graph";
 
@@ -20,20 +10,5 @@
 
 <Button {id}>{data.type}</Button>
 <Popover title="Properties" triggeredBy={idSelector(id)}>
-    <Table>
-        <TableHead>
-            <TableHeadCell>Key</TableHeadCell>
-            <TableHeadCell>Value</TableHeadCell>
-        </TableHead>
-        <TableBody>
-            {#each Object.entries(data.properties) as [key, value] }
-                <TableBodyRow>
-                    <TableBodyCell>{key}</TableBodyCell>
-                    <TableBodyCell>
-                        <PropertyValueCell data={value}></PropertyValueCell>
-                    </TableBodyCell>
-                </TableBodyRow>
-            {/each}
-        </TableBody>
-    </Table>
+    {JSON.stringify(data.properties, null, 2)}
 </Popover>

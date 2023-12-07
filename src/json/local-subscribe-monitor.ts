@@ -48,7 +48,6 @@ export function localSubscribeMonitor(p: { graph: Graph, edit: GraphEdit }): { g
                 nodeIdMonitor.notifyChange(id, null);
                 nodeSearchMonitor.notifyNodeChange(id, null);
             },
-            removeNodeProperty: decoratorNodeChange(edit.removeNodeProperty.bind(edit)),
         },
     }
 }

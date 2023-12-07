@@ -1,6 +1,5 @@
 <script lang="ts">
     import NodeCell from "./NodeCell.svelte";
-    import PropertyValueCell from "./PropertyValueCell.svelte";
     import RelationshipCell from "./RelationshipCell.svelte";
     import type {GraphValue} from "../data/graph";
 
@@ -11,6 +10,4 @@
     <NodeCell data={data.value}/>
 {:else if (data.type === "relationship")}
     <RelationshipCell data={data.value}/>
-{:else }
-    <PropertyValueCell data={data.value}/>
 {/if}
