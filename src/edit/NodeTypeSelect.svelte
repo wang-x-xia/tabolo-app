@@ -24,17 +24,11 @@
         dispatch("type", newType)
         edit = false;
     }
-
-    let open = true
-
-    function mustOpen() {
-        open = true
-    }
 </script>
 
 {#if (edit)}
     <Search bind:value={search}></Search>
-    <Listgroup on:show={mustOpen} class="absolute overflow-y-auto max-h-48">
+    <Listgroup class="absolute overflow-y-auto max-h-48">
         {#each filteredTypes as type}
             <ListgroupItem>
                 <button on:click={() => selectType(type)}>
