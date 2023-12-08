@@ -1,7 +1,7 @@
 <script lang="ts">
     import type {GraphNode} from "../data/graph";
-    import {Button, ButtonGroup, Input, Label, Modal, Textarea} from "flowbite-svelte";
-    import {CloseSolid, PlusSolid} from "flowbite-svelte-icons";
+    import {Button, ButtonGroup, Input, Label, Textarea} from "flowbite-svelte";
+    import {CloseSolid} from "flowbite-svelte-icons";
     import NodeTypeSelect from "./NodeTypeSelect.svelte";
     import {getGraphEdit} from "./graph-edit";
 
@@ -18,11 +18,8 @@
 
     reset()
 
-    let showSelectType = false
-
     async function setType(type: string) {
         data = await graphEdit.editNodeType(data.id, type)
-        showSelectType = false
     }
 
     async function removeNode() {
@@ -50,12 +47,7 @@
 </div>
 <div>
     <Label class="mb-2">Type</Label>
-    <div class="flex space-x-2">
-        <Button color="primary">{data.type}</Button>
-        <Button on:click={() => (showSelectType = true)}>
-            <PlusSolid size="sm"/>
-        </Button>
-    </div>
+    <NodeTypeSelect type={data.type} on:type={e =>setType(e.detail)}/>
 </div>
 <div>
     <Label class="mb-2">Property</Label>
@@ -68,6 +60,3 @@
     <Button color="alternative" on:click={reset}>Reset</Button>
     <Button on:click={copy}>Copy</Button>
 </div>
-<Modal bind:open={showSelectType} title="Select Node Type">
-    <NodeTypeSelect on:type={e =>setType(e.detail)}/>
-</Modal>

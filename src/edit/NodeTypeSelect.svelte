@@ -1,9 +1,10 @@
 <script lang="ts">
-    import {Button, Search} from "flowbite-svelte";
+    import {Button, ButtonGroup, Listgroup, ListgroupItem, Search} from "flowbite-svelte";
     import {getGraphMeta} from "../data/graph";
     import {asyncReadable} from "../util";
     import type {Readable} from "svelte/store";
     import {createEventDispatcher} from "svelte";
+    import {EditOutline} from "flowbite-svelte-icons";
 
 
     const dispatch = createEventDispatcher<{ "type": string }>();
@@ -11,18 +12,42 @@
 
     const types: Readable<string[]> = asyncReadable([], () => graphMeta.getNodeTypes())
 
-    let search = ""
+    export let type: string;
+
+    let search = type
+    let edit = false
 
     $: filteredTypes = $types.filter(it => it.includes(search))
 
-    function selectType(type: string) {
-        dispatch("type", type)
+    function selectType(newType: string) {
+        type = newType;
+        dispatch("type", newType)
+        edit = false;
+    }
+
+    let open = true
+
+    function mustOpen() {
+        open = true
     }
 </script>
 
-<Search bind:value={search}></Search>
-<div class="flex flex-wrap space-x-2">
-    {#each filteredTypes as type}
-        <Button on:click={() => selectType(type)} size="sm">{type}</Button>
-    {/each}
-</div>
+{#if (edit)}
+    <Search bind:value={search}></Search>
+    <Listgroup on:show={mustOpen} class="absolute overflow-y-auto max-h-48">
+        {#each filteredTypes as type}
+            <ListgroupItem>
+                <button on:click={() => selectType(type)}>
+                    {type}
+                </button>
+            </ListgroupItem>
+        {/each}
+    </Listgroup>
+{:else }
+    <ButtonGroup>
+        <Button>{type}</Button>
+        <Button on:click={()=>{edit = true}}>
+            <EditOutline/>
+        </Button>
+    </ButtonGroup>
+{/if}
