@@ -4,12 +4,17 @@ import type {GraphEdit} from "../edit/graph-edit";
 import type {NodeSearcher} from "./node-searcher";
 import {emptySearcher, typeSearcher} from "./searcher";
 
-export type ViewData = NodeViewData
+export type ViewData = NodeViewData | NodeEditViewData
 
 
 export interface NodeViewData {
     type: "NodeView",
     searcher: NodeSearcher,
+}
+
+export interface NodeEditViewData {
+    type: "NodeEditView",
+    nodeId: string,
 }
 
 export interface TaboloUI {

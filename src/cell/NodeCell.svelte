@@ -1,19 +1,22 @@
 <script lang="ts">
     import type {GraphNode} from "../data/graph.js";
-    import {Button, ButtonGroup, Modal, Popover} from "flowbite-svelte";
-    import NodeEdit from "../edit/NodeEdit.svelte";
+    import {Button, ButtonGroup, Popover} from "flowbite-svelte";
     import PropertyValueCell from "./PropertyValueCell.svelte";
     import {idSelector, randomElementId} from "../util";
     import {nodeCellConfig} from "./node-cell";
     import {JSONPath} from "jsonpath-plus";
     import {DotsHorizontalOutline} from "flowbite-svelte-icons";
+    import {getTaboloUI} from "../data/ui";
 
     export let data: GraphNode
 
-    let editModal = false
+    let taboloUI = getTaboloUI()
 
-    function done() {
-        editModal = false
+    function editNode() {
+        taboloUI.updateView({
+            type: "NodeEditView",
+            nodeId: data.id,
+        })
     }
 
     const id = randomElementId("node-cell")
@@ -33,14 +36,10 @@
             </Button>
         {/if}
     {/if}
-    <Button on:click={() => (editModal = true)}>
+    <Button on:click={editNode}>
         <DotsHorizontalOutline/>
     </Button>
 </ButtonGroup>
 <Popover title={`${data.type} Properties`} triggeredBy={idSelector(id)}>
     {JSON.stringify(data.properties, null, 2)}
 </Popover>
-
-<Modal bind:open={editModal} title="Edit Node">
-    <NodeEdit {data} {done}/>
-</Modal>

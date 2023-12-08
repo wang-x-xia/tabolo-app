@@ -1,0 +1,19 @@
+<script lang="ts">
+
+    import NodeEdit from "../edit/NodeEdit.svelte";
+    import {getGraph} from "../data/graph";
+    import type {NodeEditViewData} from "../data/ui";
+
+    let graph = getGraph()
+
+    export let data: NodeEditViewData
+
+    let nodeAsync = graph.getNode(data.nodeId)
+
+</script>
+
+{#await nodeAsync}
+    Loading
+{:then node}
+    <NodeEdit data={node}></NodeEdit>
+{/await}

@@ -8,7 +8,6 @@
     const graphEdit = getGraphEdit()
 
     export let data: GraphNode
-    export let done: () => void
 
     let property: string
 
@@ -24,7 +23,6 @@
 
     async function removeNode() {
         await graphEdit.removeNode(data.id)
-        done()
     }
 
     async function copy() {
