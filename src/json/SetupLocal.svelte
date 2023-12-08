@@ -1,19 +1,21 @@
 <script lang="ts">
-    import {setGraph, setGraphMeta} from "../data/graph";
-    import {setGraphEdit} from "../edit/graph-edit";
-    import {LocalJsonGraph} from "./local-json-graph";
+    import {type Graph, type GraphMeta, setGraph, setGraphMeta} from "../data/graph";
+    import {type GraphEdit, setGraphEdit} from "../edit/graph-edit";
     import {Button, Label, Listgroup, ListgroupItem, Modal, SpeedDial, Textarea} from "flowbite-svelte";
     import {fromGraph, setTaboloUI} from "../data/ui";
+    import type {LocalJson} from "./local-json-graph";
 
-    export let jsonDb: LocalJsonGraph;
+    export let jsonDb: [Graph, GraphEdit, GraphMeta, LocalJson];
 
-    setGraph(jsonDb)
-    setGraphMeta(jsonDb)
-    setGraphEdit(jsonDb)
-    setTaboloUI(fromGraph(jsonDb, jsonDb))
+    let [graph, graphEdit, graphMeta, localJson] = jsonDb
+
+    setGraph(graph)
+    setGraphEdit(graphEdit)
+    setGraphMeta(graphMeta)
+    setTaboloUI(fromGraph(graph, graphEdit))
 
     async function exportAll() {
-        const result = await jsonDb.exportAll();
+        const result = await localJson.exportAll();
         const url = URL.createObjectURL(new File([JSON.stringify(result, null, 2)], "data.json", {type: "application/json"}));
         window.open(url, "_blank");
     }
@@ -22,13 +24,13 @@
     let importAllValue = ""
 
     async function importAll() {
-        await jsonDb.importAll(JSON.parse(importAllValue));
+        await localJson.importAll(JSON.parse(importAllValue));
         importAllValue = "";
         importAllModal = false;
     }
 
     async function reset() {
-        await jsonDb.importAll(await import("../assets/Tabolo.json"));
+        await localJson.importAll(await import("../assets/Tabolo.json"));
     }
 </script>
 

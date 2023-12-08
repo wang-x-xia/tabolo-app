@@ -6,14 +6,13 @@ import {typeSearcher} from "../data/searcher";
 import type {RelationshipSearcher} from "../data/relationship-searcher";
 import {checkRelationship} from "../data/relationship-searcher";
 
-function asPromise<T>(request: IDBRequest<T>): Promise<T> {
-    return new Promise<T>((resolve, reject) => {
-        request.onsuccess = _ => resolve(request.result)
-        request.onerror = _ => reject(request.error)
-    })
+export interface LocalJson {
+    exportAll(): Promise<{ node: GraphNode[], relationship: GraphRelationship[] }>
+
+    importAll(data: { node: GraphNode[], relationship: GraphRelationship[] }): Promise<void>
 }
 
-export async function createJsonKv(name: string) {
+export async function createJsonKv(name: string): Promise<[Graph, GraphEdit, GraphMeta, LocalJson]> {
     let openDb = window.indexedDB.open(name);
     const db = await new Promise<IDBDatabase>((resolve, reject) => {
         openDb.onupgradeneeded = _ => {
@@ -23,7 +22,15 @@ export async function createJsonKv(name: string) {
         openDb.onsuccess = _ => resolve(openDb.result)
         openDb.onerror = _ => reject(openDb.error)
     })
-    return new LocalJsonGraph(db)
+
+    let graph = createGraph(db)
+
+    let graphEdit = createGraphEdit(db, graph)
+
+    let graphMeta = createGraphMeta(graph)
+
+
+    return [graph, graphEdit, graphMeta, createLocalJson(db)]
 }
 
 function createNodeStore(db: IDBDatabase) {
@@ -40,50 +47,52 @@ function createRelationshipStore(db: IDBDatabase) {
     }
 }
 
-export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
-
-    private db: IDBDatabase
-
-    constructor(db: IDBDatabase) {
-        this.db = db
-    }
-
-    async getValue(store: "node" | "relationship", id: string): Promise<any | null> {
-        const objectStore = this.read(store);
+function createGraph(db: IDBDatabase): Graph {
+    async function getValue(store: "node" | "relationship", id: string): Promise<any | null> {
+        const objectStore = readStore(store, db);
         let key = await asPromise(objectStore.getKey(id));
         if (key === undefined) {
             return null
         }
+
         return await asPromise(objectStore.get(id))
     }
 
-    async getNode(id: string): Promise<GraphNode | null> {
-        return await this.getValue("node", id)
+    async function getNode(id: string): Promise<GraphNode | null> {
+        return await getValue("node", id)
     }
 
-    async getNodes(ids: string[]): Promise<Record<string, GraphNode>> {
-        const value: Record<string, GraphNode> = {}
-        for (const id of ids) {
-            let node = await this.getNode(id);
-            if (node === null) {
-                value[id] = node
+    return {
+        getNode,
+
+        async getNodes(ids: string[]): Promise<Record<string, GraphNode>> {
+            const value: Record<string, GraphNode> = {}
+            for (const id of ids) {
+                let node = await getNode(id);
+                if (node === null) {
+                    value[id] = node
+                }
             }
-        }
-        return value
-    }
+            return value
+        },
 
-    async searchNodes(searcher: NodeSearcher): Promise<GraphNode[]> {
-        const nodes = await asPromise(this.read("node").getAll());
-        return nodes.filter(it => checkNode(it, searcher));
-    }
+        async searchNodes(searcher: NodeSearcher): Promise<GraphNode[]> {
+            const nodes = await asPromise(readStore("node", db).getAll());
+            return nodes.filter(it => checkNode(it, searcher));
+        },
 
-    async searchRelationships(searcher: RelationshipSearcher): Promise<GraphRelationship[]> {
-        const relationships = await asPromise(this.read("relationship").getAll());
-        return relationships.filter(it => checkRelationship(it, searcher));
+        async searchRelationships(searcher: RelationshipSearcher): Promise<GraphRelationship[]> {
+            const relationships = await asPromise(readStore("relationship", db).getAll());
+            return relationships.filter(it => checkRelationship(it, searcher));
+        },
     }
+}
 
-    async changeNode(id: string, cdc: (node: GraphNode) => "abort" | "commit"): Promise<GraphNode> {
-        const [transaction, store] = this.write("node")
+
+function createGraphEdit(db: IDBDatabase, graph: Graph): GraphEdit {
+
+    async function changeNode(id: string, cdc: (node: GraphNode) => "abort" | "commit"): Promise<GraphNode> {
+        const [transaction, store] = writeStore("node", db)
         let node = await asPromise(store.get(id)) as GraphNode;
         try {
             if (cdc(node) == "commit") {
@@ -98,8 +107,16 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
         return node;
     }
 
-    async editNodeType(id: string, type: string): Promise<GraphNode> {
-        return await this.changeNode(id, node => {
+
+    async function editNodeProperty(id: string, properties: any): Promise<GraphNode> {
+        return await changeNode(id, node => {
+            node.properties = properties
+            return "commit";
+        })
+    }
+
+    async function editNodeType(id: string, type: string): Promise<GraphNode> {
+        return await changeNode(id, node => {
             if (node.type === type) {
                 return "abort";
             }
@@ -108,20 +125,13 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
         })
     }
 
-    async editNodeProperty(id: string, properties: any): Promise<GraphNode> {
-        return await this.changeNode(id, node => {
-            node.properties = properties
-            return "commit";
-        })
-    }
-
-    async newEmptyNode(): Promise<GraphNode> {
+    async function newEmptyNode(): Promise<GraphNode> {
         let id = window.crypto.randomUUID();
-        while (await this.getNode(id) != null) {
+        while (await graph.getNode(id) != null) {
             // generate node id until not find
             id = window.crypto.randomUUID();
         }
-        const [transaction, store] = this.write("node")
+        const [transaction, store] = writeStore("node", db)
         const node: GraphNode = {
             id,
             type: "New",
@@ -132,74 +142,67 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
         return node;
     }
 
-    async removeNode(id: string): Promise<void> {
-        const [transaction, store] = this.write("node")
-        await asPromise(store.delete(id));
-        transaction.commit();
-    }
+    return {
+        editNodeProperty,
+        editNodeType,
+        newEmptyNode,
 
-    async copyNode(id: string): Promise<GraphNode> {
-        const oldNode = await this.getNode(id);
-        const newNode = await this.newEmptyNode();
-        await this.editNodeType(newNode.id, oldNode.type);
-        await this.editNodeProperty(newNode.id, oldNode.properties);
-        return await this.getNode(newNode.id);
-    }
-
-    async getNodeMeta(type: string): Promise<GraphNodeMeta> {
-        const typeNodes = await this.searchNodes({
-            type: "and",
-            searchers: [
-                typeSearcher("NodeType"),
-                {
-                    type: "eq",
-                    jsonPath: "$.name",
-                    value: type
-                }
-            ]
-        });
-        let meta: GraphNodeMeta = {name: type}
-        if (typeNodes.length != 1) {
-            console.log("Multiple node with type", typeNodes, type)
-            throw Error("Multiple nodes")
-        } else if (typeNodes.length == 1) {
-            meta = typeNodes[0].properties
-        }
-        return meta
-    }
-
-    async getNodeTypes(): Promise<string[]> {
-        const nodes = await this.searchNodes(typeSearcher("NodeType"));
-        const types = new Set<string>();
-        nodes.forEach(node => {
-            types.add(node.properties["name"]);
-        });
-        return Array.from(types).sort();
-    }
-
-    async exportAll() {
-        const nodes = await asPromise(this.read("node").getAll());
-        const relationships = await asPromise(this.read("relationship").getAll());
-        return {
-            node: nodes,
-            relationship: relationships,
-        }
-    }
-
-    async importAll(data: { node: GraphNode[], relationship: GraphRelationship[] }) {
-        await this.cleanUp();
-        for (const table of ["node", "relationship"] as ("node" | "relationship")[]) {
-            const [transaction, store] = this.write(table)
-            data[table].forEach((n: any) => {
-                store.put(n);
-            });
+        async removeNode(id: string): Promise<void> {
+            const [transaction, store] = writeStore("node", db)
+            await asPromise(store.delete(id));
             transaction.commit();
-        }
-    }
+        },
 
-    async cleanUp() {
+        async copyNode(id: string): Promise<GraphNode> {
+            const oldNode = await graph.getNode(id);
+            const newNode = await newEmptyNode();
+            await editNodeType(newNode.id, oldNode.type);
+            await editNodeProperty(newNode.id, oldNode.properties);
+            return await graph.getNode(newNode.id);
+        },
+    }
+}
+
+function createGraphMeta(graph: Graph): GraphMeta {
+    return {
+        async getNodeMeta(type: string): Promise<GraphNodeMeta> {
+            const typeNodes = await graph.searchNodes({
+                type: "and",
+                searchers: [
+                    typeSearcher("NodeType"),
+                    {
+                        type: "eq",
+                        jsonPath: "$.name",
+                        value: type
+                    }
+                ]
+            });
+            let meta: GraphNodeMeta = {name: type}
+            if (typeNodes.length != 1) {
+                console.log("Multiple node with type", typeNodes, type)
+                throw Error("Multiple nodes")
+            } else if (typeNodes.length == 1) {
+                meta = typeNodes[0].properties
+            }
+            return meta
+        },
+
+        async getNodeTypes(): Promise<string[]> {
+            const nodes = await graph.searchNodes(typeSearcher("NodeType"));
+            const types = new Set<string>();
+            nodes.forEach(node => {
+                types.add(node.properties["name"]);
+            });
+            return Array.from(types).sort();
+        },
+    }
+}
+
+
+function createLocalJson(db: IDBDatabase): LocalJson {
+    async function cleanUp() {
         for (const table of ["node", "relationship"] as ("node" | "relationship")[]) {
-            const [transaction, store] = this.write(table);
+            const [transaction, store] = writeStore(table, db);
             (await asPromise(store.getAllKeys())).forEach(key => {
                 store.delete(key)
             })
@@ -207,14 +210,43 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
         }
     }
 
-    private read(store: "node" | "relationship") {
-        return this.db.transaction(store, "readonly").objectStore(store);
-    }
+    return {
+        async exportAll() {
+            const nodes = await asPromise(readStore("node", db).getAll());
+            const relationships = await asPromise(readStore("relationship", db).getAll());
+            return {
+                node: nodes,
+                relationship: relationships,
+            }
+        },
 
-    private write(store: "node" | "relationship"): [IDBTransaction, IDBObjectStore] {
-        const transaction = this.db.transaction(store, "readwrite");
-        const objectStore = transaction.objectStore(store)
-        return [transaction, objectStore]
+        async importAll(data) {
+            await cleanUp();
+            for (const table of ["node", "relationship"] as ("node" | "relationship")[]) {
+                const [transaction, store] = writeStore(table, db)
+                data[table].forEach((n: any) => {
+                    store.put(n);
+                });
+                transaction.commit();
+            }
+        },
     }
+}
 
+
+function readStore(store: "node" | "relationship", db: IDBDatabase) {
+    return db.transaction(store, "readonly").objectStore(store);
+}
+
+function writeStore(store: "node" | "relationship", db: IDBDatabase): [IDBTransaction, IDBObjectStore] {
+    const transaction = db.transaction(store, "readwrite");
+    const objectStore = transaction.objectStore(store)
+    return [transaction, objectStore]
+}
+
+function asPromise<T>(request: IDBRequest<T>): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+        request.onsuccess = _ => resolve(request.result)
+        request.onerror = _ => reject(request.error)
+    })
 }
