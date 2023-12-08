@@ -28,7 +28,7 @@ export const [getTaboloUI, setTaboloUI] = defineInContext<TaboloUI>("UI")
 export function fromGraph(graph: Graph, graphEdit: GraphEdit): TaboloUI {
     return {
         async updateView(view: ViewData): Promise<ViewData> {
-            let nodes = (await graph.searchNodes(typeSearcher("View"))).value;
+            let nodes = await graph.searchNodes(typeSearcher("View"));
             let id: string
             if (nodes.length == 0) {
                 let node = await graphEdit.newEmptyNode();
@@ -41,7 +41,7 @@ export function fromGraph(graph: Graph, graphEdit: GraphEdit): TaboloUI {
         },
 
         async getView() {
-            let nodes = (await graph.searchNodes(typeSearcher("View"))).value;
+            let nodes = await graph.searchNodes(typeSearcher("View"));
             if (nodes.length == 0) {
                 return {type: "NodeView", searcher: emptySearcher()}
             } else {

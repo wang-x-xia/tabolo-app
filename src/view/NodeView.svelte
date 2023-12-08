@@ -13,9 +13,6 @@
     import {getGraph} from "../data/graph";
     import {getGraphEdit} from "../edit/graph-edit";
     import NodeSearch from "../search/NodeSearch.svelte";
-    import type {Readable} from "svelte/store";
-    import type {ExtendableValue} from "../data/base";
-    import {asSvelteReadable} from "../data/subscribe-svelte";
     import NodeCell from "../cell/NodeCell.svelte";
     import type {NodeSearcher} from "../data/node-searcher";
     import {getTaboloUI} from "../data/ui";
@@ -26,15 +23,14 @@
 
     export let nodeSearcher: NodeSearcher
 
-    let result: Readable<ExtendableValue<GraphNode[]>> | undefined
+    let result: GraphNode[] | undefined
 
     async function queryData() {
         await taboloUI.updateView({
             type: "NodeView",
             searcher: nodeSearcher
         })
-        let value = await graph.searchNodes(nodeSearcher);
-        result = asSvelteReadable(value);
+        result = await graph.searchNodes(nodeSearcher);
     }
 
 
@@ -59,7 +55,7 @@
             <TableHeadCell>Node</TableHeadCell>
         </TableHead>
         <TableBody>
-            {#each $result.value as node (node.id)}
+            {#each result as node (node.id)}
                 <TableBodyRow>
                     <TableBodyCell>
                         <NodeCell data={node}/>

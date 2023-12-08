@@ -3,17 +3,14 @@
     import {setGraphEdit} from "../edit/graph-edit";
     import {LocalJsonGraph} from "./local-json-graph";
     import {Button, Label, Listgroup, ListgroupItem, Modal, SpeedDial, Textarea} from "flowbite-svelte";
-    import {localSubscribeMonitor} from "./local-subscribe-monitor";
     import {fromGraph, setTaboloUI} from "../data/ui";
 
     export let jsonDb: LocalJsonGraph;
 
-    let {graph, edit} = localSubscribeMonitor({graph: jsonDb, edit: jsonDb});
-
-    setGraph(graph)
+    setGraph(jsonDb)
     setGraphMeta(jsonDb)
-    setGraphEdit(edit)
-    setTaboloUI(fromGraph(graph, edit))
+    setGraphEdit(jsonDb)
+    setTaboloUI(fromGraph(jsonDb, jsonDb))
 
     async function exportAll() {
         const result = await jsonDb.exportAll();

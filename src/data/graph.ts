@@ -1,5 +1,5 @@
 import {defineInContext} from "../util";
-import type {Extendable, ExtendableValue} from "./base";
+import type {Extendable} from "./base";
 import type {RelationshipSearcher} from "./relationship-searcher";
 import type {NodeSearcher} from "./node-searcher";
 
@@ -12,11 +12,11 @@ import type {NodeSearcher} from "./node-searcher";
 export interface Graph {
     getNode(id: string): Promise<GraphNode | null>
 
-    getNodes(id: string[]): Promise<ExtendableValue<Record<string, GraphNode>>>
+    getNodes(id: string[]): Promise<Record<string, GraphNode>>
 
-    searchNodes(searcher: NodeSearcher): Promise<ExtendableValue<GraphNode[]>>
+    searchNodes(searcher: NodeSearcher): Promise<GraphNode[]>
 
-    searchRelationships(searcher: RelationshipSearcher): Promise<ExtendableValue<GraphRelationship[]>>
+    searchRelationships(searcher: RelationshipSearcher): Promise<GraphRelationship[]>
 }
 
 export interface GraphMeta {
@@ -48,11 +48,6 @@ export type GraphValue = {
 } | {
     type: "relationship",
     value: GraphRelationship,
-}
-
-export interface CypherQueryResult {
-    keys: string[];
-    records: Record<string, GraphValue>[];
 }
 
 

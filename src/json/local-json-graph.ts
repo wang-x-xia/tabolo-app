@@ -1,6 +1,5 @@
 import type {Graph, GraphMeta, GraphNode, GraphNodeMeta, GraphRelationship} from "../data/graph";
 import type {GraphEdit} from "../edit/graph-edit";
-import type {ExtendableValue} from "../data/base";
 import type {NodeSearcher} from "../data/node-searcher";
 import {checkNode} from "../data/node-searcher";
 import {typeSearcher} from "../data/searcher";
@@ -62,7 +61,7 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
         return await this.getValue("node", id)
     }
 
-    async getNodes(ids: string[]): Promise<ExtendableValue<Record<string, GraphNode>>> {
+    async getNodes(ids: string[]): Promise<Record<string, GraphNode>> {
         const value: Record<string, GraphNode> = {}
         for (const id of ids) {
             let node = await this.getNode(id);
@@ -70,17 +69,17 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
                 value[id] = node
             }
         }
-        return {value}
+        return value
     }
 
-    async searchNodes(searcher: NodeSearcher): Promise<ExtendableValue<GraphNode[]>> {
+    async searchNodes(searcher: NodeSearcher): Promise<GraphNode[]> {
         const nodes = await asPromise(this.read("node").getAll());
-        return {value: nodes.filter(it => checkNode(it, searcher))};
+        return nodes.filter(it => checkNode(it, searcher));
     }
 
-    async searchRelationships(searcher: RelationshipSearcher): Promise<ExtendableValue<GraphRelationship[]>> {
+    async searchRelationships(searcher: RelationshipSearcher): Promise<GraphRelationship[]> {
         const relationships = await asPromise(this.read("relationship").getAll());
-        return {value: relationships.filter(it => checkRelationship(it, searcher))};
+        return relationships.filter(it => checkRelationship(it, searcher));
     }
 
     async changeNode(id: string, cdc: (node: GraphNode) => "abort" | "commit"): Promise<GraphNode> {
@@ -148,7 +147,7 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
     }
 
     async getNodeMeta(type: string): Promise<GraphNodeMeta> {
-        const typeNodes = (await this.searchNodes({
+        const typeNodes = await this.searchNodes({
             type: "and",
             searchers: [
                 typeSearcher("NodeType"),
@@ -158,7 +157,7 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
                     value: type
                 }
             ]
-        })).value;
+        });
         let meta: GraphNodeMeta = {name: type}
         if (typeNodes.length != 1) {
             console.log("Multiple node with type", typeNodes, type)
@@ -172,7 +171,7 @@ export class LocalJsonGraph implements Graph, GraphEdit, GraphMeta {
     async getNodeTypes(): Promise<string[]> {
         const nodes = await this.searchNodes(typeSearcher("NodeType"));
         const types = new Set<string>();
-        nodes.value.forEach(node => {
+        nodes.forEach(node => {
             types.add(node.properties["name"]);
         });
         return Array.from(types).sort();

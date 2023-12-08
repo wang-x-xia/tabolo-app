@@ -11,9 +11,6 @@
     } from "flowbite-svelte";
     import type {GraphRelationship} from "../data/graph";
     import {getGraph} from "../data/graph";
-    import type {Readable} from "svelte/store";
-    import type {ExtendableValue} from "../data/base";
-    import {asSvelteReadable} from "../data/subscribe-svelte";
     import {emptySearcher} from "../data/searcher";
     import type {RelationshipSearcher} from "../data/relationship-searcher";
     import RelationshipCell from "../cell/RelationshipCell.svelte";
@@ -22,11 +19,10 @@
     let graph = getGraph()
     let relationshipSearcher: RelationshipSearcher = emptySearcher()
 
-    let result: Readable<ExtendableValue<GraphRelationship[]>> | undefined
+    let result: GraphRelationship[] | undefined
 
     async function queryData() {
-        let value = await graph.searchRelationships(relationshipSearcher);
-        result = asSvelteReadable(value);
+        result = await graph.searchRelationships(relationshipSearcher);
     }
 
 
@@ -47,7 +43,7 @@
             <TableHeadCell>End Node</TableHeadCell>
         </TableHead>
         <TableBody>
-            {#each $result.value as node (node.id) }
+            {#each result as node (node.id)}
                 <TableBodyRow>
                     <TableBodyCell>
                         <NodeIdCell data={node.startNodeId}/>
