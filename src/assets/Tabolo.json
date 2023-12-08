@@ -4,7 +4,7 @@
       "id": "16c27147-a0b2-4559-b0c0-d31a6c4ff996",
       "type": "Concept",
       "properties": {
-        "name": "Node"
+        "name": "Property"
       }
     },
     {
@@ -38,11 +38,43 @@
       }
     },
     {
+      "id": "75f26e05-a3bf-4b0c-9da9-26d137748392",
+      "type": "View",
+      "properties": {
+        "type": "NodeView",
+        "searcher": {
+          "type": "empty"
+        }
+      }
+    },
+    {
+      "id": "89250f44-92be-450e-8e09-9356cf182228",
+      "type": "Concept",
+      "properties": {
+        "name": "Node"
+      }
+    },
+    {
       "id": "ab09b4be-83d6-4365-a8f7-caf6e43795ef",
       "type": "NodeType",
       "properties": {
         "name": "Application",
         "showJsonPath": "$.name"
+      }
+    },
+    {
+      "id": "b6fcc068-a91a-4104-8351-bc357d1f5234",
+      "type": "NodeType",
+      "properties": {
+        "name": "View",
+        "showJsonPath": "$.type"
+      }
+    },
+    {
+      "id": "b79778c6-b85c-47c2-89c9-bb42d2c79499",
+      "type": "NodeType",
+      "properties": {
+        "name": "New"
       }
     },
     {
