@@ -6,6 +6,7 @@
     import {idSelector, randomElementId} from "../util";
     import {nodeCellConfig} from "./node-cell";
     import {JSONPath} from "jsonpath-plus";
+    import {DotsHorizontalOutline} from "flowbite-svelte-icons";
 
     export let data: GraphNode
 
@@ -20,23 +21,22 @@
     $: config = nodeCellConfig(data.type)
 </script>
 
-<span {id} on:dblclick|preventDefault={() => (editModal = true)} role="button" tabindex="0">
-    {#if $config.type === "ShowType"}
-        <Button size="sm">{data.type}</Button>
-    {:else if $config.type === "ShowJsonPath"}
-        <ButtonGroup size="sm" outline>
-            <Button>{`<${data.type}>`}</Button>
-            {@const property = JSONPath({path: $config.jsonPath, json: data.properties, wrap: false})}
-            {#if property === undefined}
-                <Button>{$config.jsonPath}</Button>
-            {:else }
-                <Button>
-                    <PropertyValueCell data={property}/>
-                </Button>
-            {/if}
-        </ButtonGroup>
+<ButtonGroup {id} size="sm" outline>
+    <Button>{`<${data.type}>`}</Button>
+    {#if $config.type === "ShowJsonPath"}
+        {@const property = JSONPath({path: $config.jsonPath, json: data.properties, wrap: false})}
+        {#if property === undefined}
+            <Button>{$config.jsonPath}</Button>
+        {:else }
+            <Button>
+                <PropertyValueCell data={property}/>
+            </Button>
+        {/if}
     {/if}
-</span>
+    <Button on:click={() => (editModal = true)}>
+        <DotsHorizontalOutline/>
+    </Button>
+</ButtonGroup>
 <Popover title={`${data.type} Properties`} triggeredBy={idSelector(id)}>
     {JSON.stringify(data.properties, null, 2)}
 </Popover>
