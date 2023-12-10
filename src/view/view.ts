@@ -17,6 +17,11 @@ export interface NodeEditViewData {
     nodeId: string,
 }
 
+export interface SavedViewData {
+    name: string,
+    data: ViewData,
+}
+
 export interface ViewHandler {
     updateView(view: ViewData): Promise<ViewData>
 

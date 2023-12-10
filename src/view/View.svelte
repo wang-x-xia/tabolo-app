@@ -1,31 +1,47 @@
 <script lang="ts">
 
-    import {getViewHandler, setViewHandler, type ViewData} from "./view";
+    import {fromGraph, type SavedViewData, setViewHandler, type ViewData} from "./view";
     import NodeView from "./NodeView.svelte";
     import NodeEditView from "./NodeEditView.svelte";
+    import {Button, Drawer, Listgroup, ListgroupItem} from "flowbite-svelte";
+    import {randomElementId} from "../util";
+    import {getGraph} from "../data/graph";
+    import {getGraphEdit} from "../edit/graph-edit";
+    import {typeSearcher} from "../data/searcher";
 
-    let taboloUI = getViewHandler()
+    const graph = getGraph()
+    const graphEdit = getGraphEdit()
+    const viewHandler = fromGraph(graph, graphEdit);
+
+    async function updateView(view: ViewData): Promise<ViewData> {
+        const r = await viewHandler.updateView(view)
+        viewData = r
+        return r
+    }
+
+    setViewHandler({
+        ...viewHandler,
+        updateView,
+    })
+
+    let savedViews: SavedViewData[] = []
+
+    let hiddenSelectView = true
 
     let viewData: ViewData | undefined = undefined
 
-    setViewHandler({
-        ...taboloUI,
-        async updateView(view: ViewData): Promise<ViewData> {
-            const r = await taboloUI.updateView(view)
-            console.log("update view", r)
-            viewData = r
-            return r
-        },
-    })
-
     async function setup() {
-        viewData = await taboloUI.getView()
+        const nodes = await graph.searchNodes(typeSearcher("SavedView"))
+        viewData = await viewHandler.getView()
+        savedViews = nodes.map(it => it.properties as SavedViewData).sort((l, r) => l.name.localeCompare(r.name))
     }
 
     setup()
 
+    const id = randomElementId()
 </script>
 
+<Button on:click={()=> hiddenSelectView = false}>Select View</Button>
 {#if (viewData === undefined) }
     Loading
 {:else if (viewData.type === "NodeView") }
@@ -33,3 +49,16 @@
 {:else if ((viewData.type === "NodeEditView"))}
     <NodeEditView data={viewData}></NodeEditView>
 {/if}
+
+
+<Drawer bind:hidden={hiddenSelectView} {id} transitionType="fly">
+    <Listgroup>
+        {#each savedViews as savedView }
+            <ListgroupItem>
+                <Button on:click={() => updateView(savedView.data)}>
+                    {savedView.name}
+                </Button>
+            </ListgroupItem>
+        {/each}
+    </Listgroup>
+</Drawer>
