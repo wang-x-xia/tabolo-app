@@ -1,20 +1,35 @@
 <script lang="ts">
 
-    import {getTaboloUI} from "../data/ui";
+    import {getTaboloUI, setTaboloUI, type ViewData} from "../data/ui";
     import NodeView from "./NodeView.svelte";
     import NodeEditView from "./NodeEditView.svelte";
 
     let taboloUI = getTaboloUI()
 
-    let viewDataAsync = taboloUI.getView()
+    let viewData: ViewData | undefined = undefined
+
+    setTaboloUI({
+        ...taboloUI,
+        async updateView(view: ViewData): Promise<ViewData> {
+            const r = await taboloUI.updateView(view)
+            console.log("update view", r)
+            viewData = r
+            return r
+        },
+    })
+
+    async function setup() {
+        viewData = await taboloUI.getView()
+    }
+
+    setup()
+
 </script>
 
-{#await viewDataAsync}
+{#if (viewData === undefined) }
     Loading
-{:then viewData}
-    {#if (viewData.type === "NodeView") }
-        <NodeView nodeSearcher={viewData.searcher}/>
-    {:else if ((viewData.type === "NodeEditView"))}
-        <NodeEditView data={viewData}></NodeEditView>
-    {/if}
-{/await}
+{:else if (viewData.type === "NodeView") }
+    <NodeView nodeSearcher={viewData.searcher}/>
+{:else if ((viewData.type === "NodeEditView"))}
+    <NodeEditView data={viewData}></NodeEditView>
+{/if}
