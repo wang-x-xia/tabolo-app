@@ -23,10 +23,32 @@
       }
     },
     {
-      "id": "2b636514-cead-4b41-a293-85aedd805f80",
-      "type": "Concept",
+      "id": "3fc4d14e-7299-4489-a59a-e815805f0225",
+      "type": "NodeType",
       "properties": {
-        "name": "Key"
+        "name": "SavedView",
+        "showJsonPath": "$.name"
+      }
+    },
+    {
+      "id": "427ebd26-64d6-4ede-a1e2-1bd7671613e6",
+      "type": "ViewType",
+      "properties": {
+        "type": "NodeView",
+        "description": "Search node list"
+      }
+    },
+    {
+      "id": "4c717179-cf9d-4ad6-869d-d890392d81b6",
+      "type": "SavedView",
+      "properties": {
+        "name": "Search All Nodes",
+        "data": {
+          "type": "NodeView",
+          "searcher": {
+            "type": "empty"
+          }
+        }
       }
     },
     {
@@ -83,6 +105,22 @@
       "properties": {
         "name": "NodeType",
         "showJsonPath": "$.name"
+      }
+    },
+    {
+      "id": "b9a6fbea-c51e-49fa-9cf8-49907114593c",
+      "type": "NodeType",
+      "properties": {
+        "name": "ViewType",
+        "showJsonPath": "$.type"
+      }
+    },
+    {
+      "id": "d756848c-9b83-4409-8e3d-06de46cf47fc",
+      "type": "ViewType",
+      "properties": {
+        "type": "NodeEditView",
+        "description": "Edit one node"
       }
     }
   ],
