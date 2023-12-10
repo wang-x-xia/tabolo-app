@@ -2,7 +2,7 @@
     import {type Graph, type GraphMeta, setGraph, setGraphMeta} from "../data/graph";
     import {type GraphEdit, setGraphEdit} from "../edit/graph-edit";
     import {Button, Label, Listgroup, ListgroupItem, Modal, SpeedDial, Textarea} from "flowbite-svelte";
-    import {fromGraph, setTaboloUI} from "../data/ui";
+    import {fromGraph, setViewHandler} from "../view/view";
     import type {LocalJson} from "./local-json-graph";
 
     export let jsonDb: [Graph, GraphEdit, GraphMeta, LocalJson];
@@ -12,7 +12,7 @@
     setGraph(graph)
     setGraphEdit(graphEdit)
     setGraphMeta(graphMeta)
-    setTaboloUI(fromGraph(graph, graphEdit))
+    setViewHandler(fromGraph(graph, graphEdit))
 
     async function exportAll() {
         const result = await localJson.exportAll();

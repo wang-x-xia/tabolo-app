@@ -6,14 +6,14 @@
     import {nodeCellConfig} from "./node-cell";
     import {JSONPath} from "jsonpath-plus";
     import {DotsHorizontalOutline} from "flowbite-svelte-icons";
-    import {getTaboloUI} from "../data/ui";
+    import {getViewHandler} from "../view/view";
 
     export let data: GraphNode
 
-    let taboloUI = getTaboloUI()
+    let viewHandler = getViewHandler()
 
     function editNode() {
-        taboloUI.updateView({
+        viewHandler.updateView({
             type: "NodeEditView",
             nodeId: data.id,
         })

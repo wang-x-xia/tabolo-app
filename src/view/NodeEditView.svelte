@@ -2,7 +2,7 @@
 
     import NodeEdit from "../edit/NodeEdit.svelte";
     import {getGraph} from "../data/graph";
-    import type {NodeEditViewData} from "../data/ui";
+    import type {NodeEditViewData} from "./view";
 
     let graph = getGraph()
 

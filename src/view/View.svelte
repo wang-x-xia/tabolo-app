@@ -1,14 +1,14 @@
 <script lang="ts">
 
-    import {getTaboloUI, setTaboloUI, type ViewData} from "../data/ui";
+    import {getViewHandler, setViewHandler, type ViewData} from "./view";
     import NodeView from "./NodeView.svelte";
     import NodeEditView from "./NodeEditView.svelte";
 
-    let taboloUI = getTaboloUI()
+    let taboloUI = getViewHandler()
 
     let viewData: ViewData | undefined = undefined
 
-    setTaboloUI({
+    setViewHandler({
         ...taboloUI,
         async updateView(view: ViewData): Promise<ViewData> {
             const r = await taboloUI.updateView(view)

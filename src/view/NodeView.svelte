@@ -15,18 +15,18 @@
     import NodeSearch from "../search/NodeSearch.svelte";
     import NodeCell from "../cell/NodeCell.svelte";
     import type {NodeSearcher} from "../data/node-searcher";
-    import {getTaboloUI} from "../data/ui";
+    import {getViewHandler} from "./view";
 
     let graph = getGraph()
     let graphEdit = getGraphEdit()
-    let taboloUI = getTaboloUI()
+    let viewHandler = getViewHandler()
 
     export let nodeSearcher: NodeSearcher
 
     let result: GraphNode[] | undefined
 
     async function queryData() {
-        await taboloUI.updateView({
+        await viewHandler.updateView({
             type: "NodeView",
             searcher: nodeSearcher
         })

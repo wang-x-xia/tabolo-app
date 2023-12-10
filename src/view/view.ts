@@ -1,8 +1,8 @@
 import {defineInContext} from "../util";
-import type {Graph} from "./graph";
+import type {Graph} from "../data/graph";
 import type {GraphEdit} from "../edit/graph-edit";
-import type {NodeSearcher} from "./node-searcher";
-import {emptySearcher, typeSearcher} from "./searcher";
+import type {NodeSearcher} from "../data/node-searcher";
+import {emptySearcher, typeSearcher} from "../data/searcher";
 
 export type ViewData = NodeViewData | NodeEditViewData
 
@@ -17,15 +17,15 @@ export interface NodeEditViewData {
     nodeId: string,
 }
 
-export interface TaboloUI {
+export interface ViewHandler {
     updateView(view: ViewData): Promise<ViewData>
 
     getView(): Promise<ViewData>
 }
 
-export const [getTaboloUI, setTaboloUI] = defineInContext<TaboloUI>("UI")
+export const [getViewHandler, setViewHandler] = defineInContext<ViewHandler>("viewHandler")
 
-export function fromGraph(graph: Graph, graphEdit: GraphEdit): TaboloUI {
+export function fromGraph(graph: Graph, graphEdit: GraphEdit): ViewHandler {
     return {
         async updateView(view: ViewData): Promise<ViewData> {
             let nodes = await graph.searchNodes(typeSearcher("View"));
