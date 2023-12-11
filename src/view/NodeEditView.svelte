@@ -12,8 +12,10 @@
 
 </script>
 
-{#await nodeAsync}
-    Loading
-{:then node}
-    <NodeEdit data={node}></NodeEdit>
-{/await}
+<div class="w-full flex justify-center">
+    {#await nodeAsync}
+        Loading
+    {:then node}
+        <NodeEdit data={node}></NodeEdit>
+    {/await}
+</div>

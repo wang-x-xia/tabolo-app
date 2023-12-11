@@ -9,6 +9,10 @@ export interface RelationshipNodeSearcher {
     match: "start" | "end" | "both",
 }
 
+export function relationshipNodeSearcher(nodeId: string, match: "start" | "end" | "both" = "both"): RelationshipNodeSearcher {
+    return {type: "node", nodeId, match,}
+}
+
 export interface MatchAllSearcher {
     type: "and",
     searchers: RelationshipSearcher[],

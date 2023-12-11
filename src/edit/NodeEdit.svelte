@@ -1,11 +1,13 @@
 <script lang="ts">
-    import type {GraphNode} from "../data/graph";
+    import {getGraph, type GraphNode, type GraphRelationship} from "../data/graph";
     import {Button, ButtonGroup, Input, Label, Textarea} from "flowbite-svelte";
-    import {CloseSolid} from "flowbite-svelte-icons";
     import NodeTypeSelect from "./NodeTypeSelect.svelte";
     import {getGraphEdit} from "./graph-edit";
     import {getViewHandler} from "../view/view";
+    import {relationshipNodeSearcher} from "../data/relationship-searcher";
+    import RelationshipCell from "../cell/RelationshipCell.svelte";
 
+    const graph = getGraph()
     const graphEdit = getGraphEdit()
     const viewHandler = getViewHandler()
 
@@ -23,7 +25,7 @@
         data = await graphEdit.editNodeType(data.id, type)
     }
 
-    async function removeNode() {
+    async function remove() {
         await graphEdit.removeNode(data.id)
         history.back()
     }
@@ -39,29 +41,38 @@
     async function save() {
         data = await graphEdit.editNodeProperty(data.id, JSON.parse(property))
     }
+
+    let relationships: GraphRelationship[] = []
+
+    async function setup() {
+        relationships = await graph.searchRelationships(relationshipNodeSearcher(data.id))
+    }
+
+    setup()
 </script>
 
-<div>
-    <Label class="mb-2">Node ID</Label>
-    <ButtonGroup class="w-full">
-        <Input disabled value={data.id}/>
-        <Button color="primary" on:click={removeNode}>
-            <CloseSolid size="sm"/>
-        </Button>
+<div class="w-full max-w-3xl space-y-4">
+    <Label class="mb-2 text-xl">Node ID</Label>
+    <Input disabled value={data.id}/>
+    <Label class="mb-2 text-xl">Action</Label>
+    <ButtonGroup>
+        <Button on:click={copy}>Copy</Button>
+        <Button on:click={remove}>Delete</Button>
     </ButtonGroup>
-</div>
-<div>
-    <Label class="mb-2">Type</Label>
-    <NodeTypeSelect type={data.type} on:type={e =>setType(e.detail)}/>
-</div>
-<div>
-    <Label class="mb-2">Property</Label>
-    <ButtonGroup class="w-full">
-        <Textarea bind:value={property}/>
+    <Label class="mb-2 text-xl">Type</Label>
+    <NodeTypeSelect on:type={e =>setType(e.detail)} type={data.type}/>
+    <Label class="mb-2 text-xl">Property</Label>
+    <Textarea class="h-40" bind:value={property}/>
+    <ButtonGroup>
+        <Button color="primary" on:click={save}>Save</Button>
+        <Button color="alternative" on:click={reset}>Reset</Button>
     </ButtonGroup>
-</div>
-<div class="space-x-4">
-    <Button color="primary" on:click={save}>Save</Button>
-    <Button color="alternative" on:click={reset}>Reset</Button>
-    <Button on:click={copy}>Copy</Button>
+    {#if (relationships.length) === 0}
+        <Label class="mb-2 text-xl">No Relationship</Label>
+    {:else }
+        <Label class="mb-2 text-xl">Relationships</Label>
+        {#each relationships as relationship}
+            <RelationshipCell data={relationship}/>
+        {/each}
+    {/if}
 </div>
