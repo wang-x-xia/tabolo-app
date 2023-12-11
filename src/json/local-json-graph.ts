@@ -81,6 +81,10 @@ function createGraph(db: IDBDatabase): Graph {
             return nodes.filter(it => checkNode(it, searcher));
         },
 
+        async getRelationship(id: string): Promise<GraphRelationship | null> {
+            return await getValue("relationship", id)
+        },
+
         async searchRelationships(searcher: RelationshipSearcher): Promise<GraphRelationship[]> {
             const relationships = await asPromise(readStore("relationship", db).getAll());
             return relationships.filter(it => checkRelationship(it, searcher));
@@ -108,23 +112,6 @@ function createGraphEdit(db: IDBDatabase, graph: Graph): GraphEdit {
     }
 
 
-    async function editNodeProperty(id: string, properties: any): Promise<GraphNode> {
-        return await changeNode(id, node => {
-            node.properties = properties
-            return "commit";
-        })
-    }
-
-    async function editNodeType(id: string, type: string): Promise<GraphNode> {
-        return await changeNode(id, node => {
-            if (node.type === type) {
-                return "abort";
-            }
-            node.type = type;
-            return "commit";
-        })
-    }
-
     async function newEmptyNode(): Promise<GraphNode> {
         let id = window.crypto.randomUUID();
         while (await graph.getNode(id) != null) {
@@ -142,10 +129,103 @@ function createGraphEdit(db: IDBDatabase, graph: Graph): GraphEdit {
         return node;
     }
 
+
+    async function editNodeType(id: string, type: string): Promise<GraphNode> {
+        return await changeNode(id, node => {
+            if (node.type === type) {
+                return "abort";
+            }
+            node.type = type;
+            return "commit";
+        })
+    }
+
+    async function editNodeProperty(id: string, properties: any): Promise<GraphNode> {
+        return await changeNode(id, node => {
+            node.properties = properties
+            return "commit";
+        })
+    }
+
+    async function changeRelationship(id: string, cdc: (node: GraphRelationship) => "abort" | "commit"): Promise<GraphRelationship> {
+        const [transaction, store] = writeStore("relationship", db)
+        let relationship = await asPromise(store.get(id)) as GraphRelationship;
+        try {
+            if (cdc(relationship) == "commit") {
+                await asPromise(store.put(relationship))
+                transaction.commit();
+            } else {
+                transaction.abort()
+            }
+        } catch (e) {
+            transaction.abort();
+        }
+        return relationship;
+    }
+
+
+    async function newEmptyRelationship(): Promise<GraphRelationship> {
+        let id = window.crypto.randomUUID();
+        while (await graph.getRelationship(id) != null) {
+            // generate node id until not find
+            id = window.crypto.randomUUID();
+        }
+        const [transaction, store] = writeStore("relationship", db)
+        const relationship: GraphRelationship = {
+            id,
+            type: "New",
+            startNodeId: undefined,
+            endNodeId: undefined,
+            properties: {}
+        }
+        await asPromise(store.add(relationship));
+        transaction.commit();
+        return relationship;
+    }
+
+
+    async function editRelationshipType(id: string, type: string): Promise<GraphRelationship> {
+        return await changeRelationship(id, relationship => {
+            if (relationship.type === type) {
+                return "abort";
+            }
+            relationship.type = type;
+            return "commit";
+        })
+    }
+
+    async function editRelationshipStartNode(id: string, nodeId: string): Promise<GraphRelationship> {
+        return await changeRelationship(id, relationship => {
+            if (relationship.startNodeId === nodeId) {
+                return "abort";
+            }
+            relationship.startNodeId = nodeId;
+            return "commit";
+        })
+    }
+
+    async function editRelationshipEndNode(id: string, nodeId: string): Promise<GraphRelationship> {
+        return await changeRelationship(id, relationship => {
+            if (relationship.endNodeId === nodeId) {
+                return "abort";
+            }
+            relationship.endNodeId = nodeId;
+            return "commit";
+        })
+    }
+
+    async function editRelationshipProperty(id: string, properties: any): Promise<GraphRelationship> {
+        return await changeRelationship(id, relationship => {
+            relationship.properties = properties
+            return "commit";
+        })
+    }
+
+
     return {
-        editNodeProperty,
-        editNodeType,
         newEmptyNode,
+        editNodeType,
+        editNodeProperty,
 
         async removeNode(id: string): Promise<void> {
             const [transaction, store] = writeStore("node", db)
@@ -160,6 +240,28 @@ function createGraphEdit(db: IDBDatabase, graph: Graph): GraphEdit {
             await editNodeProperty(newNode.id, oldNode.properties);
             return await graph.getNode(newNode.id);
         },
+
+        newEmptyRelationship,
+        editRelationshipType,
+        editRelationshipStartNode,
+        editRelationshipEndNode,
+        editRelationshipProperty,
+
+        async removeRelationship(id: string): Promise<void> {
+            const [transaction, store] = writeStore("relationship", db)
+            await asPromise(store.delete(id));
+            transaction.commit();
+        },
+
+        async copyRelationship(id: string): Promise<GraphRelationship> {
+            const oldRelationship = await graph.getRelationship(id);
+            const newRelationship = await newEmptyRelationship();
+            await editRelationshipType(newRelationship.id, oldRelationship.type);
+            await editRelationshipStartNode(newRelationship.id, oldRelationship.startNodeId);
+            await editRelationshipEndNode(newRelationship.id, oldRelationship.endNodeId);
+            await editRelationshipProperty(newRelationship.id, oldRelationship.properties);
+            return await graph.getRelationship(newRelationship.id);
+        }
     }
 }
 

@@ -16,6 +16,8 @@ export interface Graph {
 
     searchNodes(searcher: NodeSearcher): Promise<GraphNode[]>
 
+    getRelationship(id: string): Promise<GraphRelationship | null>
+
     searchRelationships(searcher: RelationshipSearcher): Promise<GraphRelationship[]>
 }
 
