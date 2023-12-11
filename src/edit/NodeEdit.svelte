@@ -1,7 +1,7 @@
 <script lang="ts">
     import {getGraph, type GraphNode, type GraphRelationship} from "../data/graph";
     import {Button, ButtonGroup, Input, Label, Textarea} from "flowbite-svelte";
-    import NodeTypeSelect from "./NodeTypeSelect.svelte";
+    import TypeSelect from "./TypeSelect.svelte";
     import {getGraphEdit} from "./graph-edit";
     import {getViewHandler} from "../view/view";
     import {relationshipNodeSearcher} from "../data/relationship-searcher";
@@ -65,7 +65,7 @@
         <Button on:click={remove}>Delete</Button>
     </ButtonGroup>
     <Label class="mb-2 text-xl">Type</Label>
-    <NodeTypeSelect on:type={e =>setType(e.detail)} type={data.type}/>
+    <TypeSelect source="Node" on:type={e =>setType(e.detail)} type={data.type}/>
     <Label class="mb-2 text-xl">Property</Label>
     <Textarea class="h-40" bind:value={property}/>
     <ButtonGroup>

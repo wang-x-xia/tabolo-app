@@ -25,6 +25,8 @@ export interface GraphMeta {
     getNodeMeta(type: string): Promise<GraphNodeMeta>
 
     getNodeTypes(): Promise<string[]>
+
+    getRelationshipTypes(): Promise<string[]>
 }
 
 export const [getGraph, setGraph] = defineInContext<Graph>("Graph")

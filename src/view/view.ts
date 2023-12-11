@@ -4,7 +4,7 @@ import type {GraphEdit} from "../edit/graph-edit";
 import type {NodeSearcher} from "../data/node-searcher";
 import {emptySearcher, typeSearcher} from "../data/searcher";
 
-export type ViewData = NodeViewData | NodeEditViewData
+export type ViewData = NodeViewData | NodeEditViewData | RelationshipEditViewData
 
 
 export interface NodeViewData {
@@ -15,6 +15,11 @@ export interface NodeViewData {
 export interface NodeEditViewData {
     type: "NodeEditView",
     nodeId: string,
+}
+
+export interface RelationshipEditViewData {
+    type: "RelationshipEditView",
+    relationshipId: string,
 }
 
 export interface SavedViewData {

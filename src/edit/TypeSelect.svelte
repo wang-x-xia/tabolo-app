@@ -10,9 +10,17 @@
     const dispatch = createEventDispatcher<{ "type": string }>();
     const graphMeta = getGraphMeta()
 
-    const types: Readable<string[]> = asyncReadable([], () => graphMeta.getNodeTypes())
 
+    export let source: "Node" | "Relationship"
     export let type: string;
+
+    const types: Readable<string[]> = asyncReadable([], () => {
+        if (source === "Node") {
+            return graphMeta.getNodeTypes()
+        } else {
+            return graphMeta.getRelationshipTypes()
+        }
+    })
 
     let search = type
     let edit = false

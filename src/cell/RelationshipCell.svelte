@@ -1,14 +1,30 @@
 <script lang="ts">
-    import {Button, Popover} from "flowbite-svelte";
+    import {Button, ButtonGroup, Popover} from "flowbite-svelte";
     import {idSelector, randomElementId} from "../util";
     import type {GraphRelationship} from "../data/graph";
+    import {DotsHorizontalOutline} from "flowbite-svelte-icons";
+    import {getViewHandler} from "../view/view";
 
     export let data: GraphRelationship
+
+    const viewHandler = getViewHandler()
+
+    async function editRelationship() {
+        await viewHandler.updateView({
+            "type": "RelationshipEditView",
+            "relationshipId": data.id,
+        })
+    }
 
     const id = randomElementId("relationship-cell")
 </script>
 
-<Button {id}>{data.type}</Button>
+<ButtonGroup size="sm">
+    <Button {id}>{data.type}</Button>
+    <Button on:click={editRelationship}>
+        <DotsHorizontalOutline/>
+    </Button>
+</ButtonGroup>
 <Popover title="Properties" triggeredBy={idSelector(id)}>
     {JSON.stringify(data.properties, null, 2)}
 </Popover>

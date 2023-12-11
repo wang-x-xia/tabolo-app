@@ -35,7 +35,11 @@
 
 
     async function addNode() {
-        await graphEdit.newEmptyNode()
+        let node = await graphEdit.newEmptyNode();
+        await viewHandler.updateView({
+            type: "NodeEditView",
+            nodeId: node.id,
+        })
     }
 
     queryData()

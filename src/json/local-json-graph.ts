@@ -257,7 +257,6 @@ function createGraphEdit(db: IDBDatabase, graph: Graph): GraphEdit {
             const oldRelationship = await graph.getRelationship(id);
             const newRelationship = await newEmptyRelationship(oldRelationship.startNodeId, oldRelationship.endNodeId);
             await editRelationshipType(newRelationship.id, oldRelationship.type);
-            await editRelationshipEndNode(newRelationship.id, oldRelationship.endNodeId);
             await editRelationshipProperty(newRelationship.id, oldRelationship.properties);
             return await graph.getRelationship(newRelationship.id);
         }
@@ -290,6 +289,15 @@ function createGraphMeta(graph: Graph): GraphMeta {
 
         async getNodeTypes(): Promise<string[]> {
             const nodes = await graph.searchNodes(typeSearcher("NodeType"));
+            const types = new Set<string>();
+            nodes.forEach(node => {
+                types.add(node.properties["name"]);
+            });
+            return Array.from(types).sort();
+        },
+
+        async getRelationshipTypes(): Promise<string[]> {
+            const nodes = await graph.searchNodes(typeSearcher("RelationshipType"));
             const types = new Set<string>();
             nodes.forEach(node => {
                 types.add(node.properties["name"]);

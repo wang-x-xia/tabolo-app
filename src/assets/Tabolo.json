@@ -1,6 +1,13 @@
 {
   "node": [
     {
+      "id": "06a859a2-db04-4a81-ae3a-c6ca8682ab4d",
+      "type": "RelationshipType",
+      "properties": {
+        "name": "New"
+      }
+    },
+    {
       "id": "16c27147-a0b2-4559-b0c0-d31a6c4ff996",
       "type": "Concept",
       "properties": {
@@ -121,6 +128,14 @@
       "properties": {
         "type": "NodeEditView",
         "description": "Edit one node"
+      }
+    },
+    {
+      "id": "fae51b39-6015-422c-a7f0-d39cd53f7e17",
+      "type": "NodeType",
+      "properties": {
+        "name": "RelationshipType",
+        "showJsonPath": "$.name"
       }
     }
   ],

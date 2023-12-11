@@ -9,6 +9,7 @@
     import {getGraphEdit} from "../edit/graph-edit";
     import {typeSearcher} from "../data/searcher";
     import {onDestroy} from "svelte";
+    import RelationshipEditView from "./RelationshipEditView.svelte";
 
     const graph = getGraph()
     const graphEdit = getGraphEdit()
@@ -60,7 +61,9 @@
 {:else if (viewData.type === "NodeView") }
     <NodeView nodeSearcher={viewData.searcher}/>
 {:else if ((viewData.type === "NodeEditView"))}
-    <NodeEditView data={viewData}></NodeEditView>
+    <NodeEditView data={viewData}/>
+{:else if (viewData.type === "RelationshipEditView")}
+    <RelationshipEditView data={viewData}/>
 {/if}
 
 

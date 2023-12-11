@@ -24,7 +24,7 @@
     $: config = nodeCellConfig(data.type)
 </script>
 
-<ButtonGroup {id} size="sm" outline>
+<ButtonGroup {id} size="sm">
     <Button>{`<${data.type}>`}</Button>
     {#if $config.type === "ShowJsonPath"}
         {@const property = JSONPath({path: $config.jsonPath, json: data.properties, wrap: false})}
