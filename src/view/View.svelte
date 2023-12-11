@@ -8,12 +8,15 @@
     import {getGraph} from "../data/graph";
     import {getGraphEdit} from "../edit/graph-edit";
     import {typeSearcher} from "../data/searcher";
+    import {onDestroy} from "svelte";
 
     const graph = getGraph()
     const graphEdit = getGraphEdit()
     const viewHandler = fromGraph(graph, graphEdit);
 
+
     async function updateView(view: ViewData): Promise<ViewData> {
+        history.pushState(viewData, "")
         const r = await viewHandler.updateView(view)
         viewData = r
         return r
@@ -35,6 +38,16 @@
         viewData = await viewHandler.getView()
         savedViews = nodes.map(it => it.properties as SavedViewData).sort((l, r) => l.name.localeCompare(r.name))
     }
+
+    async function popState(e: PopStateEvent) {
+        viewData = await viewHandler.updateView(e.state)
+    }
+
+    window.addEventListener("popstate", popState)
+
+    onDestroy(() => {
+        window.removeEventListener("popstate", popState)
+    })
 
     setup()
 
