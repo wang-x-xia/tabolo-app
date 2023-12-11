@@ -1,12 +1,11 @@
 <script lang="ts">
-    import {getGraph, type GraphRelationship} from "../data/graph";
+    import {type GraphRelationship} from "../data/graph";
     import {Button, ButtonGroup, Input, Label, Textarea} from "flowbite-svelte";
     import {getGraphEdit} from "./graph-edit";
     import {getViewHandler} from "../view/view";
-    import NodeIdCell from "../cell/NodeIdCell.svelte";
     import TypeSelect from "./TypeSelect.svelte";
+    import NodeSelect from "./NodeSelect.svelte";
 
-    const graph = getGraph()
     const graphEdit = getGraphEdit()
     const viewHandler = getViewHandler()
 
@@ -41,6 +40,13 @@
         data = await graphEdit.editRelationshipProperty(data.id, JSON.parse(property))
     }
 
+    async function updateNodeId(pos: "Start" | "End", nodeId: string) {
+        if (pos === "Start") {
+            data = await graphEdit.editRelationshipStartNode(data.id, nodeId)
+        } else {
+            data = await graphEdit.editRelationshipEndNode(data.id, nodeId)
+        }
+    }
 </script>
 
 <div class="w-full max-w-3xl space-y-4">
@@ -54,9 +60,9 @@
     <Label class="mb-2 text-xl">Type</Label>
     <TypeSelect source="Relationship" on:type={e =>setType(e.detail)} type={data.type}/>
     <Label class="mb-2 text-xl">Start Node</Label>
-    <NodeIdCell data={data.startNodeId}/>
+    <NodeSelect on:node={e => updateNodeId("Start", e.detail)} data={data.startNodeId}/>
     <Label class="mb-2 text-xl">End Node</Label>
-    <NodeIdCell data={data.endNodeId}/>
+    <NodeSelect on:node={e => updateNodeId("End", e.detail)} data={data.endNodeId}/>
     <Label class="mb-2 text-xl">Property</Label>
     <Textarea class="h-40" bind:value={property}/>
     <ButtonGroup>

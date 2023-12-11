@@ -25,11 +25,13 @@
 
     let result: GraphNode[] | undefined
 
-    async function queryData() {
-        await viewHandler.updateView({
-            type: "NodeView",
-            searcher: nodeSearcher
-        })
+    async function queryData(updateView: "UpdateView" | "NotUpdateView" = "UpdateView") {
+        if (updateView === "UpdateView") {
+            await viewHandler.updateView({
+                type: "NodeView",
+                searcher: nodeSearcher
+            })
+        }
         result = await graph.searchNodes(nodeSearcher);
     }
 
@@ -42,12 +44,12 @@
         })
     }
 
-    queryData()
+    queryData("NotUpdateView")
 
 </script>
 
 <ButtonGroup class="space-x-px">
-    <Button color="primary" on:click={queryData}>Refresh</Button>
+    <Button color="primary" on:click={() =>queryData()}>Refresh</Button>
     <Button color="primary" on:click={addNode}>Add New Node</Button>
 </ButtonGroup>
 <NodeSearch bind:data={nodeSearcher}/>
