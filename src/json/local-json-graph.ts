@@ -164,7 +164,7 @@ function createGraphEdit(db: IDBDatabase, graph: Graph): GraphEdit {
     }
 
 
-    async function newEmptyRelationship(): Promise<GraphRelationship> {
+    async function newEmptyRelationship(startNodeId: string, endNodeId: string): Promise<GraphRelationship> {
         let id = window.crypto.randomUUID();
         while (await graph.getRelationship(id) != null) {
             // generate node id until not find
@@ -174,8 +174,8 @@ function createGraphEdit(db: IDBDatabase, graph: Graph): GraphEdit {
         const relationship: GraphRelationship = {
             id,
             type: "New",
-            startNodeId: undefined,
-            endNodeId: undefined,
+            startNodeId,
+            endNodeId,
             properties: {}
         }
         await asPromise(store.add(relationship));
@@ -255,9 +255,8 @@ function createGraphEdit(db: IDBDatabase, graph: Graph): GraphEdit {
 
         async copyRelationship(id: string): Promise<GraphRelationship> {
             const oldRelationship = await graph.getRelationship(id);
-            const newRelationship = await newEmptyRelationship();
+            const newRelationship = await newEmptyRelationship(oldRelationship.startNodeId, oldRelationship.endNodeId);
             await editRelationshipType(newRelationship.id, oldRelationship.type);
-            await editRelationshipStartNode(newRelationship.id, oldRelationship.startNodeId);
             await editRelationshipEndNode(newRelationship.id, oldRelationship.endNodeId);
             await editRelationshipProperty(newRelationship.id, oldRelationship.properties);
             return await graph.getRelationship(newRelationship.id);

@@ -48,6 +48,11 @@
         relationships = await graph.searchRelationships(relationshipNodeSearcher(data.id))
     }
 
+    async function createRelationship() {
+        await graphEdit.newEmptyRelationship(data.id, data.id)
+        await setup()
+    }
+
     setup()
 </script>
 
@@ -72,7 +77,12 @@
     {:else }
         <Label class="mb-2 text-xl">Relationships</Label>
         {#each relationships as relationship}
-            <RelationshipCell data={relationship}/>
+            <div>
+                <RelationshipCell data={relationship}/>
+            </div>
         {/each}
     {/if}
+    <ButtonGroup>
+        <Button on:click={createRelationship}>New Relationship</Button>
+    </ButtonGroup>
 </div>

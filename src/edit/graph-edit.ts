@@ -13,7 +13,7 @@ export interface GraphEdit {
 
     copyNode(id: string): Promise<GraphNode>;
 
-    newEmptyRelationship(): Promise<GraphRelationship>
+    newEmptyRelationship(startNodeId: string, endNodeId: string): Promise<GraphRelationship>
 
     editRelationshipType(id: string, nodeId: string): Promise<GraphRelationship>
 
