@@ -4,8 +4,10 @@
     import {CloseSolid} from "flowbite-svelte-icons";
     import NodeTypeSelect from "./NodeTypeSelect.svelte";
     import {getGraphEdit} from "./graph-edit";
+    import {getViewHandler} from "../view/view";
 
     const graphEdit = getGraphEdit()
+    const viewHandler = getViewHandler()
 
     export let data: GraphNode
 
@@ -23,10 +25,15 @@
 
     async function removeNode() {
         await graphEdit.removeNode(data.id)
+        history.back()
     }
 
     async function copy() {
-        await graphEdit.copyNode(data.id);
+        let node = await graphEdit.copyNode(data.id);
+        await viewHandler.updateView({
+            "type": "NodeEditView",
+            "nodeId": node.id
+        });
     }
 
     async function save() {
