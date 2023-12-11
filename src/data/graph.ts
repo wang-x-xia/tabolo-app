@@ -42,14 +42,6 @@ export interface GraphRelationship extends Extendable {
     endNodeId: string;
 }
 
-export type GraphValue = {
-    type: "node",
-    value: GraphNode,
-} | {
-    type: "relationship",
-    value: GraphRelationship,
-}
-
 
 export interface GraphNodeMeta {
     name: string,

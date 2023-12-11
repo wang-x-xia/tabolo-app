@@ -1,5 +1,4 @@
 <script lang="ts">
-    import NullNodeSearch from "./NullNodeSearch.svelte";
     import NodeTypeSearch from "./NodeTypeSearch.svelte";
     import NodeEqSearch from "./NodeEqSearch.svelte";
     import NodeMatchAllSearch from "./NodeMatchAllSearch.svelte";
@@ -40,9 +39,7 @@
 </script>
 
 <div class="flex items-end space-x-2">
-    {#if data.type === "empty"}
-        <NullNodeSearch {data}/>
-    {:else if data.type === "type"}
+    {#if data.type === "type"}
         <NodeTypeSearch {data}/>
     {:else if data.type === "eq"}
         <NodeEqSearch {data}/>
