@@ -8,7 +8,7 @@
 
     export let data: NodeSearcher
 
-    let type = data.type
+    $: type = data.type
 
     let types = [
         {value: "empty", name: "Search All"},
@@ -29,7 +29,7 @@
                 data = {type: "type", value: undefined};
                 break
             case "eq":
-                data = {type: "eq", key: undefined, value: {value: undefined}};
+                data = {type: "eq", jsonPath: undefined, value: undefined};
                 break
             case "and":
                 data = {type: "and", searchers: []};

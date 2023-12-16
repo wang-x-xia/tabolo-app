@@ -23,19 +23,29 @@
 
     export let nodeSearcher: NodeSearcher
     // Seperated local data and input data
-    $: localSearcher = nodeSearcher
+    let localSearcher: NodeSearcher
 
-    let result: GraphNode[] | undefined
+    /**
+     * like $: localSearcher = JSON.parse(JSON.stringify(nodeSearcher))
+     * But avoid link localSearcher with nodeSearcher
+     * If linked, the update of localSearcher will also invalidate nodeSearcher and cause the update issue
+     */
+    async function updateInput() {
+        localSearcher = JSON.parse(JSON.stringify(nodeSearcher))
+        await queryData("NotUpdateView")
+    }
+
+    // $ won't be called during init.
+    updateInput()
 
     $:{
-        // when input is update , refresh the data
-        queryDataWithDependency(nodeSearcher)
+        // $ bind the update of nodeSearcher
+        if (nodeSearcher) {
+            updateInput()
+        }
     }
 
-    async function queryDataWithDependency(searcher: NodeSearcher) {
-        result = await graph.searchNodes(searcher);
-    }
-
+    let result: GraphNode[] | undefined
 
     async function queryData(updateView: "UpdateView" | "NotUpdateView" = "UpdateView") {
         if (updateView === "UpdateView") {
@@ -44,9 +54,8 @@
                 searcher: localSearcher
             })
         }
-        await queryDataWithDependency(localSearcher);
+        result = await graph.searchNodes(localSearcher);
     }
-
 
     async function addNode() {
         let node = await graphEdit.newEmptyNode();
