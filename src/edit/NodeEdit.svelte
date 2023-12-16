@@ -6,6 +6,7 @@
     import {getViewHandler} from "../view/view";
     import {relationshipNodeSearcher} from "../data/relationship-searcher";
     import RelationshipCell from "../cell/RelationshipCell.svelte";
+    import NodeIdCell from "../cell/NodeIdCell.svelte";
 
     const graph = getGraph()
     const graphEdit = getGraphEdit()
@@ -78,7 +79,13 @@
         <Label class="mb-2 text-xl">Relationships</Label>
         {#each relationships as relationship}
             <div>
+                {#if (relationship.startNodeId !== data.id)}
+                    <NodeIdCell data={relationship.startNodeId}/>
+                {/if}
                 <RelationshipCell data={relationship}/>
+                {#if (relationship.endNodeId !== data.id)}
+                    <NodeIdCell data={relationship.endNodeId}/>
+                {/if}
             </div>
         {/each}
     {/if}
