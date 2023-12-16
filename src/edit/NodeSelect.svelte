@@ -32,7 +32,7 @@
 </script>
 
 {#if (edit)}
-    <NodeSearch data={nodeSearcher}></NodeSearch>
+    <NodeSearch bind:data={nodeSearcher}></NodeSearch>
     <Button on:click={queryData}>Search</Button>
     {#if result == null}
         Loading
