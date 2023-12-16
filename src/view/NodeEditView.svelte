@@ -8,7 +8,7 @@
 
     export let data: NodeEditViewData
 
-    let nodeAsync = graph.getNode(data.nodeId)
+    $: nodeAsync = graph.getNode(data.nodeId)
 
 </script>
 
