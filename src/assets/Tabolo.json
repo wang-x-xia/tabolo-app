@@ -4,14 +4,32 @@
       "id": "06a859a2-db04-4a81-ae3a-c6ca8682ab4d",
       "type": "RelationshipType",
       "properties": {
-        "name": "New"
+        "name": "New",
+        "description": "The default type of new relationship"
+      }
+    },
+    {
+      "id": "118cd98c-5080-442c-9225-ef9fcd01342d",
+      "type": "RelationshipType",
+      "properties": {
+        "name": "Is",
+        "description": "Use to describe the start node is same with end node"
+      }
+    },
+    {
+      "id": "14bc1c2b-c98e-4814-990b-bf767cb424bc",
+      "type": "RelationshipType",
+      "properties": {
+        "name": "After",
+        "description": "The start node is after the end node"
       }
     },
     {
       "id": "16c27147-a0b2-4559-b0c0-d31a6c4ff996",
       "type": "Concept",
       "properties": {
-        "name": "Property"
+        "name": "Property",
+        "description": "Each node and relationship can use property to store the data. The data schema is not limited."
       }
     },
     {
@@ -19,14 +37,30 @@
       "type": "NodeType",
       "properties": {
         "name": "Concept",
-        "showJsonPath": "$.name"
+        "showJsonPath": "$.name",
+        "description": "The concept is used to describe the resources in application"
       }
     },
     {
       "id": "22a89691-6687-4c20-bc5f-8a580620e6fd",
       "type": "Concept",
       "properties": {
-        "name": "Relationship"
+        "name": "Relationship",
+        "description": "Use to link 2 nodes with direction."
+      }
+    },
+    {
+      "id": "342249d0-4bbf-47d2-8de2-6e2888032bc1",
+      "type": "SavedView",
+      "properties": {
+        "name": "Search All Concepts",
+        "data": {
+          "type": "NodeView",
+          "searcher": {
+            "type": "type",
+            "value": "Concept"
+          }
+        }
       }
     },
     {
@@ -34,7 +68,8 @@
       "type": "NodeType",
       "properties": {
         "name": "SavedView",
-        "showJsonPath": "$.name"
+        "showJsonPath": "$.name",
+        "description": "Use to cache a view configuration"
       }
     },
     {
@@ -42,7 +77,14 @@
       "type": "ViewType",
       "properties": {
         "type": "NodeView",
-        "description": "Search node list"
+        "description": "View the node list"
+      }
+    },
+    {
+      "id": "4a4954fc-6f6b-4ac4-acb9-99f5e753f21a",
+      "type": "Feature",
+      "properties": {
+        "name": "Edit node"
       }
     },
     {
@@ -59,11 +101,41 @@
       }
     },
     {
+      "id": "5841c822-ddcf-4111-8a1a-9f356196270a",
+      "type": "Concept",
+      "properties": {
+        "name": "Edit",
+        "description": "The edit view for details"
+      }
+    },
+    {
       "id": "6547e7b8-768a-426e-a40b-33e2af93848d",
       "type": "Application",
       "properties": {
         "name": "Tabolo",
-        "description": "Tabolo is an application to view the Graph data."
+        "description": "Tabolo is an application to view the Graph-Like data."
+      }
+    },
+    {
+      "id": "69d29f6a-ffc0-4090-b90f-2dc9efafd5b4",
+      "type": "SavedView",
+      "properties": {
+        "name": "Search All Features",
+        "data": {
+          "type": "NodeView",
+          "searcher": {
+            "type": "type",
+            "value": "Feature"
+          }
+        }
+      }
+    },
+    {
+      "id": "6bde6dca-387c-4f15-894f-7bd61cccdc8f",
+      "type": "RelationshipType",
+      "properties": {
+        "name": "Has",
+        "description": "The start node has the end node"
       }
     },
     {
@@ -72,15 +144,46 @@
       "properties": {
         "type": "NodeView",
         "searcher": {
-          "type": "empty"
+          "type": "type",
+          "value": "Concept"
         }
+      }
+    },
+    {
+      "id": "7b169f34-44b0-4278-975b-fefd051f9caa",
+      "type": "Concept",
+      "properties": {
+        "name": "View"
       }
     },
     {
       "id": "89250f44-92be-450e-8e09-9356cf182228",
       "type": "Concept",
       "properties": {
-        "name": "Node"
+        "name": "Node",
+        "description": "The basic unit to store the data"
+      }
+    },
+    {
+      "id": "9fdb5f7f-9783-4147-a20c-aeaaeab6f74f",
+      "type": "SavedView",
+      "properties": {
+        "name": "Search All Saved Views",
+        "data": {
+          "type": "NodeView",
+          "searcher": {
+            "type": "type",
+            "value": "SavedView"
+          }
+        }
+      }
+    },
+    {
+      "id": "a17d9269-dfab-4d65-b7bb-5fdf8efe6aa4",
+      "type": "NodeType",
+      "properties": {
+        "name": "UserStory",
+        "description": "Use to manage the user story of the feature"
       }
     },
     {
@@ -96,14 +199,16 @@
       "type": "NodeType",
       "properties": {
         "name": "View",
-        "showJsonPath": "$.type"
+        "showJsonPath": "$.type",
+        "descrpition": "The type of current view"
       }
     },
     {
       "id": "b79778c6-b85c-47c2-89c9-bb42d2c79499",
       "type": "NodeType",
       "properties": {
-        "name": "New"
+        "name": "New",
+        "description": "The type of new node"
       }
     },
     {
@@ -119,7 +224,29 @@
       "type": "NodeType",
       "properties": {
         "name": "ViewType",
-        "showJsonPath": "$.type"
+        "showJsonPath": "$.type",
+        "description": "The type of the view. Usually, it's a component that can render in the whole window"
+      }
+    },
+    {
+      "id": "c10a6ae9-23e1-4160-a141-8b1bcb3628f1",
+      "type": "SavedView",
+      "properties": {
+        "name": "Search All Relationship Types",
+        "data": {
+          "type": "NodeView",
+          "searcher": {
+            "type": "type",
+            "value": "RelationshipType"
+          }
+        }
+      }
+    },
+    {
+      "id": "cac8b82f-61cb-4cdc-ac8e-16137da2309b",
+      "type": "Feature",
+      "properties": {
+        "name": "Edit relationship"
       }
     },
     {
@@ -131,6 +258,36 @@
       }
     },
     {
+      "id": "e0bd85c5-fc0c-445a-af08-97b6ad728ea4",
+      "type": "NodeType",
+      "properties": {
+        "name": "Feature",
+        "showJsonPath": "$.name",
+        "description": "Use to manage the feature of the application"
+      }
+    },
+    {
+      "id": "ecd6ee53-691e-4e6d-a2cd-2e01dcd3d98f",
+      "type": "SavedView",
+      "properties": {
+        "name": "Search All Node Types",
+        "data": {
+          "type": "NodeView",
+          "searcher": {
+            "type": "type",
+            "value": "NodeType"
+          }
+        }
+      }
+    },
+    {
+      "id": "f37c033e-1ee3-4dab-aecb-d13e8119543d",
+      "type": "Feature",
+      "properties": {
+        "name": "List nodes"
+      }
+    },
+    {
       "id": "fae51b39-6015-422c-a7f0-d39cd53f7e17",
       "type": "NodeType",
       "properties": {
@@ -139,5 +296,41 @@
       }
     }
   ],
-  "relationship": []
+  "relationship": [
+    {
+      "id": "6130eaac-e71d-4e1f-8837-5cefa9dedc1f",
+      "type": "Has",
+      "startNodeId": "22a89691-6687-4c20-bc5f-8a580620e6fd",
+      "endNodeId": "cac8b82f-61cb-4cdc-ac8e-16137da2309b",
+      "properties": {}
+    },
+    {
+      "id": "8cbf3543-ff8b-4343-bb2e-7bc91a52d6de",
+      "type": "Has",
+      "startNodeId": "89250f44-92be-450e-8e09-9356cf182228",
+      "endNodeId": "f37c033e-1ee3-4dab-aecb-d13e8119543d",
+      "properties": {}
+    },
+    {
+      "id": "95e56704-0fe7-4410-85cd-35eb7defeddb",
+      "type": "Has",
+      "startNodeId": "89250f44-92be-450e-8e09-9356cf182228",
+      "endNodeId": "4a4954fc-6f6b-4ac4-acb9-99f5e753f21a",
+      "properties": {}
+    },
+    {
+      "id": "9a661492-d938-499e-a457-be026d0a6f44",
+      "type": "Has",
+      "startNodeId": "7b169f34-44b0-4278-975b-fefd051f9caa",
+      "endNodeId": "b6fcc068-a91a-4104-8351-bc357d1f5234",
+      "properties": {}
+    },
+    {
+      "id": "c4158c45-7491-4c95-af7d-a5f65c8864c9",
+      "type": "New",
+      "startNodeId": "6547e7b8-768a-426e-a40b-33e2af93848d",
+      "endNodeId": "f37c033e-1ee3-4dab-aecb-d13e8119543d",
+      "properties": {}
+    }
+  ]
 }
