@@ -22,17 +22,29 @@
     let viewHandler = getViewHandler()
 
     export let nodeSearcher: NodeSearcher
+    // Seperated local data and input data
+    $: localSearcher = nodeSearcher
 
     let result: GraphNode[] | undefined
+
+    $:{
+        // when input is update , refresh the data
+        queryDataWithDependency(nodeSearcher)
+    }
+
+    async function queryDataWithDependency(searcher: NodeSearcher) {
+        result = await graph.searchNodes(searcher);
+    }
+
 
     async function queryData(updateView: "UpdateView" | "NotUpdateView" = "UpdateView") {
         if (updateView === "UpdateView") {
             await viewHandler.updateView({
                 type: "NodeView",
-                searcher: nodeSearcher
+                searcher: localSearcher
             })
         }
-        result = await graph.searchNodes(nodeSearcher);
+        await queryDataWithDependency(localSearcher);
     }
 
 
@@ -52,7 +64,7 @@
     <Button color="primary" on:click={() =>queryData()}>Refresh</Button>
     <Button color="primary" on:click={addNode}>Add New Node</Button>
 </ButtonGroup>
-<NodeSearch bind:data={nodeSearcher}/>
+<NodeSearch bind:data={localSearcher}/>
 {#if result == null}
     Loading
 {:else}
