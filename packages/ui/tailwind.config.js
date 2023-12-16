@@ -3,7 +3,7 @@ export default {
     content: [
         "./index.html",
         "./src/**/*.{svelte,js,ts,jsx,tsx}",
-        "./node_modules/flowbite-svelte/**/*.{html,js,svelte,ts}",
+        "../.././node_modules/flowbite-svelte/**/*.{html,js,svelte,ts}",
     ],
     theme: {
         extend: {
