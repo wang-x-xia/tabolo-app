@@ -41,7 +41,9 @@
     }
 
     async function popState(e: PopStateEvent) {
-        viewData = await viewHandler.updateView(e.state)
+        if (e.state) {
+            viewData = await viewHandler.updateView(e.state)
+        }
     }
 
     window.addEventListener("popstate", popState)
