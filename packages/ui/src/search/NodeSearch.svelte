@@ -3,8 +3,8 @@
     import NodeEqSearch from "./NodeEqSearch.svelte";
     import NodeMatchAllSearch from "./NodeMatchAllSearch.svelte";
     import {Select} from "flowbite-svelte";
-    import type {NodeSearcher} from "../data/node-searcher";
-    import {emptySearcher} from "../data/searcher";
+    import type {NodeSearcher} from "tabolo-core/lib/node-searcher";
+    import {emptySearcher} from "tabolo-core/lib/searcher";
 
     export let data: NodeSearcher
 

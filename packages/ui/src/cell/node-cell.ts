@@ -1,7 +1,7 @@
 import type {Readable} from "svelte/store";
 import {readable} from "svelte/store";
 import {getGraphMeta} from "../data/graph";
-import type {Extendable} from "../data/base";
+import type {Extendable} from "tabolo-core";
 
 export type NodeCellConfig = ShowType | ShowJsonPath
 

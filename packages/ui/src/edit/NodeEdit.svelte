@@ -1,12 +1,13 @@
 <script lang="ts">
-    import {getGraph, type GraphNode, type GraphRelationship} from "../data/graph";
+    import {type GraphNode, type GraphRelationship} from "tabolo-core";
     import {Button, ButtonGroup, Input, Label, Textarea} from "flowbite-svelte";
     import TypeSelect from "./TypeSelect.svelte";
     import {getGraphEdit} from "./graph-edit";
     import {getViewHandler} from "../view/view";
-    import {relationshipNodeSearcher} from "../data/relationship-searcher";
+    import {relationshipNodeSearcher} from "tabolo-core/lib/relationship-searcher";
     import RelationshipCell from "../cell/RelationshipCell.svelte";
     import NodeIdCell from "../cell/NodeIdCell.svelte";
+    import {getGraph} from "../data/graph";
 
     const graph = getGraph()
     const graphEdit = getGraphEdit()
@@ -66,9 +67,9 @@
         <Button on:click={remove}>Delete</Button>
     </ButtonGroup>
     <Label class="mb-2 text-xl">Type</Label>
-    <TypeSelect source="Node" on:type={e =>setType(e.detail)} type={data.type}/>
+    <TypeSelect on:type={e =>setType(e.detail)} source="Node" type={data.type}/>
     <Label class="mb-2 text-xl">Property</Label>
-    <Textarea class="h-40" bind:value={property}/>
+    <Textarea bind:value={property} class="h-40"/>
     <ButtonGroup>
         <Button color="primary" on:click={save}>Save</Button>
         <Button color="alternative" on:click={reset}>Reset</Button>

@@ -1,0 +1,14 @@
+{
+  "name": "tabolo-core",
+  "version": "0.1.0",
+  "description": "",
+  "devDependencies": {},
+  "scripts": {
+    "test": "vitest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wang-x-xia/tabolo-app.git"
+  },
+  "license": "MIT"
+}

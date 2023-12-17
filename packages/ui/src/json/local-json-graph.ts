@@ -1,10 +1,10 @@
-import type {Graph, GraphMeta, GraphNode, GraphNodeMeta, GraphRelationship} from "../data/graph";
+import type {Graph, GraphMeta, GraphNode, GraphNodeMeta, GraphRelationship} from "tabolo-core";
 import type {GraphEdit} from "../edit/graph-edit";
-import type {NodeSearcher} from "../data/node-searcher";
-import {checkNode} from "../data/node-searcher";
-import {typeSearcher} from "../data/searcher";
-import type {RelationshipSearcher} from "../data/relationship-searcher";
-import {checkRelationship} from "../data/relationship-searcher";
+import type {NodeSearcher} from "tabolo-core/lib/node-searcher";
+import {checkNode} from "tabolo-core/lib/node-searcher";
+import {typeSearcher} from "tabolo-core/lib/searcher";
+import type {RelationshipSearcher} from "tabolo-core/lib/relationship-searcher";
+import {checkRelationship} from "tabolo-core/lib/relationship-searcher";
 
 export interface LocalJson {
     exportAll(): Promise<{ node: GraphNode[], relationship: GraphRelationship[] }>

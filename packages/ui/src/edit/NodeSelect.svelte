@@ -1,13 +1,14 @@
 <script lang="ts">
-    import {getGraph, type GraphNode} from "../data/graph";
+    import type {GraphNode} from "tabolo-core";
     import NodeIdCell from "../cell/NodeIdCell.svelte";
     import {Button, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell} from "flowbite-svelte";
     import {EditOutline} from "flowbite-svelte-icons";
-    import type {NodeSearcher} from "../data/node-searcher";
-    import {emptySearcher} from "../data/searcher";
+    import type {NodeSearcher} from "tabolo-core/lib/node-searcher";
+    import {emptySearcher} from "tabolo-core/lib/searcher";
     import NodeSearch from "../search/NodeSearch.svelte";
     import NodeCell from "../cell/NodeCell.svelte";
     import {createEventDispatcher} from "svelte";
+    import {getGraph} from "../data/graph";
 
     const graph = getGraph()
     const dispatch = createEventDispatcher<{ "node": string }>();

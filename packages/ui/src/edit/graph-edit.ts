@@ -1,5 +1,5 @@
 import {defineInContext} from "../util";
-import type {GraphNode, GraphRelationship} from "../data/graph";
+import type {GraphNode, GraphRelationship} from "tabolo-core";
 
 export interface GraphEdit {
 

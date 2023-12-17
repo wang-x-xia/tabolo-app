@@ -1,6 +1,6 @@
 <script lang="ts">
     import {ButtonGroup, Input, InputAddon} from "flowbite-svelte";
-    import type {PropertySearcher} from "../data/node-searcher";
+    import type {PropertySearcher} from "tabolo-core/lib/node-searcher";
 
     export let data: PropertySearcher
 

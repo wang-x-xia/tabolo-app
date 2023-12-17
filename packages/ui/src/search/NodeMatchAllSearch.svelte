@@ -2,8 +2,8 @@
     import {Button, Listgroup, ListgroupItem} from "flowbite-svelte";
     import NodeSearch from "./NodeSearch.svelte";
     import {CloseSolid, PlusSolid} from "flowbite-svelte-icons";
-    import type {MatchAllSearcher, NodeSearcher} from "../data/node-searcher";
-    import {emptySearcher} from "../data/searcher";
+    import type {MatchAllSearcher, NodeSearcher} from "tabolo-core/lib/node-searcher";
+    import {emptySearcher} from "tabolo-core/lib/searcher";
 
     export let data: MatchAllSearcher
 

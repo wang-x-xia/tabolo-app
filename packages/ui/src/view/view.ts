@@ -1,8 +1,8 @@
 import {defineInContext} from "../util";
-import type {Graph} from "../data/graph";
+import type {Graph} from "tabolo-core/lib/graph";
 import type {GraphEdit} from "../edit/graph-edit";
-import type {NodeSearcher} from "../data/node-searcher";
-import {emptySearcher, typeSearcher} from "../data/searcher";
+import type {NodeSearcher} from "tabolo-core/lib/node-searcher";
+import {emptySearcher, typeSearcher} from "tabolo-core/lib/searcher";
 
 export type ViewData = NodeViewData | NodeEditViewData | RelationshipEditViewData
 

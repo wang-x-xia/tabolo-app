@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {type GraphRelationship} from "../data/graph";
+    import type {GraphRelationship} from "tabolo-core";
     import {Button, ButtonGroup, Input, Label, Textarea} from "flowbite-svelte";
     import {getGraphEdit} from "./graph-edit";
     import {getViewHandler} from "../view/view";
@@ -58,13 +58,13 @@
         <Button on:click={remove}>Delete</Button>
     </ButtonGroup>
     <Label class="mb-2 text-xl">Type</Label>
-    <TypeSelect source="Relationship" on:type={e =>setType(e.detail)} type={data.type}/>
+    <TypeSelect on:type={e =>setType(e.detail)} source="Relationship" type={data.type}/>
     <Label class="mb-2 text-xl">Start Node</Label>
-    <NodeSelect on:node={e => updateNodeId("Start", e.detail)} data={data.startNodeId}/>
+    <NodeSelect data={data.startNodeId} on:node={e => updateNodeId("Start", e.detail)}/>
     <Label class="mb-2 text-xl">End Node</Label>
-    <NodeSelect on:node={e => updateNodeId("End", e.detail)} data={data.endNodeId}/>
+    <NodeSelect data={data.endNodeId} on:node={e => updateNodeId("End", e.detail)}/>
     <Label class="mb-2 text-xl">Property</Label>
-    <Textarea class="h-40" bind:value={property}/>
+    <Textarea bind:value={property} class="h-40"/>
     <ButtonGroup>
         <Button color="primary" on:click={save}>Save</Button>
         <Button color="alternative" on:click={reset}>Reset</Button>

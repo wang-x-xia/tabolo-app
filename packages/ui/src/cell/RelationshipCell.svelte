@@ -1,7 +1,7 @@
 <script lang="ts">
     import {Button, ButtonGroup, Popover} from "flowbite-svelte";
     import {idSelector, randomElementId} from "../util";
-    import type {GraphRelationship} from "../data/graph";
+    import type {GraphRelationship} from "tabolo-core";
     import {DotsHorizontalOutline} from "flowbite-svelte-icons";
     import {getViewHandler} from "../view/view";
 

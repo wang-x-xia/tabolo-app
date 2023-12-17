@@ -9,12 +9,12 @@
         TableHead,
         TableHeadCell
     } from "flowbite-svelte";
-    import type {GraphNode} from "../data/graph";
+    import type {GraphNode} from "tabolo-core";
     import {getGraph} from "../data/graph";
     import {getGraphEdit} from "../edit/graph-edit";
     import NodeSearch from "../search/NodeSearch.svelte";
     import NodeCell from "../cell/NodeCell.svelte";
-    import type {NodeSearcher} from "../data/node-searcher";
+    import type {NodeSearcher} from "tabolo-core/lib/node-searcher";
     import {getViewHandler} from "./view";
 
     let graph = getGraph()

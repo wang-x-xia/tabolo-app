@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {getGraph} from "../data/graph.js";
+    import {getGraph} from "../data/graph";
     import NodeCell from "./NodeCell.svelte";
 
     export let data: string
