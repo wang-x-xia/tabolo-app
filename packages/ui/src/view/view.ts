@@ -1,6 +1,6 @@
 import {defineInContext} from "../util";
 import type {Graph} from "tabolo-core/lib/graph";
-import type {GraphEdit} from "../edit/graph-edit";
+import type {GraphEdit} from "tabolo-core";
 import type {NodeSearcher} from "tabolo-core/lib/node-searcher";
 import {emptySearcher, typeSearcher} from "tabolo-core/lib/searcher";
 

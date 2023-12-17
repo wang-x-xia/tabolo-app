@@ -1,7 +1,7 @@
 <script lang="ts">
-    import type {Graph, GraphMeta} from "tabolo-core";
+    import type {Graph, GraphEdit, GraphMeta} from "tabolo-core";
     import {setGraph, setGraphMeta} from "../data/graph";
-    import {type GraphEdit, setGraphEdit} from "../edit/graph-edit";
+    import {setGraphEdit} from "../edit/graph-edit";
     import {Button, Label, Listgroup, ListgroupItem, Modal, SpeedDial, Textarea} from "flowbite-svelte";
     import type {LocalJson} from "./local-json-graph";
 

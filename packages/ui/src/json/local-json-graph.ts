@@ -1,5 +1,4 @@
-import type {Graph, GraphMeta, GraphNode, GraphNodeMeta, GraphRelationship} from "tabolo-core";
-import type {GraphEdit} from "../edit/graph-edit";
+import type {Graph, GraphEdit, GraphMeta, GraphNode, GraphNodeMeta, GraphRelationship} from "tabolo-core";
 import type {NodeSearcher} from "tabolo-core/lib/node-searcher";
 import {checkNode} from "tabolo-core/lib/node-searcher";
 import {typeSearcher} from "tabolo-core/lib/searcher";
