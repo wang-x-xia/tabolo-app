@@ -64,17 +64,6 @@ function createGraph(db: IDBDatabase): Graph {
     return {
         getNode,
 
-        async getNodes(ids: string[]): Promise<Record<string, GraphNode>> {
-            const value: Record<string, GraphNode> = {}
-            for (const id of ids) {
-                let node = await getNode(id);
-                if (node === null) {
-                    value[id] = node
-                }
-            }
-            return value
-        },
-
         async searchNodes(searcher: NodeSearcher): Promise<GraphNode[]> {
             const nodes = await asPromise(readStore("node", db).getAll());
             return nodes.filter(it => checkNode(it, searcher));

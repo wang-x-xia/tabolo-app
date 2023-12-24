@@ -11,8 +11,6 @@ import type {NodeSearcher} from "./node-searcher";
 export interface Graph {
     getNode(id: string): Promise<GraphNode | null>
 
-    getNodes(id: string[]): Promise<Record<string, GraphNode>>
-
     searchNodes(searcher: NodeSearcher): Promise<GraphNode[]>
 
     getRelationship(id: string): Promise<GraphRelationship | null>
