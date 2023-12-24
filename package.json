@@ -11,13 +11,11 @@
   "scripts": {},
   "devDependencies": {
     "connect": "^3.7.0",
+    "jsonpath-plus": "^7.2.0",
     "ts-node": "^10.9.1",
     "tslib": "^2.6.0",
     "typescript": "^5.0.2",
     "vitest": "^0.34.6"
-  },
-  "dependencies": {
-    "jsonpath-plus": "^7.2.0"
   },
   "workspaces": [
     "packages\\core",
