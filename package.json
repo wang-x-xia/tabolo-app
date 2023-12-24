@@ -8,9 +8,9 @@
     "type": "git",
     "url": "git+https://github.com/wang-x-xia/tabolo-app.git"
   },
-  "scripts": {
-  },
+  "scripts": {},
   "devDependencies": {
+    "connect": "^3.7.0",
     "ts-node": "^10.9.1",
     "tslib": "^2.6.0",
     "typescript": "^5.0.2",
@@ -22,6 +22,7 @@
   "workspaces": [
     "packages\\core",
     "packages\\server",
-    "packages\\ui"
+    "packages\\ui",
+    "packages\\client"
   ]
 }

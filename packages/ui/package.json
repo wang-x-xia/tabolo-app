@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "description": "",
   "type": "module",
+  "dependencies": {
+    "tabolo-core": "*",
+    "tabolo-client": "*"
+  },
   "devDependencies": {
     "@floating-ui/dom": "^1.5.1",
     "@sveltejs/vite-plugin-svelte": "^2.4.2",

@@ -1,14 +1,11 @@
 {
-  "name": "tabolo-server",
+  "name": "tabolo-client",
   "version": "0.1.0",
   "description": "",
-  "main": "index.js",
   "dependencies": {
     "tabolo-core": "*"
   },
-  "devDependencies": {
-    "@types/node": "^20.10.4"
-  },
+  "devDependencies": {},
   "scripts": {
     "test": "vitest"
   },
