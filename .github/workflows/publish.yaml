@@ -3,6 +3,7 @@ on:
   workflow_dispatch:
 permissions:
   id-token: write
+  pages: write
 jobs:
   build-and-publish:
     name: Build And Publish
@@ -14,7 +15,7 @@ jobs:
           node-version: 18
       - run: npm install
       - run: npm run build --workspace=packages/ui
-      - uses: actions/upload-pages-artifact@v2
+      - uses: actions/upload-pages-artifact@v3
         with:
           path: packages/ui/dist
       - uses: actions/deploy-pages@v4
