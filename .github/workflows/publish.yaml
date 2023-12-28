@@ -1,0 +1,18 @@
+name: Publish to Github.io
+on:
+  workflow_dispatch:
+jobs:
+  build-and-publish:
+    name: Build And Publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: npm install
+      - run: npm run build --workspace=packages/ui
+      - uses: actions/upload-pages-artifact@v2
+        with:
+          path: packages/ui/dist
+      - uses: actions/deploy-pages@v4
