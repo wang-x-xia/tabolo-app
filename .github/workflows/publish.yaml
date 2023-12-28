@@ -1,6 +1,8 @@
-name: Publish to Github.io
+name: Publish to github.io
 on:
   workflow_dispatch:
+permissions:
+  id-token: write
 jobs:
   build-and-publish:
     name: Build And Publish
