@@ -22,5 +22,5 @@ describe("Local FS Test", async () => {
         path: "node_modules/.test",
         idPrefix: "test.",
     })
-    await verifyGraph(graph, graphEdit)
+    verifyGraph(graph, graphEdit)
 })

@@ -3,16 +3,16 @@ import {GraphEdit} from "./graph-edit";
 import {describe, expect, test} from "vitest";
 
 
-export async function verifyGraph(graph: Graph, graphEdit: GraphEdit) {
-    describe("verify node operation", async () => {
-        await verifyNode(graph, graphEdit)
+export function verifyGraph(graph: Graph, graphEdit: GraphEdit) {
+    describe("verify node operation", () => {
+        verifyNode(graph, graphEdit)
     })
-    describe("verify relationship operation", async () => {
-        await verifyRelationship(graph, graphEdit)
+    describe("verify relationship operation", () => {
+        verifyRelationship(graph, graphEdit)
     })
 }
 
-export async function verifyNode(graph: Graph, graphEdit: GraphEdit) {
+export function verifyNode(graph: Graph, graphEdit: GraphEdit) {
     test("node operations", async () => {
         let node = await graphEdit.newEmptyNode()
         const id = node.id
@@ -51,7 +51,7 @@ export async function verifyNode(graph: Graph, graphEdit: GraphEdit) {
     })
 }
 
-export async function verifyRelationship(graph: Graph, graphEdit: GraphEdit) {
+export function verifyRelationship(graph: Graph, graphEdit: GraphEdit) {
     test("relationship operations", async () => {
         const startNode = await graphEdit.newEmptyNode()
         const endNode = await graphEdit.newEmptyNode()
