@@ -1,6 +1,7 @@
-import {Graph, GraphEdit, GraphNode, GraphRelationship} from "tabolo-core"
-import {NodeSearcher} from "tabolo-core/lib/node-searcher";
-import {RelationshipSearcher} from "tabolo-core/lib/relationship-searcher";
+import type {Graph, GraphNode, GraphRelationship} from "./graph"
+import type {GraphEdit} from "./graph-edit"
+import type {NodeSearcher} from "./node-searcher";
+import type {RelationshipSearcher} from "./relationship-searcher";
 
 export interface HttpClientConfig {
     baseUrl: string

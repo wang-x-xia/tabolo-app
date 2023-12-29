@@ -4,8 +4,7 @@
   "description": "",
   "type": "module",
   "dependencies": {
-    "tabolo-core": "*",
-    "tabolo-client": "*"
+    "tabolo-core": "*"
   },
   "devDependencies": {
     "@floating-ui/dom": "^1.5.1",

@@ -1,5 +1,5 @@
 import {afterAll, beforeAll, describe} from "vitest";
-import {createHttpClientGraph, createHttpClientGraphEdit} from "tabolo-client"
+import {createHttpClientGraph, createHttpClientGraphEdit} from "tabolo-core"
 import {verifyGraph} from "tabolo-core/lib/graph-test"
 import {createFromLocalFs} from "./local-fs";
 import {koaServer} from "./http-handler";

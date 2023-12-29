@@ -21,7 +21,6 @@
   "workspaces": [
     "packages\\core",
     "packages\\server",
-    "packages\\ui",
-    "packages\\client"
+    "packages\\ui"
   ]
 }
