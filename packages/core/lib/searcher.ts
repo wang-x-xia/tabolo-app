@@ -20,3 +20,16 @@ export function typeSearcher(type: string): TypeSearcher {
         value: type,
     }
 }
+
+export interface MatchAllSearcher<T> {
+    type: "and",
+    searchers: T[],
+}
+
+
+export function matchAllSearcher<T>(searchers: T[]): MatchAllSearcher<T> {
+    return {
+        type: "and",
+        searchers: searchers,
+    }
+}

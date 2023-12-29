@@ -1,4 +1,4 @@
-import type {EmptySearcher, TypeSearcher} from "./searcher";
+import type {EmptySearcher, MatchAllSearcher, TypeSearcher} from "./searcher";
 import type {GraphNode} from "./graph";
 import {JSONPath} from "jsonpath-plus";
 
@@ -9,13 +9,7 @@ export interface PropertySearcher {
     value: any,
 }
 
-export interface MatchAllSearcher {
-    type: "and",
-    searchers: NodeSearcher[],
-}
-
-
-export type NodeSearcher = EmptySearcher | TypeSearcher | PropertySearcher | MatchAllSearcher
+export type NodeSearcher = EmptySearcher | TypeSearcher | PropertySearcher | MatchAllSearcher<NodeSearcher>
 
 export function checkNode(node: GraphNode, searcher: NodeSearcher): boolean {
     switch (searcher.type) {

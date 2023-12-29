@@ -1,10 +1,9 @@
 <script lang="ts">
-    import type {GraphNode} from "tabolo-core";
+    import type {GraphNode, NodeSearcher} from "tabolo-core";
+    import {emptySearcher} from "tabolo-core";
     import NodeIdCell from "../cell/NodeIdCell.svelte";
     import {Button, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell} from "flowbite-svelte";
     import {EditOutline} from "flowbite-svelte-icons";
-    import type {NodeSearcher} from "tabolo-core/lib/node-searcher";
-    import {emptySearcher} from "tabolo-core/lib/searcher";
     import NodeSearch from "../search/NodeSearch.svelte";
     import NodeCell from "../cell/NodeCell.svelte";
     import {createEventDispatcher} from "svelte";

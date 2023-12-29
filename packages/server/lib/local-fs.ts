@@ -1,6 +1,5 @@
 import type {Graph, GraphEdit, GraphNode, GraphRelationship} from "tabolo-core"
-import {checkNode, NodeSearcher} from "tabolo-core/lib/node-searcher"
-import {checkRelationship, RelationshipSearcher} from "tabolo-core/lib/relationship-searcher"
+import {checkNode, checkRelationship, NodeSearcher, RelationshipSearcher} from "tabolo-core"
 import * as fs from "fs/promises";
 import * as path from "path";
 import type {FileHandle} from "node:fs/promises";

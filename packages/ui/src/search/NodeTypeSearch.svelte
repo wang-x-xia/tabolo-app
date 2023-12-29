@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type {TypeSearcher} from "tabolo-core/lib/searcher";
+    import type {TypeSearcher} from "tabolo-core";
     import TypeSelect from "../edit/TypeSelect.svelte";
 
     export let data: TypeSearcher

@@ -7,7 +7,7 @@
     import {randomElementId} from "../util";
     import {getGraph} from "../data/graph";
     import {getGraphEdit} from "../edit/graph-edit";
-    import {typeSearcher} from "tabolo-core/lib/searcher";
+    import {typeSearcher} from "tabolo-core";
     import {onDestroy} from "svelte";
     import RelationshipEditView from "./RelationshipEditView.svelte";
 

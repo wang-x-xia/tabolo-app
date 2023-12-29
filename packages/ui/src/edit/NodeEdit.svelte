@@ -1,10 +1,9 @@
 <script lang="ts">
-    import {type GraphNode, type GraphRelationship} from "tabolo-core";
+    import {type GraphNode, type GraphRelationship, relationshipNodeSearcher} from "tabolo-core";
     import {Button, ButtonGroup, Input, Label, Textarea} from "flowbite-svelte";
     import TypeSelect from "./TypeSelect.svelte";
     import {getGraphEdit} from "./graph-edit";
     import {getViewHandler} from "../view/view";
-    import {relationshipNodeSearcher} from "tabolo-core/lib/relationship-searcher";
     import RelationshipCell from "../cell/RelationshipCell.svelte";
     import NodeIdCell from "../cell/NodeIdCell.svelte";
     import {getGraph} from "../data/graph";

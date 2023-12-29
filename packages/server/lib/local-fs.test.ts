@@ -1,5 +1,5 @@
 import {describe, expect, test} from "vitest"
-import {emptySearcher, typeSearcher} from "tabolo-core/lib/searcher"
+import {emptySearcher, typeSearcher} from "tabolo-core"
 import {verifyGraph} from "tabolo-core/lib/graph-test"
 import {collectSearcherTypes, createFromLocalFs} from "./local-fs"
 

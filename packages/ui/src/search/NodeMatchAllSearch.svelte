@@ -2,10 +2,10 @@
     import {Button, Listgroup, ListgroupItem} from "flowbite-svelte";
     import NodeSearch from "./NodeSearch.svelte";
     import {CloseSolid, PlusSolid} from "flowbite-svelte-icons";
-    import type {MatchAllSearcher, NodeSearcher} from "tabolo-core/lib/node-searcher";
-    import {emptySearcher} from "tabolo-core/lib/searcher";
+    import type {NodeSearcher} from "tabolo-core";
+    import {emptySearcher, type MatchAllSearcher} from "tabolo-core";
 
-    export let data: MatchAllSearcher
+    export let data: MatchAllSearcher<NodeSearcher>
 
     function remove(searcher: NodeSearcher) {
         data.searchers = data.searchers.filter(it => it !== searcher);

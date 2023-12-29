@@ -1,7 +1,11 @@
-import type {EmptySearcher, TypeSearcher} from "./searcher";
+import type {EmptySearcher, MatchAllSearcher, TypeSearcher} from "./searcher";
 import type {GraphRelationship} from "./graph";
 
-export type RelationshipSearcher = EmptySearcher | TypeSearcher | RelationshipNodeSearcher | MatchAllSearcher
+export type RelationshipSearcher =
+    EmptySearcher
+    | TypeSearcher
+    | RelationshipNodeSearcher
+    | MatchAllSearcher<RelationshipSearcher>
 
 export interface RelationshipNodeSearcher {
     type: "node",
@@ -11,11 +15,6 @@ export interface RelationshipNodeSearcher {
 
 export function relationshipNodeSearcher(nodeId: string, match: "start" | "end" | "both" = "both"): RelationshipNodeSearcher {
     return {type: "node", nodeId, match,}
-}
-
-export interface MatchAllSearcher {
-    type: "and",
-    searchers: RelationshipSearcher[],
 }
 
 export function checkRelationship(relationship: GraphRelationship, searcher: RelationshipSearcher): boolean {

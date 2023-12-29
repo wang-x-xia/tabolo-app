@@ -9,10 +9,9 @@
         TableHead,
         TableHeadCell
     } from "flowbite-svelte";
-    import type {GraphRelationship} from "tabolo-core/lib/graph";
+    import type {GraphRelationship, RelationshipSearcher} from "tabolo-core";
+    import {emptySearcher} from "tabolo-core";
     import {getGraph} from "../data/graph";
-    import {emptySearcher} from "tabolo-core/lib/searcher";
-    import type {RelationshipSearcher} from "tabolo-core/lib/relationship-searcher";
     import RelationshipCell from "../cell/RelationshipCell.svelte";
     import NodeIdCell from "../cell/NodeIdCell.svelte";
 
