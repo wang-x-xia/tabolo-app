@@ -9,9 +9,10 @@
     "url": "git+https://github.com/wang-x-xia/tabolo-app.git"
   },
   "scripts": {
-    "test": "vitest"
+    "test": "vitest --run"
   },
   "devDependencies": {
+    "jsdom": "^23.0.1",
     "jsonpath-plus": "^7.2.0",
     "ts-node": "^10.9.1",
     "tslib": "^2.6.0",
