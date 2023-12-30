@@ -1,5 +1,5 @@
-import {Graph} from "./graph";
-import {GraphEdit} from "./graph-edit";
+import type {Graph} from "./graph";
+import type {GraphEdit} from "./graph-edit";
 import {describe, expect, test} from "vitest";
 
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type {GraphNode} from "../data/graph.js";
+    import type {GraphNode} from "tabolo-core";
     import {Button, ButtonGroup, Popover} from "flowbite-svelte";
     import PropertyValueCell from "./PropertyValueCell.svelte";
     import {idSelector, randomElementId} from "../util";
