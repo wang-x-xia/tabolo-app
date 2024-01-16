@@ -1,4 +1,4 @@
-import {defineInContext} from "../util";
+import {createContext} from "react";
 import type {Graph, GraphEdit, NodeSearcher} from "tabolo-core";
 import {emptySearcher, typeSearcher} from "tabolo-core";
 
@@ -31,7 +31,7 @@ export interface ViewHandler {
     getView(): Promise<ViewData>
 }
 
-export const [getViewHandler, setViewHandler] = defineInContext<ViewHandler>("viewHandler")
+export const ViewHandlerContext = createContext<ViewHandler>(null as any)
 
 export function fromGraph(graph: Graph, graphEdit: GraphEdit): ViewHandler {
     return {

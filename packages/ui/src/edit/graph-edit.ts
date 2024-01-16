@@ -1,4 +1,4 @@
-import {defineInContext} from "../util";
+import {createContext} from "react";
 import type {GraphEdit} from "tabolo-core"
 
-export const [getGraphEdit, setGraphEdit] = defineInContext<GraphEdit>("GraphEdit")
+export const GraphEditContext = createContext<GraphEdit>(null as any)

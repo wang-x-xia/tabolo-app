@@ -1,5 +1,6 @@
-import {defineInContext} from "../util";
+import {createContext} from "react";
 import type {Graph, GraphMeta} from "tabolo-core"
 
-export const [getGraph, setGraph] = defineInContext<Graph>("Graph")
-export const [getGraphMeta, setGraphMeta] = defineInContext<GraphMeta>("GraphMeta")
+export const GraphContext = createContext<Graph>(null as any)
+
+export const GraphMetaContext = createContext<GraphMeta>(null as any)
