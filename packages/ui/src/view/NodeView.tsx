@@ -6,6 +6,7 @@ import {NodeCell} from "../cell/NodeCell.tsx";
 import {GraphContext} from "../data/graph"
 import {GraphEditContext} from "../edit/graph-edit";
 import {NodeSearch} from "../search/NodeSearch.tsx";
+import {useMenuItem} from "./menu.tsx";
 import {NodeViewData, ViewHandlerContext} from "./view"
 
 export function NodeView({data}: {
@@ -46,6 +47,7 @@ export function NodeView({data}: {
         setNodes(await graph.searchNodes(searcher))
     }, [localSearcher])
 
+    const refreshMenu = useMenuItem("Refresh", <Button onClick={() => queryData()}>Refresh</Button>);
 
     async function addNode() {
         const node = await graphEdit.newEmptyNode();
@@ -60,7 +62,7 @@ export function NodeView({data}: {
     }
 
     return <>
-        <Button onClick={() => queryData()}>Refresh</Button>
+        {refreshMenu}
         <Button onClick={addNode}>Add New Node</Button>
         <NodeSearch data={localSearcher} onChange={setLocalSearcher}/>
         <Table columns={columns} dataSource={nodes} rowKey="id"/>

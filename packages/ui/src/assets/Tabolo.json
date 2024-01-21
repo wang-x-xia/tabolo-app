@@ -9,6 +9,36 @@
       }
     },
     {
+      "id": "081db216-16a0-44b7-9091-9f6089fa7965",
+      "type": "Concept",
+      "properties": {
+        "name": "Node Metadata",
+        "description": "The metadata of the node"
+      }
+    },
+    {
+      "id": "106cb4fe-0a65-447a-8e0e-fb59e8bff6df",
+      "type": "Feature",
+      "properties": {
+        "name": "Dynamic View",
+        "description": "The Tabolo Application should be managed by data. The view should be dynamic"
+      }
+    },
+    {
+      "id": "112ede31-0944-4a96-bf74-b6e20b5c040e",
+      "type": "SavedView",
+      "properties": {
+        "name": "Search All Graph Source Type",
+        "data": {
+          "type": "NodeView",
+          "searcher": {
+            "type": "type",
+            "value": "Graph Source Type"
+          }
+        }
+      }
+    },
+    {
       "id": "118cd98c-5080-442c-9225-ef9fcd01342d",
       "type": "RelationshipType",
       "properties": {
@@ -33,6 +63,14 @@
       }
     },
     {
+      "id": "1d78ead2-c8e0-4911-8900-645759971701",
+      "type": "NodeType",
+      "properties": {
+        "name": "Graph Source Type",
+        "showJsonPath": "$.name"
+      }
+    },
+    {
       "id": "21eebf99-7ea6-4f48-a144-ddafce2268a4",
       "type": "NodeType",
       "properties": {
@@ -47,6 +85,23 @@
       "properties": {
         "name": "Relationship",
         "description": "Use to link 2 nodes with direction."
+      }
+    },
+    {
+      "id": "256c5dad-43dc-4ccf-9606-9ff3b547365f",
+      "type": "NodeType",
+      "properties": {
+        "name": "Workflow",
+        "showJsonPath": "$.name",
+        "description": "A job to run steps"
+      }
+    },
+    {
+      "id": "32fce550-00ec-49fb-aa46-34411c110e06",
+      "type": "Graph Source Type",
+      "properties": {
+        "name": "Local FS Graph Source",
+        "description": "Use local fs to store the graph data."
       }
     },
     {
@@ -70,6 +125,14 @@
         "name": "SavedView",
         "showJsonPath": "$.name",
         "description": "Use to cache a view configuration"
+      }
+    },
+    {
+      "id": "4190bea0-9a7d-4e24-9c48-be5bdf8ea674",
+      "type": "Module",
+      "properties": {
+        "name": "tabolo-ui",
+        "description": "A Svelte project to manage all components and this page."
       }
     },
     {
@@ -101,11 +164,68 @@
       }
     },
     {
+      "id": "532e113e-4c0e-4e66-b81b-bd54028a45d7",
+      "type": "UserStory",
+      "properties": {
+        "name": "Select View",
+        "description": "As a user, I can select the view from the list."
+      }
+    },
+    {
+      "id": "547ebc6c-0edf-4033-9ab3-8547f077dd31",
+      "type": "NodeType",
+      "properties": {
+        "name": "Menu Item",
+        "showJsonPath": "$.name"
+      }
+    },
+    {
+      "id": "57ba638c-f646-4c09-a759-15aaa09cdd6b",
+      "type": "SavedView",
+      "properties": {
+        "name": "Search All Modules",
+        "data": {
+          "type": "NodeView",
+          "searcher": {
+            "type": "type",
+            "value": "Module"
+          }
+        }
+      }
+    },
+    {
       "id": "5841c822-ddcf-4111-8a1a-9f356196270a",
       "type": "Concept",
       "properties": {
         "name": "Edit",
         "description": "The edit view for details"
+      }
+    },
+    {
+      "id": "59758fd3-791f-4144-b111-70e62f1fcb41",
+      "type": "Module",
+      "properties": {
+        "name": "tabolo-core",
+        "description": "The shared libraries for server and ui"
+      }
+    },
+    {
+      "id": "5d3b6325-e904-4ae4-9e55-df460b3931ef",
+      "type": "NodeType",
+      "properties": {
+        "name": "Module",
+        "showJsonPath": "$.name",
+        "description": "Separation of codes"
+      }
+    },
+    {
+      "id": "65246323-b238-41cd-928f-4357d884412a",
+      "type": "Workflow",
+      "properties": {
+        "name": "Publish to github.io",
+        "description": "Publish Tabolo to github.io",
+        "type": "github actions",
+        "path": ".github/workflows/publish.yaml"
       }
     },
     {
@@ -139,13 +259,21 @@
       }
     },
     {
+      "id": "7172d82b-f862-45fe-bce9-9837a7a6cb5a",
+      "type": "NodeType",
+      "properties": {
+        "name": "Action",
+        "showJsonPath": "$.name",
+        "description": "A callable things, which has input and output"
+      }
+    },
+    {
       "id": "75f26e05-a3bf-4b0c-9da9-26d137748392",
       "type": "View",
       "properties": {
         "type": "NodeView",
         "searcher": {
-          "type": "type",
-          "value": "Concept"
+          "type": "empty"
         }
       }
     },
@@ -157,11 +285,25 @@
       }
     },
     {
+      "id": "84834b4d-f18f-4855-b02c-3924cd590756",
+      "type": "Menu Item",
+      "properties": {
+        "name": "Refresh"
+      }
+    },
+    {
       "id": "89250f44-92be-450e-8e09-9356cf182228",
       "type": "Concept",
       "properties": {
         "name": "Node",
         "description": "The basic unit to store the data"
+      }
+    },
+    {
+      "id": "986c899a-467f-457c-ab32-c0de23b6bd23",
+      "type": "Menu Item",
+      "properties": {
+        "name": "Select View"
       }
     },
     {
@@ -183,6 +325,7 @@
       "type": "NodeType",
       "properties": {
         "name": "UserStory",
+        "showJsonPath": "$.name",
         "description": "Use to manage the user story of the feature"
       }
     },
@@ -192,6 +335,20 @@
       "properties": {
         "name": "Application",
         "showJsonPath": "$.name"
+      }
+    },
+    {
+      "id": "b6ba85f4-f928-4e0b-bb35-f61e82309759",
+      "type": "SavedView",
+      "properties": {
+        "name": "Search All User Stories",
+        "data": {
+          "type": "NodeView",
+          "searcher": {
+            "type": "type",
+            "value": "UserStory"
+          }
+        }
       }
     },
     {
@@ -229,6 +386,14 @@
       }
     },
     {
+      "id": "c07e1bbe-067b-44da-8a2d-852bc801ec90",
+      "type": "Graph Source Type",
+      "properties": {
+        "name": "Local Storage Graph Source",
+        "description": "Use local storage. Only for browser"
+      }
+    },
+    {
       "id": "c10a6ae9-23e1-4160-a141-8b1bcb3628f1",
       "type": "SavedView",
       "properties": {
@@ -250,11 +415,43 @@
       }
     },
     {
+      "id": "cd4042e0-7cd9-4171-9447-04a73d5c8ab0",
+      "type": "Module",
+      "properties": {
+        "name": "tabolo-server",
+        "description": "The NodeJS libraries of tabolo"
+      }
+    },
+    {
+      "id": "d31eb59f-21da-4c54-b822-0aae0a01647c",
+      "type": "Graph Source Type",
+      "properties": {
+        "name": "HTTP Client Graph Source",
+        "description": "Use fetch API to access the Graph data."
+      }
+    },
+    {
       "id": "d756848c-9b83-4409-8e3d-06de46cf47fc",
       "type": "ViewType",
       "properties": {
         "type": "NodeEditView",
         "description": "Edit one node"
+      }
+    },
+    {
+      "id": "dad929a1-a429-4214-a342-ee1ecdd32707",
+      "type": "RelationshipType",
+      "properties": {
+        "name": "Related",
+        "description": "The start node related to the end node"
+      }
+    },
+    {
+      "id": "dccc87e1-5779-4057-af26-336f08993897",
+      "type": "Concept",
+      "properties": {
+        "name": "Graph",
+        "description": "The collection of Nodes and Relationships"
       }
     },
     {
@@ -298,6 +495,20 @@
   ],
   "relationship": [
     {
+      "id": "017b911a-aa59-4e9e-83ec-10386e855f44",
+      "type": "Related",
+      "startNodeId": "106cb4fe-0a65-447a-8e0e-fb59e8bff6df",
+      "endNodeId": "7b169f34-44b0-4278-975b-fefd051f9caa",
+      "properties": {}
+    },
+    {
+      "id": "2bf6e08e-9a30-4f24-ada6-b941db5187d2",
+      "type": "Has",
+      "startNodeId": "106cb4fe-0a65-447a-8e0e-fb59e8bff6df",
+      "endNodeId": "532e113e-4c0e-4e66-b81b-bd54028a45d7",
+      "properties": {}
+    },
+    {
       "id": "6130eaac-e71d-4e1f-8837-5cefa9dedc1f",
       "type": "Has",
       "startNodeId": "22a89691-6687-4c20-bc5f-8a580620e6fd",
@@ -323,13 +534,6 @@
       "type": "Has",
       "startNodeId": "7b169f34-44b0-4278-975b-fefd051f9caa",
       "endNodeId": "b6fcc068-a91a-4104-8351-bc357d1f5234",
-      "properties": {}
-    },
-    {
-      "id": "c4158c45-7491-4c95-af7d-a5f65c8864c9",
-      "type": "New",
-      "startNodeId": "6547e7b8-768a-426e-a40b-33e2af93848d",
-      "endNodeId": "f37c033e-1ee3-4dab-aecb-d13e8119543d",
       "properties": {}
     }
   ]
