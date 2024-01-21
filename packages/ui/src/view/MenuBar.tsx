@@ -1,13 +1,13 @@
-import {Layout} from "antd";
-import {type PropsWithChildren, useContext, useMemo} from "react";
+import {type PropsWithChildren, useContext, useMemo, useState} from "react";
 import {GraphContext} from "../data/graph.ts";
 import {GraphEditContext} from "../edit/graph-edit.ts";
 import {useAsyncOrDefault} from "../utils/hooks.ts";
-import {createMenuFromGraph, MenuContext, type MenuItem} from "./menu.ts";
+import {createMenuFromGraph, MenuContext, type MenuItem, MenuRenderContext} from "./menu";
 
 export function SetupMenuBar({children}: PropsWithChildren) {
     const graph = useContext(GraphContext)
     const graphEdit = useContext(GraphEditContext)
+    const [menuRender, setMenuRender] = useState<Record<string, Element>>({})
 
     const menu = useMemo(() => createMenuFromGraph(graph, graphEdit), [graph, graphEdit])
 
@@ -15,17 +15,25 @@ export function SetupMenuBar({children}: PropsWithChildren) {
         return await menu.listMenuItems()
     }, [menu])
 
-    return <>
-        <Layout.Header className="sticky top-0 z-10">
-            {items.map(item => <MenuItem data={item}/>)}
-        </Layout.Header>
-        <MenuContext.Provider value={menu}>
-            {children}
-        </MenuContext.Provider>
-    </>
-}
+    function setRef(item: MenuItem, dom: HTMLElement) {
+        if (menuRender[item.name] === dom) {
+            return
+        }
+        setMenuRender({
+            ...menuRender,
+            [item.name]: dom
+        })
+    }
 
-function MenuItem({}: { data: MenuItem }) {
     return <>
+        <header className="sticky top-0 z-10">
+            {items.map(item =>
+                <span ref={dom => dom && setRef(item, dom)}/>)}
+        </header>
+        <MenuContext.Provider value={menu}>
+            <MenuRenderContext.Provider value={menuRender}>
+                {children}
+            </MenuRenderContext.Provider>
+        </MenuContext.Provider>
     </>
 }

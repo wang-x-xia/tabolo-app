@@ -1,4 +1,5 @@
-import {Button, Table, TableProps} from "antd"
+import {Table, TableProps} from "antd"
+import {Button} from "flowbite-react";
 import {useCallback, useContext, useEffect, useMemo, useState} from "react"
 import {emptySearcher, GraphNode, NodeSearcher} from "tabolo-core"
 import {NodeCell} from "../cell/NodeCell.tsx";
@@ -27,20 +28,22 @@ export function NodeView({data}: {
     useEffect(() => {
         if (data !== undefined) {
             setLocalSearcher(data.searcher)
-            queryData("NotUpdateView")
+            queryData("NotUpdateView", data.searcher)
         }
     }, [data])
 
     const [nodes, setNodes] = useState<GraphNode[]>()
 
-    const queryData = useCallback(async function (updateView: "UpdateView" | "NotUpdateView" = "UpdateView") {
+    const queryData = useCallback(async function (
+        updateView: "UpdateView" | "NotUpdateView" = "UpdateView",
+        searcher = localSearcher) {
         if (updateView === "UpdateView") {
             await viewHandler.updateView({
                 type: "NodeView",
-                searcher: localSearcher!!
+                searcher: searcher
             })
         }
-        setNodes(await graph.searchNodes(localSearcher!!))
+        setNodes(await graph.searchNodes(searcher))
     }, [localSearcher])
 
 
@@ -57,8 +60,8 @@ export function NodeView({data}: {
     }
 
     return <>
-        <Button type="primary" onClick={() => queryData()}>Refresh</Button>
-        <Button type="primary" onClick={addNode}>Add New Node</Button>
+        <Button onClick={() => queryData()}>Refresh</Button>
+        <Button onClick={addNode}>Add New Node</Button>
         <NodeSearch data={localSearcher} onChange={setLocalSearcher}/>
         <Table columns={columns} dataSource={nodes} rowKey="id"/>
     </>

@@ -1,9 +1,10 @@
-import {List} from "antd"
+import {Dropdown} from "flowbite-react"
 import {useCallback, useContext, useEffect, useMemo, useState} from "react"
 import {emptySearcher, typeSearcher} from "tabolo-core"
 import {GraphContext} from "../data/graph"
 import {GraphEditContext} from "../edit/graph-edit"
 import {useAsyncOrDefault} from "../utils/hooks"
+import {useMenuItem} from "./menu.tsx";
 import {NodeEditView} from "./NodeEditView"
 import {NodeView} from "./NodeView"
 import {RelationshipEditView} from "./RelationshipEditView"
@@ -49,13 +50,14 @@ export function View() {
         }
     }, [updateView, viewHandler])
 
+    const menuItem = useMenuItem("Select View", <SelectView onUpdateView={updateView}/>)
 
     if (viewData === undefined) {
         return <>Loading</>
     }
 
     return <>
-        <SelectView onUpdateView={updateView}/>
+        {menuItem}
         <ViewHandlerContext.Provider value={childViewHandler}>
             <DispatchView data={viewData}/>
         </ViewHandlerContext.Provider>
@@ -72,15 +74,14 @@ export function SelectView({onUpdateView}: {
             .sort((l, r) => l.name.localeCompare(r.name))
     }, [graph])
 
-    return <List
-        bordered
-        dataSource={savedViews}
-        renderItem={(item) => (
-            <List.Item onClick={() => onUpdateView(item.data)}>
-                {item.name}
-            </List.Item>
+
+    return <Dropdown label="Select View">
+        {savedViews.map(view =>
+            <Dropdown.Item onClick={() => onUpdateView(view.data)}>
+                {view.name}
+            </Dropdown.Item>
         )}
-    />
+    </Dropdown>
 }
 
 export function DispatchView({data}: {
