@@ -94,7 +94,7 @@ export function NodeEdit({data}: {
         <div>Type</div>
         <TypeSelect type={local.type} source="Node" onChange={setType}/>
         <div>Property</div>
-        <Input.TextArea rows={20} onChange={e => setProperty(e.target.value)}/>
+        <Input.TextArea rows={20} value={property} onChange={e => setProperty(e.target.value)}/>
         <Space.Compact block>
             <Button onClick={save}>Save</Button>
             <Button onClick={reset}>Reset</Button>
