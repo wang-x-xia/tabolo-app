@@ -1,5 +1,5 @@
-import {Button, Input, List, Select, Space} from "antd";
-import {useEffect, useState} from "react";
+import {Button, Select, TextInput} from "flowbite-react";
+import {type ReactNode, useEffect, useState} from "react";
 import {
     emptySearcher,
     type MatchAllSearcher,
@@ -8,6 +8,7 @@ import {
     type TypeSearcher
 } from "tabolo-core";
 import {TypeSelect} from "../edit/TypeSelect.tsx";
+import {PopoverButton} from "../utils/PopoverButton.tsx";
 
 export function NodeSearch({data, onChange}: {
     data: NodeSearcher,
@@ -37,77 +38,73 @@ export function NodeSearch({data, onChange}: {
         }
     }
 
+    const typeSelect = <>
+        <Select className="min-w-xs max-w-sm" value={data.type}
+                onChange={e => updateType(e.target.value)}>
+            <option value="empty">Search All</option>
+            <option value="type">Match Type</option>
+            <option value="eq">Match Property</option>
+            <option value="and">All Match</option>
+        </Select>
+    </>
+
     let searcher
     switch (local.type) {
         default:
         case "empty":
-            searcher = <></>
+            searcher = typeSelect
             break;
         case "type":
-            searcher = <NodeTypeSearch data={local} onChange={onChange}/>
+            searcher = <NodeTypeSearch data={local} onChange={onChange} typeSelect={typeSelect}/>
             break;
         case "eq":
-            searcher = <NodeEqSearch data={local} onChange={onChange}/>
+            searcher = <NodeEqSearch data={local} onChange={onChange} typeSelect={typeSelect}/>
             break;
         case "and":
-            searcher = <NodeMatchAllSearch data={local} onChange={onChange}/>
+            searcher = <NodeMatchAllSearch data={local} onChange={onChange} typeSelect={typeSelect}/>
             break;
     }
 
-    return <>
+    return <div className="flex items-baseline space-x-2">
         {searcher}
-        <Select
-            defaultValue={data.type}
-            style={{width: 120}}
-            onChange={e => updateType(e)}
-            options={[
-                {value: "empty", label: "Search All"},
-                {value: "type", label: "Match Type"},
-                {value: "eq", label: "Match Property"},
-                {value: "and", label: "All Match"},
-            ]}
-        />
+
+    </div>
+}
+
+interface SearchProps<T extends NodeSearcher> {
+    data: T,
+    typeSelect: ReactNode,
+
+    onChange(data: T): void,
+}
+
+function NodeTypeSearch({data, onChange, typeSelect}: SearchProps<TypeSearcher>) {
+    return <>
+        <PopoverButton name="Type =">{typeSelect}</PopoverButton>
+        <TypeSelect type={data.value} source="Node" onChange={(value) => onChange({...data, "value": value})}/>
     </>
 }
 
-function NodeTypeSearch({data, onChange}: {
-    data: TypeSearcher,
-    onChange(data: TypeSearcher): void
-}) {
-    return <TypeSelect
-        type={data.value} source="Node"
-        onChange={(value) => onChange({...data, "value": value})}/>
-}
 
-
-function NodeEqSearch({data, onChange}: {
-    data: PropertySearcher,
-    onChange(data: PropertySearcher): void
-}) {
-    return <Space.Compact block>
-        <Input
+function NodeEqSearch({data, onChange, typeSelect}: SearchProps<PropertySearcher>) {
+    return <>
+        <TextInput
+            placeholder="JSON Path"
             value={data.jsonPath}
             onChange={e => onChange({...data, jsonPath: e.target.value})}/>
-        <Button>=</Button>
-
-        <Input
+        <PopoverButton name="=">
+            {typeSelect}
+        </PopoverButton>
+        <TextInput
+            placeholder="Expected Value"
             value={data.value}
             onChange={e => onChange({...data, value: e.target.value})}/>
-    </Space.Compact>
+    </>
 }
 
-function NodeMatchAllSearch({data, onChange}: {
-    data: MatchAllSearcher<NodeSearcher>,
-    onChange(data: MatchAllSearcher<NodeSearcher>): void
-}) {
-    return <List
-        bordered
-        dataSource={data.searchers}
-        footer={<Button onClick={() => onChange({
-            ...data,
-            searchers: [...data.searchers, emptySearcher()]
-        })}>New</Button>}
-        renderItem={(item) => <List.Item>
+function NodeMatchAllSearch({data, onChange, typeSelect}: SearchProps<MatchAllSearcher<NodeSearcher>>) {
+    return <>
+        {data.searchers.map(item => <>
             <NodeSearch data={item} onChange={d => onChange({
                 ...data,
                 searchers: data.searchers.map(old => {
@@ -118,6 +115,9 @@ function NodeMatchAllSearch({data, onChange}: {
                     }
                 })
             })}/>
-        </List.Item>}
-    />
+            <span className="text-sm"> and </span>
+        </>)}
+        <Button onClick={() => onChange({...data, searchers: [...data.searchers, emptySearcher()]})}>New</Button>
+        {typeSelect}
+    </>
 }
