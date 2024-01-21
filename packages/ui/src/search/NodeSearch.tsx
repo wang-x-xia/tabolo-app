@@ -65,7 +65,7 @@ export function NodeSearch({data, onChange}: {
             break;
     }
 
-    return <div className="flex items-baseline space-x-2">
+    return <div className="flex items-baseline space-x-2 p-2">
         {searcher}
 
     </div>
