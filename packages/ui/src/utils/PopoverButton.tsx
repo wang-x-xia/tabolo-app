@@ -39,7 +39,8 @@ export function PopoverButton({name, size, children}: PropsWithChildren<{ name: 
             {name}
         </Button>
         {isOpen && <FloatingFocusManager context={context} modal={false}>
-            <div ref={refs.setFloating} className="z-10" style={floatingStyles} {...getFloatingProps()}>
+            <div ref={refs.setFloating} className="z-10 p-2 bg-white rounded shadow"
+                 style={floatingStyles} {...getFloatingProps()}>
                 {children}
             </div>
         </FloatingFocusManager>
