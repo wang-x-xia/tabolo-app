@@ -57,13 +57,15 @@ export function NodeView({data}: {
         })
     }
 
+    const addNodeMenu = useMenuItem("Add New Node", <Button onClick={addNode}>Add New Node</Button>);
+
     if (nodes === undefined) {
         return <>Loading</>
     }
 
     return <>
         {refreshMenu}
-        <Button onClick={addNode}>Add New Node</Button>
+        {addNodeMenu}
         <NodeSearch data={localSearcher} onChange={setLocalSearcher}/>
         <Table columns={columns} dataSource={nodes} rowKey="id"/>
     </>

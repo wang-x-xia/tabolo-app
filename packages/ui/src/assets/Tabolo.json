@@ -17,6 +17,20 @@
       }
     },
     {
+      "id": "08c92941-da0b-481c-8e54-ae9bd612030d",
+      "type": "SavedView",
+      "properties": {
+        "name": "Search All Menu Items",
+        "data": {
+          "type": "NodeView",
+          "searcher": {
+            "type": "type",
+            "value": "Menu Item"
+          }
+        }
+      }
+    },
+    {
       "id": "106cb4fe-0a65-447a-8e0e-fb59e8bff6df",
       "type": "Feature",
       "properties": {
@@ -273,7 +287,8 @@
       "properties": {
         "type": "NodeView",
         "searcher": {
-          "type": "empty"
+          "type": "type",
+          "value": "Concept"
         }
       }
     },
@@ -297,6 +312,13 @@
       "properties": {
         "name": "Node",
         "description": "The basic unit to store the data"
+      }
+    },
+    {
+      "id": "9018a07d-9384-4fc2-826d-f9696b70ae04",
+      "type": "Menu Item",
+      "properties": {
+        "name": "Add New Node"
       }
     },
     {
