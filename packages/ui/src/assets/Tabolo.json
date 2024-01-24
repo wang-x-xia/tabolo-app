@@ -287,8 +287,7 @@
       "properties": {
         "type": "NodeView",
         "searcher": {
-          "type": "type",
-          "value": "Concept"
+          "type": "empty"
         }
       }
     },
@@ -483,6 +482,13 @@
         "name": "Feature",
         "showJsonPath": "$.name",
         "description": "Use to manage the feature of the application"
+      }
+    },
+    {
+      "id": "ec2fa418-0577-4192-b82a-c4933d797b0f",
+      "type": "Menu Item",
+      "properties": {
+        "name": "Save View"
       }
     },
     {

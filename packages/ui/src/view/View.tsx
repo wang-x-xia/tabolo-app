@@ -1,4 +1,4 @@
-import {Dropdown} from "flowbite-react"
+import {Button, Dropdown} from "flowbite-react"
 import {useCallback, useContext, useEffect, useMemo, useState} from "react"
 import {emptySearcher, typeSearcher} from "tabolo-core"
 import {GraphContext} from "../data/graph"
@@ -50,15 +50,17 @@ export function View() {
         }
     }, [updateView, viewHandler])
 
-    const menuItem = useMenuItem("Select View", <SelectView onUpdateView={updateView}/>)
+    const selectViewMenuItem = useMenuItem("Select View", <SelectView onUpdateView={updateView}/>)
+    const saveViewMenuItem = useMenuItem("Save View", <SaveView data={viewData}/>)
 
     if (viewData === undefined) {
         return <>Loading</>
     }
 
     return <>
-        {menuItem}
+        {selectViewMenuItem}
         <ViewHandlerContext.Provider value={childViewHandler}>
+            {saveViewMenuItem}
             <DispatchView data={viewData}/>
         </ViewHandlerContext.Provider>
     </>
@@ -82,6 +84,24 @@ export function SelectView({onUpdateView}: {
             </Dropdown.Item>
         )}
     </Dropdown>
+}
+
+export function SaveView({data}: { data: ViewData }) {
+    const graphEdit = useContext(GraphEditContext)
+    const viewHandler = useContext(ViewHandlerContext)
+
+    async function saveView() {
+        const node = await graphEdit.newEmptyNode()
+        const savedViewData: SavedViewData = {
+            name: "New View",
+            data,
+        }
+        await graphEdit.editNodeProperty(node.id, savedViewData)
+        await graphEdit.editNodeType(node.id, "SavedView")
+        await viewHandler.updateView({type: "NodeEditView", nodeId: node.id})
+    }
+
+    return <Button onClick={saveView}>Save View</Button>
 }
 
 export function DispatchView({data}: {
