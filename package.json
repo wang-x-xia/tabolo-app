@@ -9,7 +9,10 @@
     "url": "git+https://github.com/wang-x-xia/tabolo-app.git"
   },
   "scripts": {
-    "test": "vitest --run"
+    "test": "vitest --run",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "devDependencies": {
     "jsdom": "^23.0.1",
@@ -17,11 +20,26 @@
     "ts-node": "^10.9.1",
     "tslib": "^2.6.0",
     "typescript": "^5.0.2",
-    "vitest": "^0.34.6"
-  },
-  "workspaces": [
-    "packages\\core",
-    "packages\\server",
-    "packages\\ui"
-  ]
+    "vitest": "^0.34.6",
+    "@ant-design/icons": "^5.2.6",
+    "@floating-ui/dom": "^1.5.1",
+    "@floating-ui/react": "^0.26.6",
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18",
+    "@vitejs/plugin-react": "^4.2.1",
+    "antd": "^5.13.1",
+    "autoprefixer": "^10.4.17",
+    "flowbite-react": "^0.6.4",
+    "postcss": "^8.4.33",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tailwindcss": "^3.4.1",
+    "vite": "^4.4.5",
+    "@koa/router": "^12.0.1",
+    "@types/koa": "^2.13.12",
+    "@types/koa__router": "^12.0.4",
+    "@types/node": "^20.10.4",
+    "koa": "^2.14.2",
+    "koa-body": "^6.0.1"
+  }
 }
