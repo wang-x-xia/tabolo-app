@@ -1,7 +1,7 @@
 import {PlusOutlined} from '@ant-design/icons'
 import {FloatButton, Input, Modal} from 'antd'
 import {type PropsWithChildren, useCallback, useState} from "react"
-import type {Graph, GraphEdit, GraphMeta} from "tabolo-core"
+import type {Graph, GraphEdit, GraphMeta} from "../../core"
 import {GraphContext, GraphMetaContext} from "../data/graph.ts"
 import {GraphEditContext} from "../edit/graph-edit.ts"
 import {useAsync} from "../utils/hooks.ts"
