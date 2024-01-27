@@ -1,0 +1,16 @@
+{
+  "data": [
+    {
+      "id": "75f26e05-a3bf-4b0c-9da9-26d137748392",
+      "type": "View",
+      "properties": {
+        "type": "NodeView",
+        "searcher": {
+          "type": "type",
+          "value": "Concept"
+        }
+      },
+      "updateTime": "2024-01-27T15:13:03.513Z"
+    }
+  ]
+}

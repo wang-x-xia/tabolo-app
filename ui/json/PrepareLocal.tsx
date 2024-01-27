@@ -1,13 +1,43 @@
 import {PlusOutlined} from '@ant-design/icons'
 import {FloatButton, Input, Modal} from 'antd'
 import {type PropsWithChildren, useCallback, useState} from "react"
-import type {Graph, GraphEdit, GraphMeta} from "../../core"
+import {
+    createHttpClientGraph,
+    createHttpClientGraphEdit,
+    emptySearcher,
+    type Graph,
+    type GraphEdit,
+    type GraphMeta
+} from "../../core"
 import {GraphContext, GraphMetaContext} from "../data/graph.ts"
 import {GraphEditContext} from "../edit/graph-edit.ts"
 import {useAsync} from "../utils/hooks.ts"
-import {createJsonKv, type LocalJson} from "./local-json-graph.ts"
+import {createGraphMetaFromGraph, createJsonKv, type LocalJson} from "./local-json-graph.ts"
 
 export function PrepareLocal({children}: PropsWithChildren) {
+    if (import.meta.env.DEV) {
+        const graph = createHttpClientGraph({baseUrl: `${location.origin}/dev-graph/graph`});
+        const graphEdit = createHttpClientGraphEdit({baseUrl: `${location.origin}/dev-graph/graphEdit`});
+        const graphMeta = createGraphMetaFromGraph(graph)
+        const localJson: LocalJson = {
+            async exportAll() {
+                return {
+                    node: await graph.searchNodes(emptySearcher()),
+                    relationship: await graph.searchRelationships(emptySearcher()),
+                }
+            },
+
+            async importAll(_) {
+                console.log("No OP for import all when dev")
+            },
+        }
+
+        return <SetupLocal graph={graph} graphEdit={graphEdit} graphMeta={graphMeta} localJson={localJson}>
+            {children}
+        </SetupLocal>
+    }
+
+
     const jsonKv = useAsync(() => createJsonKv("Tabolo"), [])
 
     switch (jsonKv.status) {

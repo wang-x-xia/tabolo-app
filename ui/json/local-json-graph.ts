@@ -31,8 +31,7 @@ export async function createJsonKv(name: string): Promise<[Graph, GraphEdit, Gra
 
     let graphEdit = createGraphEdit(db, graph)
 
-    let graphMeta = createGraphMeta(graph)
-
+    let graphMeta = createGraphMetaFromGraph(graph)
 
     return [graph, graphEdit, graphMeta, createLocalJson(db)]
 }
@@ -256,7 +255,7 @@ function createGraphEdit(db: IDBDatabase, graph: Graph): GraphEdit {
     }
 }
 
-function createGraphMeta(graph: Graph): GraphMeta {
+export function createGraphMetaFromGraph(graph: Graph): GraphMeta {
     return {
         async getNodeMeta(type: string): Promise<GraphNodeMeta> {
             const typeNodes = await graph.searchNodes({

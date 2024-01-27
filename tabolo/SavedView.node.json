@@ -1,0 +1,143 @@
+{
+  "data": [
+    {
+      "id": "08c92941-da0b-481c-8e54-ae9bd612030d",
+      "type": "SavedView",
+      "properties": {
+        "name": "Search All Menu Items",
+        "data": {
+          "type": "NodeView",
+          "searcher": {
+            "type": "type",
+            "value": "Menu Item"
+          }
+        }
+      }
+    },
+    {
+      "id": "112ede31-0944-4a96-bf74-b6e20b5c040e",
+      "type": "SavedView",
+      "properties": {
+        "name": "Search All Graph Source Type",
+        "data": {
+          "type": "NodeView",
+          "searcher": {
+            "type": "type",
+            "value": "Graph Source Type"
+          }
+        }
+      }
+    },
+    {
+      "id": "342249d0-4bbf-47d2-8de2-6e2888032bc1",
+      "type": "SavedView",
+      "properties": {
+        "name": "Search All Concepts",
+        "data": {
+          "type": "NodeView",
+          "searcher": {
+            "type": "type",
+            "value": "Concept"
+          }
+        }
+      }
+    },
+    {
+      "id": "4c717179-cf9d-4ad6-869d-d890392d81b6",
+      "type": "SavedView",
+      "properties": {
+        "name": "Search All Nodes",
+        "data": {
+          "type": "NodeView",
+          "searcher": {
+            "type": "empty"
+          }
+        }
+      }
+    },
+    {
+      "id": "57ba638c-f646-4c09-a759-15aaa09cdd6b",
+      "type": "SavedView",
+      "properties": {
+        "name": "Search All Modules",
+        "data": {
+          "type": "NodeView",
+          "searcher": {
+            "type": "type",
+            "value": "Module"
+          }
+        }
+      }
+    },
+    {
+      "id": "69d29f6a-ffc0-4090-b90f-2dc9efafd5b4",
+      "type": "SavedView",
+      "properties": {
+        "name": "Search All Features",
+        "data": {
+          "type": "NodeView",
+          "searcher": {
+            "type": "type",
+            "value": "Feature"
+          }
+        }
+      }
+    },
+    {
+      "id": "9fdb5f7f-9783-4147-a20c-aeaaeab6f74f",
+      "type": "SavedView",
+      "properties": {
+        "name": "Search All Saved Views",
+        "data": {
+          "type": "NodeView",
+          "searcher": {
+            "type": "type",
+            "value": "SavedView"
+          }
+        }
+      }
+    },
+    {
+      "id": "b6ba85f4-f928-4e0b-bb35-f61e82309759",
+      "type": "SavedView",
+      "properties": {
+        "name": "Search All User Stories",
+        "data": {
+          "type": "NodeView",
+          "searcher": {
+            "type": "type",
+            "value": "UserStory"
+          }
+        }
+      }
+    },
+    {
+      "id": "c10a6ae9-23e1-4160-a141-8b1bcb3628f1",
+      "type": "SavedView",
+      "properties": {
+        "name": "Search All Relationship Types",
+        "data": {
+          "type": "NodeView",
+          "searcher": {
+            "type": "type",
+            "value": "RelationshipType"
+          }
+        }
+      }
+    },
+    {
+      "id": "ecd6ee53-691e-4e6d-a2cd-2e01dcd3d98f",
+      "type": "SavedView",
+      "properties": {
+        "name": "Search All Node Types",
+        "data": {
+          "type": "NodeView",
+          "searcher": {
+            "type": "type",
+            "value": "NodeType"
+          }
+        }
+      }
+    }
+  ]
+}

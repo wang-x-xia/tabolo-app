@@ -58,7 +58,7 @@ interface LocalFsOperation {
 }
 
 
-async function createLocalFsOperation(config: LocalFsConfiguration): Promise<LocalFsOperation> {
+export async function createLocalFsOperation(config: LocalFsConfiguration): Promise<LocalFsOperation> {
     const root = config.path
     const idPrefix = config.idPrefix
 
@@ -67,13 +67,13 @@ async function createLocalFsOperation(config: LocalFsConfiguration): Promise<Loc
 
     async function readJson<T>(name: string, defaultValue: T): Promise<T> {
         const fullPath = path.join(root, name)
-        let handle: FileHandle = null
+        let handle: FileHandle | null = null
         try {
             handle = await fs.open(fullPath, "r")
             const content = await handle.readFile("utf8")
             return JSON.parse(content)
         } catch (err) {
-            if (err.code === 'ENOENT') {
+            if ((err as any).code === 'ENOENT') {
                 return defaultValue
             } else {
                 throw err;
@@ -85,7 +85,7 @@ async function createLocalFsOperation(config: LocalFsConfiguration): Promise<Loc
 
     async function writeJson<T>(name: string, content: T) {
         const fullPath = path.join(root, name)
-        let handle: FileHandle = null
+        let handle: FileHandle | null = null
         try {
             handle = await fs.open(fullPath, "w")
             await handle.writeFile(JSON.stringify(content, null, 2), "utf8")
@@ -104,7 +104,7 @@ async function createLocalFsOperation(config: LocalFsConfiguration): Promise<Loc
         }
     }
 
-    async function randomId(source: "node" | "relationship"): Promise<string> {
+    async function randomId(_: keyof SourceMapping): Promise<string> {
         return `${idPrefix}${crypto.randomUUID()}`
     }
 
@@ -182,13 +182,13 @@ function createGraph(op: LocalFsOperation): Graph {
     async function searchNodes(searcher: NodeSearcher): Promise<GraphNode[]> {
         let types = collectSearcherTypes(searcher)
         if (types === null) {
-            types = await op.types("relationship")
+            types = await op.types("node")
         }
         if (types.length === 0) {
             return []
         }
         const result: GraphNode[] = []
-        for (const type in types) {
+        for (const type of types) {
             const nodes = await op.read("node", type)
             for (const node of Object.values(nodes.data)) {
                 if (checkNode(node, searcher)) {
@@ -282,9 +282,13 @@ function createGraphEdit(graph: Graph, op: LocalFsOperation): GraphEdit {
     }
 
     async function editType<T extends keyof SourceMapping>(source: T, id: string, type: string): Promise<ItemSourceMapping<T>> {
-        const previousType = await op.id2Type(source, id)
+        const previousType = (await op.id2Type(source, id))!
         if (type === previousType) {
-            return graph.getNode(id)
+            if (source === "node") {
+                return (await graph.getNode(id))!
+            } else {
+                return (await graph.getRelationship(id))!
+            }
         }
         const listPreviousType = await op.read(source, previousType)
         const item = mustRemoveById(source, id, listPreviousType)
@@ -304,7 +308,7 @@ function createGraphEdit(graph: Graph, op: LocalFsOperation): GraphEdit {
     }
 
     async function editFields<T extends keyof SourceMapping>(source: T, id: string, set: (item: ItemSourceMapping<T>) => void): Promise<ItemSourceMapping<T>> {
-        const type = await op.id2Type(source, id)
+        const type = (await op.id2Type(source, id))!
         const data = await op.read(source, type)
         const item = mustFoundById(source, id, data)
         set(item)
@@ -320,7 +324,7 @@ function createGraphEdit(graph: Graph, op: LocalFsOperation): GraphEdit {
     }
 
     async function remove(source: keyof SourceMapping, id: string,) {
-        const type = await op.id2Type(source, id)
+        const type = (await op.id2Type(source, id))!
         const nodes = await op.read(source, type)
         mustRemoveById(source, id, nodes)
         await op.write(source, type, nodes)
@@ -334,7 +338,7 @@ function createGraphEdit(graph: Graph, op: LocalFsOperation): GraphEdit {
 
     async function copy<T extends keyof SourceMapping>(source: T, id: string): Promise<ItemSourceMapping<T>> {
         const newId = await op.randomId(source);
-        const type = await op.id2Type(source, id)
+        const type = (await op.id2Type(source, id))!
         const data = await op.read(source, type)
         const item = mustFoundById(source, id, data)
         const newItem = {

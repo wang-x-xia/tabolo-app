@@ -1,0 +1,32 @@
+{
+  "data": [
+    {
+      "id": "84834b4d-f18f-4855-b02c-3924cd590756",
+      "type": "Menu Item",
+      "properties": {
+        "name": "Refresh"
+      }
+    },
+    {
+      "id": "9018a07d-9384-4fc2-826d-f9696b70ae04",
+      "type": "Menu Item",
+      "properties": {
+        "name": "Add New Node"
+      }
+    },
+    {
+      "id": "986c899a-467f-457c-ab32-c0de23b6bd23",
+      "type": "Menu Item",
+      "properties": {
+        "name": "Select View"
+      }
+    },
+    {
+      "id": "ec2fa418-0577-4192-b82a-c4933d797b0f",
+      "type": "Menu Item",
+      "properties": {
+        "name": "Save View"
+      }
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "data": [
+    {
+      "id": "06a859a2-db04-4a81-ae3a-c6ca8682ab4d",
+      "type": "RelationshipType",
+      "properties": {
+        "name": "New",
+        "description": "The default type of new relationship"
+      }
+    },
+    {
+      "id": "118cd98c-5080-442c-9225-ef9fcd01342d",
+      "type": "RelationshipType",
+      "properties": {
+        "name": "Is",
+        "description": "Use to describe the start node is same with end node"
+      }
+    },
+    {
+      "id": "14bc1c2b-c98e-4814-990b-bf767cb424bc",
+      "type": "RelationshipType",
+      "properties": {
+        "name": "After",
+        "description": "The start node is after the end node"
+      }
+    },
+    {
+      "id": "6bde6dca-387c-4f15-894f-7bd61cccdc8f",
+      "type": "RelationshipType",
+      "properties": {
+        "name": "Has",
+        "description": "The start node has the end node"
+      }
+    },
+    {
+      "id": "dad929a1-a429-4214-a342-ee1ecdd32707",
+      "type": "RelationshipType",
+      "properties": {
+        "name": "Related",
+        "description": "The start node related to the end node"
+      }
+    }
+  ]
+}

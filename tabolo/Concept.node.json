@@ -1,0 +1,59 @@
+{
+  "data": [
+    {
+      "id": "081db216-16a0-44b7-9091-9f6089fa7965",
+      "type": "Concept",
+      "properties": {
+        "name": "Node Metadata",
+        "description": "The metadata of the node"
+      }
+    },
+    {
+      "id": "16c27147-a0b2-4559-b0c0-d31a6c4ff996",
+      "type": "Concept",
+      "properties": {
+        "name": "Property",
+        "description": "Each node and relationship can use property to store the data. The data schema is not limited."
+      }
+    },
+    {
+      "id": "22a89691-6687-4c20-bc5f-8a580620e6fd",
+      "type": "Concept",
+      "properties": {
+        "name": "Relationship",
+        "description": "Use to link 2 nodes with direction."
+      }
+    },
+    {
+      "id": "5841c822-ddcf-4111-8a1a-9f356196270a",
+      "type": "Concept",
+      "properties": {
+        "name": "Edit",
+        "description": "The edit view for details"
+      }
+    },
+    {
+      "id": "7b169f34-44b0-4278-975b-fefd051f9caa",
+      "type": "Concept",
+      "properties": {
+        "name": "View"
+      }
+    },
+    {
+      "id": "89250f44-92be-450e-8e09-9356cf182228",
+      "type": "Concept",
+      "properties": {
+        "name": "Node",
+        "description": "The basic unit to store the data"
+      }
+    },
+    {
+      "id": "dccc87e1-5779-4057-af26-336f08993897",
+      "type": "Concept",
+      "properties": {
+        "name": "Graph",
+        "description": "The collection of Nodes and Relationships"
+      }
+    }
+  ]
+}

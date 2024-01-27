@@ -1,0 +1,28 @@
+{
+  "data": [
+    {
+      "id": "32fce550-00ec-49fb-aa46-34411c110e06",
+      "type": "Graph Source Type",
+      "properties": {
+        "name": "Local FS Graph Source",
+        "description": "Use local fs to store the graph data."
+      }
+    },
+    {
+      "id": "c07e1bbe-067b-44da-8a2d-852bc801ec90",
+      "type": "Graph Source Type",
+      "properties": {
+        "name": "Local Storage Graph Source",
+        "description": "Use local storage. Only for browser"
+      }
+    },
+    {
+      "id": "d31eb59f-21da-4c54-b822-0aae0a01647c",
+      "type": "Graph Source Type",
+      "properties": {
+        "name": "HTTP Client Graph Source",
+        "description": "Use fetch API to access the Graph data."
+      }
+    }
+  ]
+}

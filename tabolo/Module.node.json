@@ -1,0 +1,28 @@
+{
+  "data": [
+    {
+      "id": "4190bea0-9a7d-4e24-9c48-be5bdf8ea674",
+      "type": "Module",
+      "properties": {
+        "name": "tabolo-ui",
+        "description": "A Svelte project to manage all components and this page."
+      }
+    },
+    {
+      "id": "59758fd3-791f-4144-b111-70e62f1fcb41",
+      "type": "Module",
+      "properties": {
+        "name": "tabolo-core",
+        "description": "The shared libraries for server and ui"
+      }
+    },
+    {
+      "id": "cd4042e0-7cd9-4171-9447-04a73d5c8ab0",
+      "type": "Module",
+      "properties": {
+        "name": "tabolo-server",
+        "description": "The NodeJS libraries of tabolo"
+      }
+    }
+  ]
+}

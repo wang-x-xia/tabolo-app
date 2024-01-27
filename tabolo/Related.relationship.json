@@ -1,0 +1,11 @@
+{
+  "data": [
+    {
+      "id": "017b911a-aa59-4e9e-83ec-10386e855f44",
+      "type": "Related",
+      "startNodeId": "106cb4fe-0a65-447a-8e0e-fb59e8bff6df",
+      "endNodeId": "7b169f34-44b0-4278-975b-fefd051f9caa",
+      "properties": {}
+    }
+  ]
+}

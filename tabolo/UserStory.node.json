@@ -1,0 +1,12 @@
+{
+  "data": [
+    {
+      "id": "532e113e-4c0e-4e66-b81b-bd54028a45d7",
+      "type": "UserStory",
+      "properties": {
+        "name": "Select View",
+        "description": "As a user, I can select the view from the list."
+      }
+    }
+  ]
+}

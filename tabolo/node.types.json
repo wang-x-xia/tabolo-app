@@ -1,0 +1,17 @@
+{
+  "data": [
+    "Application",
+    "Concept",
+    "Feature",
+    "Graph Source Type",
+    "Menu Item",
+    "Module",
+    "NodeType",
+    "RelationshipType",
+    "SavedView",
+    "UserStory",
+    "View",
+    "ViewType",
+    "Workflow"
+  ]
+}

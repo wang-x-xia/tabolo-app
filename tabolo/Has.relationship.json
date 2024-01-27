@@ -1,0 +1,39 @@
+{
+  "data": [
+    {
+      "id": "2bf6e08e-9a30-4f24-ada6-b941db5187d2",
+      "type": "Has",
+      "startNodeId": "106cb4fe-0a65-447a-8e0e-fb59e8bff6df",
+      "endNodeId": "532e113e-4c0e-4e66-b81b-bd54028a45d7",
+      "properties": {}
+    },
+    {
+      "id": "6130eaac-e71d-4e1f-8837-5cefa9dedc1f",
+      "type": "Has",
+      "startNodeId": "22a89691-6687-4c20-bc5f-8a580620e6fd",
+      "endNodeId": "cac8b82f-61cb-4cdc-ac8e-16137da2309b",
+      "properties": {}
+    },
+    {
+      "id": "8cbf3543-ff8b-4343-bb2e-7bc91a52d6de",
+      "type": "Has",
+      "startNodeId": "89250f44-92be-450e-8e09-9356cf182228",
+      "endNodeId": "f37c033e-1ee3-4dab-aecb-d13e8119543d",
+      "properties": {}
+    },
+    {
+      "id": "95e56704-0fe7-4410-85cd-35eb7defeddb",
+      "type": "Has",
+      "startNodeId": "89250f44-92be-450e-8e09-9356cf182228",
+      "endNodeId": "4a4954fc-6f6b-4ac4-acb9-99f5e753f21a",
+      "properties": {}
+    },
+    {
+      "id": "9a661492-d938-499e-a457-be026d0a6f44",
+      "type": "Has",
+      "startNodeId": "7b169f34-44b0-4278-975b-fefd051f9caa",
+      "endNodeId": "b6fcc068-a91a-4104-8351-bc357d1f5234",
+      "properties": {}
+    }
+  ]
+}

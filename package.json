@@ -12,7 +12,8 @@
     "test": "vitest --run",
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "json2local": "ts-node --esm --experimentalSpecifierResolution node server/json-to-local-fs.ts"
   },
   "devDependencies": {
     "jsdom": "^23.0.1",

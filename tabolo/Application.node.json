@@ -1,0 +1,12 @@
+{
+  "data": [
+    {
+      "id": "6547e7b8-768a-426e-a40b-33e2af93848d",
+      "type": "Application",
+      "properties": {
+        "name": "Tabolo",
+        "description": "Tabolo is an application to view the Graph-Like data."
+      }
+    }
+  ]
+}

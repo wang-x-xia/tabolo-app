@@ -1,0 +1,14 @@
+{
+  "data": [
+    {
+      "id": "65246323-b238-41cd-928f-4357d884412a",
+      "type": "Workflow",
+      "properties": {
+        "name": "Publish to github.io",
+        "description": "Publish Tabolo to github.io",
+        "type": "github actions",
+        "path": ".github/workflows/publish.yaml"
+      }
+    }
+  ]
+}

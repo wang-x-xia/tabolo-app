@@ -1,0 +1,133 @@
+{
+  "data": [
+    {
+      "id": "1d78ead2-c8e0-4911-8900-645759971701",
+      "type": "NodeType",
+      "properties": {
+        "name": "Graph Source Type",
+        "showJsonPath": "$.name"
+      }
+    },
+    {
+      "id": "21eebf99-7ea6-4f48-a144-ddafce2268a4",
+      "type": "NodeType",
+      "properties": {
+        "name": "Concept",
+        "showJsonPath": "$.name",
+        "description": "The concept is used to describe the resources in application"
+      }
+    },
+    {
+      "id": "256c5dad-43dc-4ccf-9606-9ff3b547365f",
+      "type": "NodeType",
+      "properties": {
+        "name": "Workflow",
+        "showJsonPath": "$.name",
+        "description": "A job to run steps"
+      }
+    },
+    {
+      "id": "3fc4d14e-7299-4489-a59a-e815805f0225",
+      "type": "NodeType",
+      "properties": {
+        "name": "SavedView",
+        "showJsonPath": "$.name",
+        "description": "Use to cache a view configuration"
+      }
+    },
+    {
+      "id": "547ebc6c-0edf-4033-9ab3-8547f077dd31",
+      "type": "NodeType",
+      "properties": {
+        "name": "Menu Item",
+        "showJsonPath": "$.name"
+      }
+    },
+    {
+      "id": "5d3b6325-e904-4ae4-9e55-df460b3931ef",
+      "type": "NodeType",
+      "properties": {
+        "name": "Module",
+        "showJsonPath": "$.name",
+        "description": "Separation of codes"
+      }
+    },
+    {
+      "id": "7172d82b-f862-45fe-bce9-9837a7a6cb5a",
+      "type": "NodeType",
+      "properties": {
+        "name": "Action",
+        "showJsonPath": "$.name",
+        "description": "A callable things, which has input and output"
+      }
+    },
+    {
+      "id": "a17d9269-dfab-4d65-b7bb-5fdf8efe6aa4",
+      "type": "NodeType",
+      "properties": {
+        "name": "UserStory",
+        "showJsonPath": "$.name",
+        "description": "Use to manage the user story of the feature"
+      }
+    },
+    {
+      "id": "ab09b4be-83d6-4365-a8f7-caf6e43795ef",
+      "type": "NodeType",
+      "properties": {
+        "name": "Application",
+        "showJsonPath": "$.name"
+      }
+    },
+    {
+      "id": "b6fcc068-a91a-4104-8351-bc357d1f5234",
+      "type": "NodeType",
+      "properties": {
+        "name": "View",
+        "showJsonPath": "$.type",
+        "descrpition": "The type of current view"
+      }
+    },
+    {
+      "id": "b79778c6-b85c-47c2-89c9-bb42d2c79499",
+      "type": "NodeType",
+      "properties": {
+        "name": "New",
+        "description": "The type of new node"
+      }
+    },
+    {
+      "id": "b826596d-86b2-4ac6-8934-7f69b4495474",
+      "type": "NodeType",
+      "properties": {
+        "name": "NodeType",
+        "showJsonPath": "$.name"
+      }
+    },
+    {
+      "id": "b9a6fbea-c51e-49fa-9cf8-49907114593c",
+      "type": "NodeType",
+      "properties": {
+        "name": "ViewType",
+        "showJsonPath": "$.type",
+        "description": "The type of the view. Usually, it's a component that can render in the whole window"
+      }
+    },
+    {
+      "id": "e0bd85c5-fc0c-445a-af08-97b6ad728ea4",
+      "type": "NodeType",
+      "properties": {
+        "name": "Feature",
+        "showJsonPath": "$.name",
+        "description": "Use to manage the feature of the application"
+      }
+    },
+    {
+      "id": "fae51b39-6015-422c-a7f0-d39cd53f7e17",
+      "type": "NodeType",
+      "properties": {
+        "name": "RelationshipType",
+        "showJsonPath": "$.name"
+      }
+    }
+  ]
+}

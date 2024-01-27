@@ -1,0 +1,20 @@
+{
+  "data": [
+    {
+      "id": "427ebd26-64d6-4ede-a1e2-1bd7671613e6",
+      "type": "ViewType",
+      "properties": {
+        "type": "NodeView",
+        "description": "View the node list"
+      }
+    },
+    {
+      "id": "d756848c-9b83-4409-8e3d-06de46cf47fc",
+      "type": "ViewType",
+      "properties": {
+        "type": "NodeEditView",
+        "description": "Edit one node"
+      }
+    }
+  ]
+}
