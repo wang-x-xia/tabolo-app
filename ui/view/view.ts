@@ -1,6 +1,7 @@
 import {createContext} from "react";
 import type {Graph, GraphEdit, NodeSearcher} from "../../core";
 import {emptySearcher, typeSearcher} from "../../core";
+import type {PropertyViewData} from "./property.ts";
 
 export type ViewData = NodeViewData | NodeEditViewData | RelationshipEditViewData
 
@@ -8,6 +9,7 @@ export type ViewData = NodeViewData | NodeEditViewData | RelationshipEditViewDat
 export interface NodeViewData {
     type: "NodeView",
     searcher: NodeSearcher,
+    columns: PropertyViewData[]
 }
 
 export interface NodeEditViewData {

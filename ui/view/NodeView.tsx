@@ -1,12 +1,13 @@
-import {Table, TableProps} from "antd"
-import {Button} from "flowbite-react";
-import {useCallback, useContext, useEffect, useMemo, useState} from "react"
+import {Button, Table} from "flowbite-react";
+import {useCallback, useContext, useEffect, useState} from "react"
 import {emptySearcher, GraphNode, NodeSearcher} from "../../core"
 import {NodeCell} from "../cell/NodeCell.tsx";
 import {GraphContext} from "../data/graph"
 import {GraphEditContext} from "../edit/graph-edit";
 import {NodeSearch} from "../search/NodeSearch.tsx";
 import {useMenuItem} from "./menu.tsx";
+import type {PropertyViewData} from "./property.ts";
+import {CreatePropertyPopupButton, PropertyView} from "./PropertyView.tsx";
 import {NodeViewData, ViewHandlerContext} from "./view"
 
 export function NodeView({data}: {
@@ -16,34 +17,25 @@ export function NodeView({data}: {
     const graphEdit = useContext(GraphEditContext)
     const viewHandler = useContext(ViewHandlerContext)
 
-    const columns: TableProps<GraphNode>['columns'] = useMemo(() => {
-        return [{
-            title: "Node",
-            key: "node",
-            render: (_, node) => <NodeCell data={node}/>,
-        }]
-    }, [])
+    const [columns, setColumns] = useState<PropertyViewData[]>([])
+    useEffect(() => {
+        if (data !== undefined && data.columns !== undefined) {
+            setColumns(data.columns)
+        }
+    }, [data])
 
     const [localSearcher, setLocalSearcher] =
-        useState<NodeSearcher>(emptySearcher)
+        useState<NodeSearcher>(emptySearcher())
     useEffect(() => {
         if (data !== undefined) {
             setLocalSearcher(data.searcher)
-            queryData("NotUpdateView", data.searcher)
+            queryData(data.searcher)
         }
     }, [data])
 
     const [nodes, setNodes] = useState<GraphNode[]>()
 
-    const queryData = useCallback(async function (
-        updateView: "UpdateView" | "NotUpdateView" = "UpdateView",
-        searcher = localSearcher) {
-        if (updateView === "UpdateView") {
-            await viewHandler.updateView({
-                type: "NodeView",
-                searcher: searcher
-            })
-        }
+    const queryData = useCallback(async function (searcher = localSearcher) {
         setNodes(await graph.searchNodes(searcher))
     }, [localSearcher])
 
@@ -59,6 +51,12 @@ export function NodeView({data}: {
 
     const addNodeMenu = useMenuItem("Add New Node", <Button onClick={addNode}>Add New Node</Button>);
 
+    function addColumn(column: PropertyViewData) {
+        setColumns([...columns, column])
+    }
+
+    const addColumnMenu = useMenuItem("Add New Column",
+        <CreatePropertyPopupButton name="Add New Column" onCreate={addColumn}/>);
     if (nodes === undefined) {
         return <>Loading</>
     }
@@ -66,7 +64,27 @@ export function NodeView({data}: {
     return <>
         {refreshMenu}
         {addNodeMenu}
+        {addColumnMenu}
         <NodeSearch data={localSearcher} onChange={setLocalSearcher}/>
-        <Table columns={columns} dataSource={nodes} rowKey="id"/>
+        <Table>
+            <Table.Head>
+                <Table.HeadCell>
+                    Node
+                </Table.HeadCell>
+                {columns.map(it => <Table.HeadCell>
+                    {it.name}
+                </Table.HeadCell>)}
+            </Table.Head>
+            <Table.Body>
+                {nodes.map(node => <Table.Row>
+                    <Table.Cell>
+                        <NodeCell data={node}/>
+                    </Table.Cell>
+                    {columns.map(it => <Table.Cell>
+                        <PropertyView data={node.properties} config={it}/>
+                    </Table.Cell>)}
+                </Table.Row>)}
+            </Table.Body>
+        </Table>
     </>
 }

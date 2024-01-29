@@ -7,10 +7,10 @@
         "type": "NodeView",
         "searcher": {
           "type": "type",
-          "value": "Concept"
+          "value": "Menu Item"
         }
       },
-      "updateTime": "2024-01-27T15:13:03.513Z"
+      "updateTime": "2024-01-29T15:03:14.235Z"
     }
   ]
 }

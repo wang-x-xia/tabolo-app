@@ -27,6 +27,15 @@
       "properties": {
         "name": "Save View"
       }
+    },
+    {
+      "id": "7bb791b1-1b3a-4a3f-87f8-e41e2864d7dc",
+      "type": "Menu Item",
+      "properties": {
+        "name": "Add New Column"
+      },
+      "createTime": "2024-01-28T14:17:37.555Z",
+      "updateTime": "2024-01-28T14:17:58.369Z"
     }
   ]
 }
