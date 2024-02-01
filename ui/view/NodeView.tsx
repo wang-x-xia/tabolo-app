@@ -1,4 +1,4 @@
-import {Button, Table} from "flowbite-react";
+import {Button, type DeepPartial, type FlowbiteTableTheme, Table} from "flowbite-react";
 import {useCallback, useContext, useEffect, useState} from "react"
 import {emptySearcher, GraphNode, NodeSearcher} from "../../core"
 import {NodeCell} from "../cell/NodeCell.tsx";
@@ -9,6 +9,12 @@ import {useMenuItem} from "./menu.tsx";
 import type {PropertyViewData} from "./property.ts";
 import {CreatePropertyPopupButton, PropertyView} from "./PropertyView.tsx";
 import {NodeViewData, ViewHandlerContext} from "./view"
+
+const TABLE_THEME: DeepPartial<FlowbiteTableTheme> = {
+    root: {
+        base: "w-full text-sm text-left",
+    }
+}
 
 export function NodeView({data}: {
     data: NodeViewData | undefined
@@ -66,7 +72,7 @@ export function NodeView({data}: {
         {addNodeMenu}
         {addColumnMenu}
         <NodeSearch data={localSearcher} onChange={setLocalSearcher}/>
-        <Table>
+        <Table theme={TABLE_THEME}>
             <Table.Head>
                 <Table.HeadCell>
                     Node

@@ -226,11 +226,11 @@ function createGraphEdit(db: IDBDatabase, graph: Graph): GraphEdit {
         },
 
         async copyNode(id: string): Promise<GraphNode> {
-            const oldNode = await graph.getNode(id);
+            const oldNode = (await graph.getNode(id))!;
             const newNode = await newEmptyNode();
             await editNodeType(newNode.id, oldNode.type);
             await editNodeProperty(newNode.id, oldNode.properties);
-            return await graph.getNode(newNode.id);
+            return (await graph.getNode(newNode.id))!;
         },
 
         newEmptyRelationship,
@@ -246,11 +246,11 @@ function createGraphEdit(db: IDBDatabase, graph: Graph): GraphEdit {
         },
 
         async copyRelationship(id: string): Promise<GraphRelationship> {
-            const oldRelationship = await graph.getRelationship(id);
+            const oldRelationship = (await graph.getRelationship(id))!;
             const newRelationship = await newEmptyRelationship(oldRelationship.startNodeId, oldRelationship.endNodeId);
             await editRelationshipType(newRelationship.id, oldRelationship.type);
             await editRelationshipProperty(newRelationship.id, oldRelationship.properties);
-            return await graph.getRelationship(newRelationship.id);
+            return (await graph.getRelationship(newRelationship.id))!;
         }
     }
 }
