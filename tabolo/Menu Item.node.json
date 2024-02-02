@@ -36,6 +36,51 @@
       },
       "createTime": "2024-01-28T14:17:37.555Z",
       "updateTime": "2024-01-28T14:17:58.369Z"
+    },
+    {
+      "id": "b3691d49-7276-43e1-a2e9-178ea3264e18",
+      "type": "Menu Item",
+      "properties": {
+        "name": "Copy Node"
+      },
+      "createTime": "2024-02-02T14:23:00.259Z",
+      "updateTime": "2024-02-02T14:23:05.322Z"
+    },
+    {
+      "id": "66042f14-debc-4e73-ac2e-a166fa4f7fdd",
+      "type": "Menu Item",
+      "properties": {
+        "name": "Delete Node"
+      },
+      "createTime": "2024-02-02T14:28:06.508Z",
+      "updateTime": "2024-02-02T14:28:09.806Z"
+    },
+    {
+      "id": "b5b0e43d-80bf-4164-9be8-85803228bf70",
+      "type": "Menu Item",
+      "properties": {
+        "name": "Save Node Property"
+      },
+      "createTime": "2024-02-02T14:35:35.201Z",
+      "updateTime": "2024-02-02T14:35:44.781Z"
+    },
+    {
+      "id": "5bcc1d77-5634-4b1e-b5b3-8d5f192a2ea1",
+      "type": "Menu Item",
+      "properties": {
+        "name": "Reset Node Property"
+      },
+      "createTime": "2024-02-02T14:35:55.414Z",
+      "updateTime": "2024-02-02T14:36:01.737Z"
+    },
+    {
+      "id": "c1de4ca6-b515-4042-bc27-f49ae10aa88c",
+      "type": "Menu Item",
+      "properties": {
+        "name": "Create Relationship"
+      },
+      "createTime": "2024-02-02T14:56:53.249Z",
+      "updateTime": "2024-02-02T14:57:08.267Z"
     }
   ]
 }

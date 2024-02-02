@@ -4,13 +4,10 @@
       "id": "75f26e05-a3bf-4b0c-9da9-26d137748392",
       "type": "View",
       "properties": {
-        "type": "NodeView",
-        "searcher": {
-          "type": "type",
-          "value": "Menu Item"
-        }
+        "type": "NodeEditView",
+        "nodeId": "106cb4fe-0a65-447a-8e0e-fb59e8bff6df"
       },
-      "updateTime": "2024-01-29T16:16:16.029Z"
+      "updateTime": "2024-02-02T14:59:03.039Z"
     }
   ]
 }

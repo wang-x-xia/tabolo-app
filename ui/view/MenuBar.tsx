@@ -28,7 +28,7 @@ export function SetupMenuBar({children}: PropsWithChildren) {
     return <>
         <header className="sticky top-0 z-10 flex space-x-2 p-2">
             {items.map(item =>
-                <span key={item.name} ref={dom => dom && setRef(item, dom)}/>)}
+                <span key={item.name} id={item.name} ref={dom => dom && setRef(item, dom)}/>)}
         </header>
         <MenuContext.Provider value={menu}>
             <MenuRenderContext.Provider value={menuRender}>

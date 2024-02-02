@@ -216,11 +216,11 @@ function createGraph(op: LocalFsOperation): Graph {
             return []
         }
         const result: GraphRelationship[] = []
-        for (const type in types) {
+        for (const type of types) {
             const relationships = await op.read("relationship", type)
-            for (const node of Object.values(relationships.data)) {
-                if (checkRelationship(node, searcher)) {
-                    result.push(node)
+            for (const relationship of Object.values(relationships.data)) {
+                if (checkRelationship(relationship, searcher)) {
+                    result.push(relationship)
                 }
             }
         }
