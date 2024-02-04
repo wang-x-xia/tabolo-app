@@ -1,11 +1,12 @@
 import {Button, Textarea, TextInput} from "flowbite-react";
 import {useContext, useEffect, useState} from "react";
-import {type GraphRelationship} from "../../core";
+import {type GraphNode, type GraphRelationship} from "../../core";
 import {NodeIdCell} from "../cell/NodeCell.tsx";
 import {RelationshipCell} from "../cell/RelationshipCell.tsx";
 import {useMenuItem} from "../view/menu.tsx";
 import {ViewHandlerContext} from "../view/view.ts";
 import {GraphEditContext} from "./graph-edit.ts";
+import {NodeSelect} from "./NodeSelect.tsx";
 import {TypeSelect} from "./TypeSelect.tsx";
 
 export function RelationshipEdit({data}: {
@@ -56,6 +57,14 @@ export function RelationshipEdit({data}: {
 
     const resetPropertyItem = useMenuItem("Reset Relationship Property", <Button onClick={reset}>Reset</Button>);
 
+    async function changeStartNode(node: GraphNode) {
+        setLocal(await graphEdit.editRelationshipStartNode(local.id, node.id))
+    }
+
+    async function changeEndNode(node: GraphNode) {
+        setLocal(await graphEdit.editRelationshipEndNode(local.id, node.id))
+    }
+
     return <>
         {deleteItem}
         {copyItem}
@@ -82,6 +91,11 @@ export function RelationshipEdit({data}: {
                 <label className="text-lg">Type</label>
                 <div className="max-w-48">
                     <TypeSelect type={local.type} source="Relationship" onChange={setType}/>
+                </div>
+                <label className="text-lg">Change Nodes</label>
+                <div className="flex space-x-2">
+                    <NodeSelect label="Select Start Node" selectedId={local.startNodeId} onSelect={changeStartNode}/>
+                    <NodeSelect label="Select End Node" selectedId={local.endNodeId} onSelect={changeEndNode}/>
                 </div>
                 <label className="text-lg">Property</label>
                 <Textarea rows={property.split("\n").length}
