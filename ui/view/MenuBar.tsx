@@ -1,32 +1,53 @@
-import {type PropsWithChildren, useContext, useMemo, useState} from "react";
+import {type PropsWithChildren, ReactElement, type ReactNode, useContext, useMemo, useState} from "react";
+import {createPortal} from "react-dom";
 import {GraphContext} from "../data/graph.ts";
 import {GraphEditContext} from "../edit/graph-edit.ts";
 import {useAsyncOrDefault} from "../utils/hooks.ts";
-import {createMenuFromGraph, MenuContext, type MenuItem, MenuRenderContext} from "./menu";
+import {createMenuFromGraph, MenuContext, type MenuItem, type MenuRender, MenuRenderContext} from "./menu";
 
 export function SetupMenuBar({children}: PropsWithChildren) {
     const graph = useContext(GraphContext)
     const graphEdit = useContext(GraphEditContext)
-    const [menuRender, setMenuRender] = useState<Record<string, Element>>({})
+    const [refMap, setRefMap] = useState<Record<string, Element>>({})
 
     const menu = useMemo(() => createMenuFromGraph(graph, graphEdit), [graph, graphEdit])
 
-    const items = useAsyncOrDefault([], async () => {
-        return await menu.listMenuItems()
+    const allItems = useAsyncOrDefault(null, async () => {
+        const items = await menu.listMenuItems()
+        const result: Record<string, MenuItem> = {}
+        items.forEach(it => result[it.name] = it)
+        return result
     }, [menu])
 
+    const [items, setItems] = useState<MenuItem[]>([])
+
     function setRef(item: MenuItem, dom: HTMLElement) {
-        if (menuRender[item.name] === dom) {
+        if (refMap[item.name] === dom) {
             return
         }
-        setMenuRender({
-            ...menuRender,
+        setRefMap({
+            ...refMap,
             [item.name]: dom
         })
     }
 
+    const menuRender = useMemo<MenuRender>(() => ({
+        item(menuItem: string, component: ReactNode): ReactElement {
+            const dom = refMap[menuItem]
+            if (dom) {
+                return createPortal(component, dom)
+            } else {
+                if (items.every(it => it.name !== menuItem) && allItems != null) {
+                    const item = allItems[menuItem] || {name: menuItem}
+                    setItems([...items, item])
+                }
+                return <></>
+            }
+        }
+    }), [items, refMap, allItems])
+
     return <>
-        <header className="sticky top-0 z-10 flex space-x-2 p-2">
+        <header className="sticky top-0 z-10 flex p-2 space-x-2">
             {items.map(item =>
                 <span key={item.name} id={item.name} ref={dom => dom && setRef(item, dom)}/>)}
         </header>

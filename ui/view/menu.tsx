@@ -1,5 +1,4 @@
-import {createContext, type ReactNode, useContext, useMemo} from "react";
-import {createPortal} from "react-dom";
+import {createContext, type ReactElement, type ReactNode, useContext} from "react";
 import {type Graph, type GraphEdit, typeSearcher} from "../../core";
 
 export interface Menu {
@@ -12,7 +11,7 @@ export interface MenuItem {
 
 
 export interface MenuRender {
-    [key: string]: Element
+    item(menuItem: string, component: ReactNode): ReactElement
 }
 
 
@@ -33,11 +32,5 @@ export function createMenuFromGraph(graph: Graph, graphEdit: GraphEdit): Menu {
 
 export function useMenuItem(name: string, component: ReactNode) {
     const menuRender = useContext(MenuRenderContext)
-    const dom = useMemo(() => menuRender[name], [name, menuRender])
-
-    if (dom) {
-        return createPortal(component, dom)
-    } else {
-        return <></>
-    }
+    return menuRender.item(name, component)
 }
