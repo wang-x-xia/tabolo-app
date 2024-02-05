@@ -1,4 +1,13 @@
-import {createContext, type ReactElement, type ReactNode, useContext} from "react";
+import {
+    createContext,
+    type Dispatch,
+    type ReactElement,
+    type ReactNode,
+    type SetStateAction,
+    useContext,
+    useEffect,
+    useState
+} from "react";
 import {type Graph, type GraphEdit, typeSearcher} from "../../core";
 
 export interface Menu {
@@ -9,9 +18,11 @@ export interface MenuItem {
     name: string
 }
 
-
 export interface MenuRender {
-    item(menuItem: string, component: ReactNode): ReactElement
+    /**
+     * @return remove fn
+     */
+    render(name: string, update: Dispatch<SetStateAction<ReactElement>>, component: ReactNode): () => void
 }
 
 
@@ -32,5 +43,10 @@ export function createMenuFromGraph(graph: Graph, graphEdit: GraphEdit): Menu {
 
 export function useMenuItem(name: string, component: ReactNode) {
     const menuRender = useContext(MenuRenderContext)
-    return menuRender.item(name, component)
+    // create a hook if the r is ready
+    const [element, setElement] = useState(<></>)
+    useEffect(() => {
+        return menuRender.render(name, setElement, component)
+    }, [component])
+    return element
 }
