@@ -10,13 +10,13 @@ import type {
 } from "../../core";
 import {checkNode, checkRelationship, typeSearcher} from "../../core";
 
-export interface LocalJson {
+export interface BatchOperation {
     exportAll(): Promise<{ node: GraphNode[], relationship: GraphRelationship[] }>
 
     importAll(data: { node: GraphNode[], relationship: GraphRelationship[] }): Promise<void>
 }
 
-export async function createJsonKv(name: string): Promise<[Graph, GraphEdit, GraphMeta, LocalJson]> {
+export async function createJsonKv(name: string): Promise<[Graph, GraphEdit, GraphMeta, BatchOperation]> {
     let openDb = window.indexedDB.open(name);
     const db = await new Promise<IDBDatabase>((resolve, reject) => {
         openDb.onupgradeneeded = _ => {
@@ -33,7 +33,7 @@ export async function createJsonKv(name: string): Promise<[Graph, GraphEdit, Gra
 
     let graphMeta = createGraphMetaFromGraph(graph)
 
-    return [graph, graphEdit, graphMeta, createLocalJson(db)]
+    return [graph, graphEdit, graphMeta, createBatchOp(db)]
 }
 
 function createNodeStore(db: IDBDatabase) {
@@ -300,7 +300,7 @@ export function createGraphMetaFromGraph(graph: Graph): GraphMeta {
 }
 
 
-function createLocalJson(db: IDBDatabase): LocalJson {
+function createBatchOp(db: IDBDatabase): BatchOperation {
     async function cleanUp() {
         for (const table of ["node", "relationship"] as ("node" | "relationship")[]) {
             const [transaction, store] = writeStore(table, db);
