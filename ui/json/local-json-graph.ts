@@ -1,14 +1,17 @@
-import type {
-    Graph,
-    GraphEdit,
-    GraphMeta,
-    GraphNode,
-    GraphNodeMeta,
-    GraphRelationship,
-    NodeSearcher,
-    RelationshipSearcher
+import {
+    checkNode,
+    checkRelationship,
+    type Graph,
+    type GraphEdit,
+    type GraphMeta,
+    type GraphNode,
+    type GraphNodeEditMeta,
+    type GraphNodeMeta,
+    type GraphRelationship,
+    type NodeSearcher,
+    type RelationshipSearcher,
+    typeSearcher
 } from "../../core";
-import {checkNode, checkRelationship, typeSearcher} from "../../core";
 
 export interface BatchOperation {
     exportAll(): Promise<{ node: GraphNode[], relationship: GraphRelationship[] }>
@@ -256,27 +259,37 @@ function createGraphEdit(db: IDBDatabase, graph: Graph): GraphEdit {
 }
 
 export function createGraphMetaFromGraph(graph: Graph): GraphMeta {
+    async function getNodeMetaNode<T>(nodeType: string, metaType: string): Promise<T | null> {
+        const metaNodes = await graph.searchNodes({
+            type: "and",
+            searchers: [
+                typeSearcher(metaType),
+                {
+                    type: "eq",
+                    jsonPath: "$.name",
+                    value: nodeType
+                }
+            ]
+        });
+        if (metaNodes.length != 1) {
+            console.log("Multiple meta nodes", metaNodes, nodeType, metaType)
+            throw Error("Multiple meta nodes")
+        } else if (metaNodes.length == 1) {
+            return metaNodes[0].properties
+        } else {
+            return null
+        }
+    }
+
     return {
         async getNodeMeta(type: string): Promise<GraphNodeMeta> {
-            const typeNodes = await graph.searchNodes({
-                type: "and",
-                searchers: [
-                    typeSearcher("NodeType"),
-                    {
-                        type: "eq",
-                        jsonPath: "$.name",
-                        value: type
-                    }
-                ]
-            });
-            let meta: GraphNodeMeta = {name: type}
-            if (typeNodes.length != 1) {
-                console.log("Multiple node with type", typeNodes, type)
-                throw Error("Multiple nodes")
-            } else if (typeNodes.length == 1) {
-                meta = typeNodes[0].properties
-            }
-            return meta
+            const r = await getNodeMetaNode<GraphNodeMeta>(type, "NodeType")
+            return r === null ? {name: type} : r;
+        },
+
+        async getNodeEditMeta(type: string): Promise<GraphNodeEditMeta> {
+            const r = await getNodeMetaNode<GraphNodeEditMeta>(type, "Node Edit Meta")
+            return r === null ? {markdownJsonPath: ""} : r
         },
 
         async getNodeTypes(): Promise<string[]> {
@@ -295,7 +308,7 @@ export function createGraphMetaFromGraph(graph: Graph): GraphMeta {
                 types.add(node.properties["name"]);
             });
             return Array.from(types).sort();
-        },
+        }
     }
 }
 

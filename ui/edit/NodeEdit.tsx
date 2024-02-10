@@ -1,9 +1,11 @@
 import {Button, Table, Textarea, TextInput} from "flowbite-react";
-import {useContext, useEffect, useState} from "react";
+import {JSONPath} from "jsonpath-plus";
+import {useContext, useEffect, useMemo, useState} from "react";
+import Markdown from "react-markdown";
 import {GraphNode, relationshipNodeSearcher} from "../../core";
 import {NodeCell, NodeIdCell} from "../cell/NodeCell.tsx";
 import {RelationshipCell} from "../cell/RelationshipCell.tsx";
-import {GraphContext} from "../data/graph";
+import {GraphContext, GraphMetaContext} from "../data/graph";
 import {TABLE_THEME} from "../utils/flowbite.ts";
 import {useAsyncOrDefault} from "../utils/hooks.ts";
 import {useMenuItem} from "../view/menu.tsx";
@@ -16,9 +18,14 @@ export function NodeEdit({data}: {
 }) {
     const graphEdit = useContext(GraphEditContext)
     const viewHandler = useContext(ViewHandlerContext)
+    const graphMeta = useContext(GraphMetaContext)
 
     const [local, setLocal] = useState(data)
     const [property, setProperty] = useState("")
+
+    const editMeta = useAsyncOrDefault({},
+        async () => await graphMeta.getNodeEditMeta(local.type),
+        [local, graphMeta])
 
     useEffect(() => {
         setProperty(JSON.stringify(data.properties, null, 2))
@@ -80,6 +87,9 @@ export function NodeEdit({data}: {
                     <NodeCell data={local}/>
                 </div>
             </div>
+            {editMeta.markdownJsonPath && <div className="prose max-w-6xl grow p-6">
+                <RenderMarkdown data={local} path={editMeta.markdownJsonPath}/>
+            </div>}
             <div className="flex flex-col grow p-4 space-y-4">
                 <label className="text-lg">Node ID</label>
                 <TextInput className="max-w-96" disabled value={local.id}/>
@@ -139,4 +149,14 @@ export function NodeRelationships({data}: {
             </Table>
         </div>
     </>
+}
+
+export function RenderMarkdown({data, path}: { data: GraphNode, path: string }) {
+    const text = useMemo(() => JSONPath({
+        path,
+        json: data.properties,
+        wrap: false
+    }), [data, path])
+
+    return <Markdown>{text}</Markdown>
 }

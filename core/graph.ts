@@ -1,6 +1,6 @@
 import type {Extendable} from "./base";
-import type {RelationshipSearcher} from "./relationship-searcher";
 import type {NodeSearcher} from "./node-searcher";
+import type {RelationshipSearcher} from "./relationship-searcher";
 
 /**
  * An abstraction of Neo4j.
@@ -20,6 +20,8 @@ export interface Graph {
 
 export interface GraphMeta {
     getNodeMeta(type: string): Promise<GraphNodeMeta>
+
+    getNodeEditMeta(type: string): Promise<GraphNodeEditMeta>
 
     getNodeTypes(): Promise<string[]>
 
@@ -44,4 +46,8 @@ export interface GraphRelationship extends Extendable {
 export interface GraphNodeMeta {
     name: string,
     showJsonPath?: string | null,
+}
+
+export interface GraphNodeEditMeta {
+    markdownJsonPath?: string
 }
