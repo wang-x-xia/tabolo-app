@@ -77,7 +77,7 @@ export function NodeView({data}: {
                 </Table.HeadCell>)}
             </Table.Head>
             <Table.Body>
-                {nodes.map(node => <Table.Row>
+                {nodes.map(node => <Table.Row key={node.id}>
                     <Table.Cell>
                         <NodeCell data={node}/>
                     </Table.Cell>

@@ -17,7 +17,8 @@ export function View() {
 
     const [viewData, setViewData] = useState<ViewData>({
         type: "NodeView",
-        searcher: emptySearcher()
+        searcher: emptySearcher(),
+        columns: [],
     })
 
     useEffect(() => {
@@ -79,7 +80,7 @@ export function SelectView({onUpdateView}: {
 
     return <Dropdown label="Select View">
         {savedViews.map(view =>
-            <Dropdown.Item onClick={() => onUpdateView(view.data)}>
+            <Dropdown.Item key={view.name} onClick={() => onUpdateView(view.data)}>
                 {view.name}
             </Dropdown.Item>
         )}
