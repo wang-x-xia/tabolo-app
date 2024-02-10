@@ -12,11 +12,40 @@ export interface LocalFsConfiguration {
 
 export async function createFromLocalFs(config: LocalFsConfiguration): Promise<[Graph, GraphEdit]> {
     const fsOperation = await createLocalFsOperation(config)
-    const graph = createGraph(fsOperation)
-    const graphEdit = createGraphEdit(graph, fsOperation)
+    const markdownExtension = createMarkdownExtension(fsOperation)
+    const graph = createGraph(fsOperation, [markdownExtension])
+    const graphEdit = createGraphEdit(graph, fsOperation, [markdownExtension])
     return [graph, graphEdit]
 }
 
+interface NodeExtension {
+    type: string[],
+
+    reReadNode(properties: any, node: GraphNode): Promise<any>
+
+    reWriteNode(properties: any, node: GraphNode): Promise<any>
+}
+
+function createMarkdownExtension(op: LocalFsOperation): NodeExtension {
+    return {
+        type: ["Markdown"],
+
+        async reReadNode(properties: any): Promise<any> {
+            const content = await op.readRaw(properties.path)
+            return {
+                ...properties,
+                "content": content,
+            }
+        },
+
+        async reWriteNode(properties: any): Promise<any> {
+            await op.writeRaw(properties.path, properties.content)
+            const newProperties = {...properties}
+            delete newProperties.content
+            return newProperties;
+        }
+    }
+}
 
 interface Nodes {
     data: GraphNode[]
@@ -55,6 +84,10 @@ interface LocalFsOperation {
     modifyId2Type(source: keyof SourceMapping, id: string, type: string): Promise<void>
 
     removeId2Type(source: keyof SourceMapping, id: string): Promise<void>
+
+    readRaw(path: string): Promise<string | null>
+
+    writeRaw(path: string, content: string): Promise<void>
 }
 
 
@@ -65,16 +98,15 @@ export async function createLocalFsOperation(config: LocalFsConfiguration): Prom
     // try to create root
     await fs.mkdir(root, {recursive: true})
 
-    async function readJson<T>(name: string, defaultValue: T): Promise<T> {
-        const fullPath = path.join(root, name)
+    async function readRaw(file: string): Promise<string | null> {
+        const fullPath = path.join(root, file)
         let handle: FileHandle | null = null
         try {
             handle = await fs.open(fullPath, "r")
-            const content = await handle.readFile("utf8")
-            return JSON.parse(content)
+            return await handle.readFile("utf8")
         } catch (err) {
             if ((err as any).code === 'ENOENT') {
-                return defaultValue
+                return null
             } else {
                 throw err;
             }
@@ -83,15 +115,24 @@ export async function createLocalFsOperation(config: LocalFsConfiguration): Prom
         }
     }
 
-    async function writeJson<T>(name: string, content: T) {
-        const fullPath = path.join(root, name)
+    async function writeRaw(file: string, content: string): Promise<void> {
+        const fullPath = path.join(root, file)
         let handle: FileHandle | null = null
         try {
             handle = await fs.open(fullPath, "w")
-            await handle.writeFile(JSON.stringify(content, null, 2), "utf8")
+            await handle.writeFile(content, "utf8")
         } finally {
             await handle?.close()
         }
+    }
+
+    async function readJson<T>(name: string, defaultValue: T): Promise<T> {
+        const content = await readRaw(name)
+        return content === null ? defaultValue : JSON.parse(content)
+    }
+
+    async function writeJson<T>(name: string, content: T) {
+        return writeRaw(name, JSON.stringify(content, null, 2));
     }
 
     async function id2Type(source: "node" | "relationship", id: string): Promise<string | null> {
@@ -147,6 +188,8 @@ export async function createLocalFsOperation(config: LocalFsConfiguration): Prom
         write,
         modifyId2Type,
         removeId2Type,
+        readRaw,
+        writeRaw,
     }
 }
 
@@ -169,14 +212,26 @@ function mustRemoveById<T extends keyof SourceMapping>(source: T, id: string, da
     throw Error(`Not found ${source}`)
 }
 
-function createGraph(op: LocalFsOperation): Graph {
+function createGraph(op: LocalFsOperation, nodeExtensions: NodeExtension[]): Graph {
+
+    async function postReadNode(node: GraphNode): Promise<GraphNode> {
+        let result: GraphNode = {
+            ...node,
+        }
+        for (const e of nodeExtensions) {
+            if (e.type.includes(node.type)) {
+                result.properties = await e.reReadNode(result.properties, node)
+            }
+        }
+        return result
+    }
 
     async function getNode(id: string): Promise<GraphNode | null> {
         const type = await op.id2Type("node", id)
         if (type === null) {
             return null
         }
-        return mustFoundById("node", id, await op.read("node", type))
+        return await postReadNode(mustFoundById("node", id, await op.read("node", type)))
     }
 
     async function searchNodes(searcher: NodeSearcher): Promise<GraphNode[]> {
@@ -192,7 +247,7 @@ function createGraph(op: LocalFsOperation): Graph {
             const nodes = await op.read("node", type)
             for (const node of Object.values(nodes.data)) {
                 if (checkNode(node, searcher)) {
-                    result.push(node)
+                    result.push(await postReadNode(node))
                 }
             }
         }
@@ -259,11 +314,22 @@ export function collectSearcherTypes(searcher: NodeSearcher | RelationshipSearch
 }
 
 
-function createGraphEdit(graph: Graph, op: LocalFsOperation): GraphEdit {
+function createGraphEdit(graph: Graph, op: LocalFsOperation, nodeExtensions: NodeExtension[]): GraphEdit {
 
     function now(): string {
         return new Date().toISOString()
     }
+
+    async function preWriteNode(node: GraphNode, properties: any): Promise<any> {
+        let result = properties
+        for (const e of nodeExtensions) {
+            if (e.type.includes(node.type)) {
+                result = await e.reWriteNode(result, node)
+            }
+        }
+        return result
+    }
+
 
     async function newEmptyNode(): Promise<GraphNode> {
         const id = await op.randomId("node")
@@ -307,19 +373,19 @@ function createGraphEdit(graph: Graph, op: LocalFsOperation): GraphEdit {
         return editType("node", id, type)
     }
 
-    async function editFields<T extends keyof SourceMapping>(source: T, id: string, set: (item: ItemSourceMapping<T>) => void): Promise<ItemSourceMapping<T>> {
+    async function editFields<T extends keyof SourceMapping>(source: T, id: string, set: (item: ItemSourceMapping<T>) => Promise<void>): Promise<ItemSourceMapping<T>> {
         const type = (await op.id2Type(source, id))!
         const data = await op.read(source, type)
         const item = mustFoundById(source, id, data)
-        set(item)
+        await set(item)
         item.updateTime = now()
         await op.write(source, type, data)
         return item
     }
 
     async function editNodeProperty(id: string, properties: any): Promise<GraphNode> {
-        return editFields("node", id, item => {
-            item.properties = properties
+        return editFields("node", id, async (item) => {
+            item.properties = await preWriteNode(item, properties)
         })
     }
 
