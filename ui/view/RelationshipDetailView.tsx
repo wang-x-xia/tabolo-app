@@ -1,9 +1,9 @@
-import {RelationshipEdit} from "../edit/RelationshipEdit.tsx";
+import {RelationshipDetail} from "../detail/RelationshipDetail.tsx";
 import {useAsync, useGraph} from "../utils/hooks";
-import type {RelationshipEditViewData} from "./view.ts";
+import type {RelationshipDetailViewData} from "./view.ts";
 
-export function RelationshipEditView({data}: {
-    data: RelationshipEditViewData,
+export function RelationshipDetailView({data}: {
+    data: RelationshipDetailViewData,
 }) {
     const graph = useGraph()
 
@@ -18,7 +18,7 @@ export function RelationshipEditView({data}: {
         case "error":
             return <>Error</>
         case "done":
-            return <RelationshipEdit data={relationshipAsync.value!!}/>
+            return <RelationshipDetail data={relationshipAsync.value!!}/>
 
     }
 }

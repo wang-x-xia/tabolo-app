@@ -8,9 +8,10 @@ import {RelationshipCell} from "../cell/RelationshipCell.tsx";
 import {TABLE_THEME} from "../utils/flowbite.ts";
 import {useAsyncOrDefault, useGraph, useGraphEdit, useGraphMeta, useViewHandler} from "../utils/hooks";
 import {useMenuItem} from "../view/menu.tsx";
+import {nodeDetailView} from "../view/view.ts";
 import {TypeSelect} from "./TypeSelect.tsx";
 
-export function NodeEdit({data}: {
+export function NodeDetail({data}: {
     data: GraphNode
 }) {
     const graphEdit = useGraphEdit()
@@ -43,10 +44,7 @@ export function NodeEdit({data}: {
 
     async function copy() {
         const node = await graphEdit.copyNode(data.id);
-        await viewHandler.updateView({
-            "type": "NodeEditView",
-            "nodeId": node.id
-        });
+        await viewHandler.updateView(nodeDetailView(node.id))
     }
 
     const copyMenuItem = useMenuItem("Copy Node", <Button onClick={copy}>Copy</Button>);

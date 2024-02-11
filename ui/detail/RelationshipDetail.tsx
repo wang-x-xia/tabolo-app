@@ -5,10 +5,11 @@ import {NodeIdCell} from "../cell/NodeCell.tsx";
 import {RelationshipCell} from "../cell/RelationshipCell.tsx";
 import {useGraphEdit, useViewHandler} from "../utils/hooks";
 import {useMenuItem} from "../view/menu.tsx";
+import {relationshipDetailView} from "../view/view.ts";
 import {NodeSelect} from "./NodeSelect.tsx";
 import {TypeSelect} from "./TypeSelect.tsx";
 
-export function RelationshipEdit({data}: {
+export function RelationshipDetail({data}: {
     data: GraphRelationship
 }) {
     const graphEdit = useGraphEdit()
@@ -36,10 +37,7 @@ export function RelationshipEdit({data}: {
 
     async function copy() {
         const relationship = await graphEdit.copyRelationship(data.id);
-        await viewHandler.updateView({
-            "type": "RelationshipEditView",
-            "relationshipId": relationship.id
-        });
+        await viewHandler.updateView(relationshipDetailView(relationship.id))
     }
 
     const copyItem = useMenuItem("Copy Relationship", <Button onClick={copy}>Copy</Button>);

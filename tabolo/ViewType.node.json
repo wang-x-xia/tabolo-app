@@ -12,8 +12,8 @@
       "id": "d756848c-9b83-4409-8e3d-06de46cf47fc",
       "type": "ViewType",
       "properties": {
-        "type": "NodeEditView",
-        "description": "Edit one node"
+        "type": "NodeDetailView",
+        "description": "View the node details"
       }
     }
   ]

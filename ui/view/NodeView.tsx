@@ -44,7 +44,7 @@ export function NodeView({data}: {
     async function addNode() {
         const node = await graphEdit.newEmptyNode();
         await viewHandler.updateView({
-            type: "NodeEditView",
+            type: "NodeDetailView",
             nodeId: node.id,
         })
     }

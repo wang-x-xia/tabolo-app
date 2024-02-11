@@ -1,6 +1,7 @@
 import {Dropdown} from "flowbite-react";
 import type {GraphRelationship} from "../../core"
 import {useViewHandler} from "../utils/hooks";
+import {relationshipDetailView} from "../view/view.ts";
 
 export function RelationshipCell({data}: {
     data: GraphRelationship
@@ -8,10 +9,7 @@ export function RelationshipCell({data}: {
     const viewHandler = useViewHandler()
 
     async function editRelationship() {
-        await viewHandler.updateView({
-            "type": "RelationshipEditView",
-            "relationshipId": data.id,
-        })
+        await viewHandler.updateView(relationshipDetailView(data.id))
     }
 
     return <div className="flex flex-col items-center

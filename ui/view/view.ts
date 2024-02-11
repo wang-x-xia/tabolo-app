@@ -3,7 +3,7 @@ import type {Graph, GraphEdit, GraphId, NodeSearcher} from "../../core";
 import {emptySearcher, typeSearcher} from "../../core";
 import type {PropertyViewData} from "./property.ts";
 
-export type ViewData = NodeViewData | NodeEditViewData | RelationshipEditViewData
+export type ViewData = NodeViewData | NodeDetailViewData | RelationshipDetailViewData
 
 
 export interface NodeViewData {
@@ -12,14 +12,28 @@ export interface NodeViewData {
     columns: PropertyViewData[]
 }
 
-export interface NodeEditViewData {
-    type: "NodeEditView",
+export interface NodeDetailViewData {
+    type: "NodeDetailView",
     nodeId: GraphId,
 }
 
-export interface RelationshipEditViewData {
-    type: "RelationshipEditView",
+export function nodeDetailView(nodeId: GraphId): NodeDetailViewData {
+    return {
+        type: "NodeDetailView",
+        nodeId,
+    }
+}
+
+export interface RelationshipDetailViewData {
+    type: "RelationshipDetailView",
     relationshipId: GraphId,
+}
+
+export function relationshipDetailView(relationshipId: GraphId): RelationshipDetailViewData {
+    return {
+        type: "RelationshipDetailView",
+        relationshipId,
+    }
 }
 
 export interface SavedViewData {

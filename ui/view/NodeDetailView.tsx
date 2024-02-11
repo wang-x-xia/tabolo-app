@@ -1,9 +1,9 @@
-import {NodeEdit} from "../edit/NodeEdit.tsx";
+import {NodeDetail} from "../detail/NodeDetail.tsx";
 import {useAsync, useGraph} from "../utils/hooks";
-import type {NodeEditViewData} from "./view.ts";
+import type {NodeDetailViewData} from "./view.ts";
 
-export function NodeEditView({data}: {
-    data: NodeEditViewData
+export function NodeDetailView({data}: {
+    data: NodeDetailViewData
 }) {
     const graph = useGraph()
     const nodeAsync = useAsync(async () => {
@@ -16,7 +16,7 @@ export function NodeEditView({data}: {
         case "error":
             return <>Error</>
         case "done":
-            return <NodeEdit data={nodeAsync.value!!}/>
+            return <NodeDetail data={nodeAsync.value!!}/>
 
     }
 }

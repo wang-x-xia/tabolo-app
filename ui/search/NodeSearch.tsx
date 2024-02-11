@@ -1,7 +1,7 @@
 import {Button, Select, TextInput} from "flowbite-react";
 import {type ReactNode, useEffect, useState} from "react";
 import {emptySearcher, type MatchAllSearcher, NodeSearcher, type PropertySearcher, type TypeSearcher} from "../../core";
-import {TypeSelect} from "../edit/TypeSelect.tsx";
+import {TypeSelect} from "../detail/TypeSelect.tsx";
 import {PopoverButton} from "../utils/PopoverButton.tsx";
 
 export function NodeSearch({data, onChange}: {

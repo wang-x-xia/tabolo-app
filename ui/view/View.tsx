@@ -3,10 +3,10 @@ import {useCallback, useEffect, useMemo, useState} from "react"
 import {emptySearcher, typeSearcher} from "../../core"
 import {useAsyncOrDefault, useGraph, useGraphEdit, useViewHandler, ViewHandlerContext} from "../utils/hooks"
 import {useMenuItem} from "./menu.tsx";
-import {NodeEditView} from "./NodeEditView"
+import {NodeDetailView} from "./NodeDetailView.tsx"
 import {NodeView} from "./NodeView"
-import {RelationshipEditView} from "./RelationshipEditView"
-import {fromGraph, type SavedViewData, ViewData} from "./view"
+import {RelationshipDetailView} from "./RelationshipDetailView.tsx"
+import {fromGraph, nodeDetailView, type SavedViewData, ViewData} from "./view"
 
 export function View() {
     const graph = useGraph()
@@ -97,7 +97,7 @@ export function SaveView({data}: { data: ViewData }) {
         }
         await graphEdit.editNodeProperty(node.id, savedViewData)
         await graphEdit.editNodeType(node.id, "SavedView")
-        await viewHandler.updateView({type: "NodeEditView", nodeId: node.id})
+        await viewHandler.updateView(nodeDetailView(node.id))
     }
 
     return <Button onClick={saveView}>Save View</Button>
@@ -109,10 +109,10 @@ export function DispatchView({data}: {
     switch (data.type) {
         case "NodeView":
             return <NodeView data={data}/>
-        case "NodeEditView":
-            return <NodeEditView data={data}/>
-        case "RelationshipEditView":
-            return <RelationshipEditView data={data}/>
+        case "NodeDetailView":
+            return <NodeDetailView data={data}/>
+        case "RelationshipDetailView":
+            return <RelationshipDetailView data={data}/>
 
     }
 }

@@ -2,6 +2,7 @@ import {Dropdown} from "flowbite-react"
 import {JSONPath} from "jsonpath-plus"
 import type {GraphId, GraphNode} from "../../core"
 import {useAsync, useAsyncOrDefault, useGraph, useGraphMeta, useViewHandler} from "../utils/hooks"
+import {nodeDetailView} from "../view/view.ts";
 import {NodeCellConfig} from "./node-cell.ts"
 import {PropertyValueCell} from "./PropertyValueCell"
 
@@ -44,10 +45,7 @@ export function NodeCell({data}: {
     }, [graphMeta, data.type])
 
     async function editNode() {
-        await viewHandler.updateView({
-            type: "NodeEditView",
-            nodeId: data.id,
-        })
+        await viewHandler.updateView(nodeDetailView(data.id))
     }
 
     const showJsonPathPart = config.type === "ShowJsonPath" ?
