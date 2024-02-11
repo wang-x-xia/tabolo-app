@@ -1,24 +1,21 @@
 import {Button, Table, Textarea, TextInput} from "flowbite-react";
 import {JSONPath} from "jsonpath-plus";
-import {useContext, useEffect, useMemo, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import Markdown from "react-markdown";
 import {displayGraphId, GraphNode, relationshipNodeSearcher} from "../../core";
 import {NodeCell, NodeIdCell} from "../cell/NodeCell.tsx";
 import {RelationshipCell} from "../cell/RelationshipCell.tsx";
-import {GraphContext, GraphMetaContext} from "../data/graph";
 import {TABLE_THEME} from "../utils/flowbite.ts";
-import {useAsyncOrDefault} from "../utils/hooks.ts";
+import {useAsyncOrDefault, useGraph, useGraphEdit, useGraphMeta, useViewHandler} from "../utils/hooks";
 import {useMenuItem} from "../view/menu.tsx";
-import {ViewHandlerContext} from "../view/view.ts";
-import {GraphEditContext} from "./graph-edit.ts";
 import {TypeSelect} from "./TypeSelect.tsx";
 
 export function NodeEdit({data}: {
     data: GraphNode
 }) {
-    const graphEdit = useContext(GraphEditContext)
-    const viewHandler = useContext(ViewHandlerContext)
-    const graphMeta = useContext(GraphMetaContext)
+    const graphEdit = useGraphEdit()
+    const viewHandler = useViewHandler()
+    const graphMeta = useGraphMeta()
 
     const [local, setLocal] = useState(data)
     const [property, setProperty] = useState("")
@@ -112,7 +109,7 @@ export function NodeRelationships({data}: {
     data: GraphNode,
 }) {
 
-    const graph = useContext(GraphContext)
+    const graph = useGraph()
 
     const relationships = useAsyncOrDefault([], async () => {
         return await graph.searchRelationships(relationshipNodeSearcher(data.id))

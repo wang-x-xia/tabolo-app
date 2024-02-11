@@ -1,18 +1,16 @@
 import {Button, Dropdown} from "flowbite-react"
-import {useCallback, useContext, useEffect, useMemo, useState} from "react"
+import {useCallback, useEffect, useMemo, useState} from "react"
 import {emptySearcher, typeSearcher} from "../../core"
-import {GraphContext} from "../data/graph"
-import {GraphEditContext} from "../edit/graph-edit"
-import {useAsyncOrDefault} from "../utils/hooks"
+import {useAsyncOrDefault, useGraph, useGraphEdit, useViewHandler, ViewHandlerContext} from "../utils/hooks"
 import {useMenuItem} from "./menu.tsx";
 import {NodeEditView} from "./NodeEditView"
 import {NodeView} from "./NodeView"
 import {RelationshipEditView} from "./RelationshipEditView"
-import {fromGraph, type SavedViewData, ViewData, ViewHandlerContext} from "./view"
+import {fromGraph, type SavedViewData, ViewData} from "./view"
 
 export function View() {
-    const graph = useContext(GraphContext)
-    const graphEdit = useContext(GraphEditContext)
+    const graph = useGraph()
+    const graphEdit = useGraphEdit()
     const viewHandler = useMemo(() => fromGraph(graph, graphEdit), [graph, graphEdit]);
 
     const [viewData, setViewData] = useState<ViewData>({
@@ -70,7 +68,7 @@ export function View() {
 export function SelectView({onUpdateView}: {
     onUpdateView(view: ViewData): any
 }) {
-    const graph = useContext(GraphContext)
+    const graph = useGraph()
     const savedViews = useAsyncOrDefault<SavedViewData[]>([], async () => {
         const nodes = await graph.searchNodes(typeSearcher("SavedView"))
         return nodes.map(it => it.properties as SavedViewData)
@@ -88,8 +86,8 @@ export function SelectView({onUpdateView}: {
 }
 
 export function SaveView({data}: { data: ViewData }) {
-    const graphEdit = useContext(GraphEditContext)
-    const viewHandler = useContext(ViewHandlerContext)
+    const graphEdit = useGraphEdit()
+    const viewHandler = useViewHandler()
 
     async function saveView() {
         const node = await graphEdit.newEmptyNode()

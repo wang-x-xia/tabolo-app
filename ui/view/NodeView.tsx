@@ -1,22 +1,21 @@
 import {Button, Table} from "flowbite-react";
-import {useCallback, useContext, useEffect, useState} from "react"
+import {useCallback, useEffect, useState} from "react"
 import {emptySearcher, GraphNode, NodeSearcher} from "../../core"
 import {NodeCell} from "../cell/NodeCell.tsx";
-import {GraphContext} from "../data/graph"
-import {GraphEditContext} from "../edit/graph-edit";
 import {NodeSearch} from "../search/NodeSearch.tsx";
 import {TABLE_THEME} from "../utils/flowbite.ts";
+import {useGraph, useGraphEdit, useViewHandler} from "../utils/hooks";
 import {useMenuItem} from "./menu.tsx";
 import type {PropertyViewData} from "./property.ts";
 import {CreatePropertyPopupButton, PropertyView} from "./PropertyView.tsx";
-import {NodeViewData, ViewHandlerContext} from "./view"
+import {NodeViewData} from "./view"
 
 export function NodeView({data}: {
     data: NodeViewData | undefined
 }) {
-    const graph = useContext(GraphContext)
-    const graphEdit = useContext(GraphEditContext)
-    const viewHandler = useContext(ViewHandlerContext)
+    const graph = useGraph()
+    const graphEdit = useGraphEdit()
+    const viewHandler = useViewHandler()
 
     const [columns, setColumns] = useState<PropertyViewData[]>([])
     useEffect(() => {

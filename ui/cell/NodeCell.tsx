@@ -1,17 +1,14 @@
 import {Dropdown} from "flowbite-react"
 import {JSONPath} from "jsonpath-plus"
-import {useContext} from "react"
 import type {GraphId, GraphNode} from "../../core"
-import {GraphContext, GraphMetaContext} from "../data/graph"
-import {useAsync, useAsyncOrDefault} from "../utils/hooks"
-import {ViewHandlerContext} from "../view/view"
+import {useAsync, useAsyncOrDefault, useGraph, useGraphMeta, useViewHandler} from "../utils/hooks"
 import {NodeCellConfig} from "./node-cell.ts"
 import {PropertyValueCell} from "./PropertyValueCell"
 
 export function NodeIdCell({data}: {
     data: GraphId
 }) {
-    const graph = useContext(GraphContext)
+    const graph = useGraph()
     const nodeAsync = useAsync(async () => {
         return await graph.getNode(data)
     }, [data])
@@ -30,8 +27,8 @@ export function NodeCell({data}: {
     data: GraphNode
 }) {
 
-    const viewHandler = useContext(ViewHandlerContext)
-    const graphMeta = useContext(GraphMetaContext)
+    const viewHandler = useViewHandler()
+    const graphMeta = useGraphMeta()
 
     const config: NodeCellConfig = useAsyncOrDefault({type: "ShowType", provider: "default"}, async () => {
         const meta = await graphMeta.getNodeMeta(data.type)

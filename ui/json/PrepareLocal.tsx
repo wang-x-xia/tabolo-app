@@ -8,8 +8,7 @@ import {
     type GraphEdit,
     type GraphMeta
 } from "../../core"
-import {GraphContext, GraphMetaContext} from "../data/graph.ts"
-import {GraphEditContext} from "../edit/graph-edit.ts"
+import {GraphContext, GraphEditContext, GraphMetaContext} from "../utils/hooks";
 import {useMenuItem} from "../view/menu.tsx";
 import {type BatchOperation, createGraphMetaFromGraph} from "./local-json-graph.ts"
 import {createLocalStorage} from "./local-storage-graph-source.ts";

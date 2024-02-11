@@ -1,12 +1,11 @@
 import {Dropdown} from "flowbite-react";
-import {useContext} from "react"
 import type {GraphRelationship} from "../../core"
-import {ViewHandlerContext} from "../view/view"
+import {useViewHandler} from "../utils/hooks";
 
 export function RelationshipCell({data}: {
     data: GraphRelationship
 }) {
-    const viewHandler = useContext(ViewHandlerContext)
+    const viewHandler = useViewHandler()
 
     async function editRelationship() {
         await viewHandler.updateView({

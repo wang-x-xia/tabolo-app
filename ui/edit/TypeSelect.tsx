@@ -11,10 +11,9 @@ import {
     useRole
 } from "@floating-ui/react";
 import {textInputTheme} from "flowbite-react/lib/esm/components/TextInput/theme";
-import {useContext, useMemo, useState} from "react";
+import {useMemo, useState} from "react";
 import {twMerge} from 'tailwind-merge';
-import {GraphMetaContext} from "../data/graph";
-import {useAsyncOrDefault} from "../utils/hooks.ts";
+import {useAsyncOrDefault, useGraphMeta} from "../utils/hooks";
 
 const INPUT_CLAZZ = twMerge(
     textInputTheme.field.input.base,
@@ -28,7 +27,7 @@ export function TypeSelect({type, source, onChange}: {
     source: "Node" | "Relationship"
     onChange(type: string): void
 }) {
-    const graphMeta = useContext(GraphMetaContext)
+    const graphMeta = useGraphMeta()
 
     const [search, setSearch] = useState("")
 

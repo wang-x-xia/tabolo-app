@@ -4,14 +4,11 @@ import {
     type ReactElement,
     type ReactNode,
     type SetStateAction,
-    useContext,
     useMemo,
     useState
 } from "react";
 import {createPortal} from "react-dom";
-import {GraphContext} from "../data/graph.ts";
-import {GraphEditContext} from "../edit/graph-edit.ts";
-import {useAsyncOrDefault} from "../utils/hooks.ts";
+import {useAsyncOrDefault, useGraph, useGraphEdit} from "../utils/hooks";
 import {createMenuFromGraph, MenuContext, type MenuItem, type MenuRender, MenuRenderContext} from "./menu";
 
 /**
@@ -26,8 +23,8 @@ interface RefData {
 }
 
 export function SetupMenuBar({children}: PropsWithChildren) {
-    const graph = useContext(GraphContext)
-    const graphEdit = useContext(GraphEditContext)
+    const graph = useGraph()
+    const graphEdit = useGraphEdit()
 
     const menu = useMemo(() => createMenuFromGraph(graph, graphEdit), [graph, graphEdit])
 

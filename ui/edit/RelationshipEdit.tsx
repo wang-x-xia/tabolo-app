@@ -1,19 +1,18 @@
 import {Button, Textarea, TextInput} from "flowbite-react";
-import {useContext, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {displayGraphId, type GraphNode, type GraphRelationship} from "../../core";
 import {NodeIdCell} from "../cell/NodeCell.tsx";
 import {RelationshipCell} from "../cell/RelationshipCell.tsx";
+import {useGraphEdit, useViewHandler} from "../utils/hooks";
 import {useMenuItem} from "../view/menu.tsx";
-import {ViewHandlerContext} from "../view/view.ts";
-import {GraphEditContext} from "./graph-edit.ts";
 import {NodeSelect} from "./NodeSelect.tsx";
 import {TypeSelect} from "./TypeSelect.tsx";
 
 export function RelationshipEdit({data}: {
     data: GraphRelationship
 }) {
-    const graphEdit = useContext(GraphEditContext)
-    const viewHandler = useContext(ViewHandlerContext)
+    const graphEdit = useGraphEdit()
+    const viewHandler = useViewHandler()
 
     const [local, setLocal] = useState(data)
     const [property, setProperty] = useState("")

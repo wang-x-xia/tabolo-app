@@ -1,10 +1,9 @@
 import {Button, Modal} from "flowbite-react";
-import {useContext, useState} from "react";
+import {useState} from "react";
 import {emptySearcher, type GraphId, type GraphNode, type NodeSearcher} from "../../core";
 import {NodeCell} from "../cell/NodeCell.tsx";
-import {GraphContext} from "../data/graph.ts";
 import {NodeSearch} from "../search/NodeSearch.tsx";
-import {useAsyncOrDefault} from "../utils/hooks.ts";
+import {useAsyncOrDefault, useGraph} from "../utils/hooks";
 
 export function NodeSelect({label, selectedId, onSelect}: {
     label: string,
@@ -14,7 +13,7 @@ export function NodeSelect({label, selectedId, onSelect}: {
     const [openModal, setOpenModal] = useState(false);
     const [searcher, setSeacher] = useState<NodeSearcher>(emptySearcher())
 
-    const graph = useContext(GraphContext)
+    const graph = useGraph()
 
     const nodes = useAsyncOrDefault([], async () => {
         return await graph.searchNodes(searcher)

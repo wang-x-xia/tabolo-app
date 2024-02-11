@@ -1,13 +1,11 @@
-import {useContext} from "react";
-import {GraphContext} from "../data/graph.ts";
 import {RelationshipEdit} from "../edit/RelationshipEdit.tsx";
-import {useAsync} from "../utils/hooks.ts";
+import {useAsync, useGraph} from "../utils/hooks";
 import type {RelationshipEditViewData} from "./view.ts";
 
 export function RelationshipEditView({data}: {
     data: RelationshipEditViewData,
 }) {
-    const graph = useContext(GraphContext)
+    const graph = useGraph()
 
     const relationshipAsync = useAsync(async () => {
         return await graph.getRelationship(data.relationshipId)
