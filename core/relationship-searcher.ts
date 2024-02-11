@@ -1,5 +1,6 @@
-import type {EmptySearcher, MatchAllSearcher, TypeSearcher} from "./searcher";
 import type {GraphRelationship} from "./graph";
+import {type GraphId, isSameGraphId} from "./graph-id";
+import type {EmptySearcher, MatchAllSearcher, TypeSearcher} from "./searcher";
 
 export type RelationshipSearcher =
     EmptySearcher
@@ -9,11 +10,11 @@ export type RelationshipSearcher =
 
 export interface RelationshipNodeSearcher {
     type: "node",
-    nodeId: string,
+    nodeId: GraphId,
     match: "start" | "end" | "both",
 }
 
-export function relationshipNodeSearcher(nodeId: string, match: "start" | "end" | "both" = "both"): RelationshipNodeSearcher {
+export function relationshipNodeSearcher(nodeId: GraphId, match: "start" | "end" | "both" = "both"): RelationshipNodeSearcher {
     return {type: "node", nodeId, match,}
 }
 
@@ -26,11 +27,11 @@ export function checkRelationship(relationship: GraphRelationship, searcher: Rel
         case "node":
             switch (searcher.match) {
                 case "start":
-                    return relationship.startNodeId == searcher.nodeId;
+                    return isSameGraphId(relationship.startNodeId, searcher.nodeId)
                 case "end":
-                    return relationship.endNodeId == searcher.nodeId;
+                    return isSameGraphId(relationship.endNodeId, searcher.nodeId)
                 case "both":
-                    return relationship.startNodeId == searcher.nodeId || relationship.endNodeId == searcher.nodeId;
+                    return isSameGraphId(relationship.startNodeId, searcher.nodeId) || isSameGraphId(relationship.endNodeId, searcher.nodeId)
                 default:
                     throw Error()
             }

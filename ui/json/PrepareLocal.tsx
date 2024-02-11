@@ -1,5 +1,5 @@
 import {Button, Modal, Textarea} from "flowbite-react";
-import {Context, type PropsWithChildren, useCallback, useContext, useState} from "react"
+import {Context, type PropsWithChildren, useCallback, useContext, useMemo, useState} from "react"
 import {
     createHttpClientGraph,
     createHttpClientGraphEdit,
@@ -10,53 +10,41 @@ import {
 } from "../../core"
 import {GraphContext, GraphMetaContext} from "../data/graph.ts"
 import {GraphEditContext} from "../edit/graph-edit.ts"
-import {useAsync} from "../utils/hooks.ts"
 import {useMenuItem} from "../view/menu.tsx";
-import {type BatchOperation, createGraphMetaFromGraph, createJsonKv} from "./local-json-graph.ts"
+import {type BatchOperation, createGraphMetaFromGraph} from "./local-json-graph.ts"
+import {createLocalStorage} from "./local-storage-graph-source.ts";
 
 export function PrepareLocal({children, batchOpKey}: PropsWithChildren & {
     batchOpKey: Context<BatchOperation>
 }) {
+    let graph: Graph, graphEdit: GraphEdit
     if (import.meta.env.DEV) {
-        const graph = createHttpClientGraph({baseUrl: `${location.origin}/dev-graph/graph`});
-        const graphEdit = createHttpClientGraphEdit({baseUrl: `${location.origin}/dev-graph/graphEdit`});
-        const graphMeta = createGraphMetaFromGraph(graph)
-        const batchOp: BatchOperation = {
-            async exportAll() {
-                return {
-                    node: await graph.searchNodes(emptySearcher()),
-                    relationship: await graph.searchRelationships(emptySearcher()),
-                }
-            },
-
-            async importAll(_) {
-                console.log("No OP for import all when dev")
-            },
-        }
-
-        return <SetupLocal graph={graph} graphEdit={graphEdit} graphMeta={graphMeta}>
-            <batchOpKey.Provider value={batchOp}>
-                {children}
-            </batchOpKey.Provider>
-        </SetupLocal>
+        graph = createHttpClientGraph({baseUrl: `${location.origin}/dev-graph/graph`});
+        graphEdit = createHttpClientGraphEdit({baseUrl: `${location.origin}/dev-graph/graphEdit`});
+    } else {
+        [graph, graphEdit] = useMemo(() => createLocalStorage({name: "Tabolo"}), [])
     }
 
+    const graphMeta = createGraphMetaFromGraph(graph)
+    const batchOp: BatchOperation = {
+        async exportAll() {
+            return {
+                node: await graph.searchNodes(emptySearcher()),
+                relationship: await graph.searchRelationships(emptySearcher()),
+            }
+        },
 
-    const jsonKv = useAsync(() => createJsonKv("Tabolo"), [])
-
-    switch (jsonKv.status) {
-        case "loading":
-            return <>Loading db</>
-        case "error":
-            return <>Failed to load db</>
-        case "done":
-            const [graph, graphEdit, graphMeta, batchOp] = jsonKv.value
-            return <SetupLocal graph={graph} graphEdit={graphEdit} graphMeta={graphMeta}>
-                <batchOpKey.Provider value={batchOp}>
-                    {children}
-                </batchOpKey.Provider>
-            </SetupLocal>
+        async importAll(_) {
+            // TODO
+            alert("Not support yet!")
+        },
     }
+
+    return <SetupLocal graph={graph} graphEdit={graphEdit} graphMeta={graphMeta}>
+        <batchOpKey.Provider value={batchOp}>
+            {children}
+        </batchOpKey.Provider>
+    </SetupLocal>
 }
 
 export function SetupLocal({graph, graphEdit, graphMeta, children}: PropsWithChildren<{

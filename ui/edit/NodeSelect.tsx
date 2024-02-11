@@ -1,6 +1,6 @@
 import {Button, Modal} from "flowbite-react";
 import {useContext, useState} from "react";
-import {emptySearcher, type GraphNode, type NodeSearcher} from "../../core";
+import {emptySearcher, type GraphId, type GraphNode, type NodeSearcher} from "../../core";
 import {NodeCell} from "../cell/NodeCell.tsx";
 import {GraphContext} from "../data/graph.ts";
 import {NodeSearch} from "../search/NodeSearch.tsx";
@@ -8,7 +8,7 @@ import {useAsyncOrDefault} from "../utils/hooks.ts";
 
 export function NodeSelect({label, selectedId, onSelect}: {
     label: string,
-    selectedId?: string,
+    selectedId?: GraphId,
     onSelect(node: GraphNode): void
 }) {
     const [openModal, setOpenModal] = useState(false);

@@ -2,7 +2,7 @@ import {Button, Table, Textarea, TextInput} from "flowbite-react";
 import {JSONPath} from "jsonpath-plus";
 import {useContext, useEffect, useMemo, useState} from "react";
 import Markdown from "react-markdown";
-import {GraphNode, relationshipNodeSearcher} from "../../core";
+import {displayGraphId, GraphNode, relationshipNodeSearcher} from "../../core";
 import {NodeCell, NodeIdCell} from "../cell/NodeCell.tsx";
 import {RelationshipCell} from "../cell/RelationshipCell.tsx";
 import {GraphContext, GraphMetaContext} from "../data/graph";
@@ -92,7 +92,7 @@ export function NodeEdit({data}: {
             </div>}
             <div className="flex flex-col grow p-4 space-y-4">
                 <label className="text-lg">Node ID</label>
-                <TextInput className="max-w-96" disabled value={local.id}/>
+                <TextInput className="max-w-96" disabled value={displayGraphId(local.id)}/>
                 <label className="text-lg">Type</label>
                 <div className="max-w-48">
                     <TypeSelect type={local.type} source="Node" onChange={setType}/>

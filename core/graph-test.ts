@@ -1,6 +1,6 @@
+import {describe, expect, test} from "vitest";
 import type {Graph} from "./graph";
 import type {GraphEdit} from "./graph-edit";
-import {describe, expect, test} from "vitest";
 
 
 export function verifyGraph(graph: Graph, graphEdit: GraphEdit) {
@@ -16,16 +16,15 @@ export function verifyNode(graph: Graph, graphEdit: GraphEdit) {
     test("node operations", async () => {
         let node = await graphEdit.newEmptyNode()
         const id = node.id
-        expect(id).toBeTypeOf("string")
         expect(await graph.getNode(id), "Check query").toStrictEqual(node)
 
         node = await graphEdit.editNodeType(id, "Type")
-        expect(node.id).toBe(id)
+        expect(node.id).toStrictEqual(id)
         expect(node.type).toBe("Type")
         expect(await graph.getNode(id), "Check after modify type").toStrictEqual(node)
 
         node = await graphEdit.editNodeProperty(id, {"test": "node ops"})
-        expect(node.id).toBe(id)
+        expect(node.id).toStrictEqual(id)
         expect(node.properties).toStrictEqual({"test": "node ops"})
         expect(await graph.getNode(id), "Check after modify property").toStrictEqual(node)
 
@@ -41,7 +40,7 @@ export function verifyNode(graph: Graph, graphEdit: GraphEdit) {
 
         let copiedNode = await graphEdit.copyNode(id)
         const copiedId = copiedNode.id
-        expect(copiedNode.id).not.toBe(id)
+        expect(copiedNode.id).not.toStrictEqual(id)
         expect(copiedNode.type).toBe("Type")
         expect(copiedNode.properties).toStrictEqual({"test": "node copy"})
         expect(await graph.getNode(copiedId), "Check copied node").toStrictEqual(copiedNode)
@@ -58,24 +57,23 @@ export function verifyRelationship(graph: Graph, graphEdit: GraphEdit) {
 
         let relationship = await graphEdit.newEmptyRelationship(startNode.id, endNode.id);
         const id = relationship.id
-        expect(id).toBeTypeOf("string")
-        expect(relationship.startNodeId).toBe(startNode.id)
-        expect(relationship.endNodeId).toBe(endNode.id)
+        expect(relationship.startNodeId).toStrictEqual(startNode.id)
+        expect(relationship.endNodeId).toStrictEqual(endNode.id)
         expect(await graph.getRelationship(id), "Check query").toStrictEqual(relationship)
 
         relationship = await graphEdit.editRelationshipType(id, "Type")
-        expect(relationship.id).toBe(id)
+        expect(relationship.id).toStrictEqual(id)
         expect(relationship.type).toBe("Type")
         expect(await graph.getRelationship(id), "Check after modify type").toStrictEqual(relationship)
 
         const newStartNode = await graphEdit.newEmptyNode()
         relationship = await graphEdit.editRelationshipStartNode(id, newStartNode.id)
-        expect(relationship.startNodeId).toBe(newStartNode.id)
+        expect(relationship.startNodeId).toStrictEqual(newStartNode.id)
         expect(await graph.getRelationship(id), "Check after modify start node").toStrictEqual(relationship)
 
         const newEndNode = await graphEdit.newEmptyNode()
         relationship = await graphEdit.editRelationshipEndNode(id, newEndNode.id)
-        expect(relationship.endNodeId).toBe(newEndNode.id)
+        expect(relationship.endNodeId).toStrictEqual(newEndNode.id)
         expect(await graph.getRelationship(id), "Check after modify end node").toStrictEqual(relationship)
 
         relationship = await graphEdit.editRelationshipProperty(id, {"test": "relationship op"})

@@ -15,7 +15,7 @@ export function devGraph(): PluginOption {
                 const koa = koaServer(graph, graphEdit)
                 return koa.callback()
             }()
-            return () => server.middlewares.use("/dev-graph", async (req, res, next) => {
+            return () => server.middlewares.use("/dev-graph", async (req, res) => {
                 const middleware = await middlewareAsync
                 await middleware(req, res)
             })

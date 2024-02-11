@@ -1,7 +1,7 @@
 import {Dropdown} from "flowbite-react"
 import {JSONPath} from "jsonpath-plus"
 import {useContext} from "react"
-import type {GraphNode} from "../../core"
+import type {GraphId, GraphNode} from "../../core"
 import {GraphContext, GraphMetaContext} from "../data/graph"
 import {useAsync, useAsyncOrDefault} from "../utils/hooks"
 import {ViewHandlerContext} from "../view/view"
@@ -9,7 +9,7 @@ import {NodeCellConfig} from "./node-cell.ts"
 import {PropertyValueCell} from "./PropertyValueCell"
 
 export function NodeIdCell({data}: {
-    data: string
+    data: GraphId
 }) {
     const graph = useContext(GraphContext)
     const nodeAsync = useAsync(async () => {
@@ -46,8 +46,8 @@ export function NodeCell({data}: {
         }
     }, [graphMeta, data.type])
 
-    function editNode() {
-        viewHandler.updateView({
+    async function editNode() {
+        await viewHandler.updateView({
             type: "NodeEditView",
             nodeId: data.id,
         })

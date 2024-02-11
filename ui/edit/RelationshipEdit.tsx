@@ -1,6 +1,6 @@
 import {Button, Textarea, TextInput} from "flowbite-react";
 import {useContext, useEffect, useState} from "react";
-import {type GraphNode, type GraphRelationship} from "../../core";
+import {displayGraphId, type GraphNode, type GraphRelationship} from "../../core";
 import {NodeIdCell} from "../cell/NodeCell.tsx";
 import {RelationshipCell} from "../cell/RelationshipCell.tsx";
 import {useMenuItem} from "../view/menu.tsx";
@@ -87,7 +87,7 @@ export function RelationshipEdit({data}: {
             </div>
             <div className="flex flex-col grow p-4 space-y-4">
                 <label className="text-lg">Relationship ID</label>
-                <TextInput className="max-w-96" disabled value={local.id}/>
+                <TextInput className="max-w-96" disabled value={displayGraphId(local.id)}/>
                 <label className="text-lg">Type</label>
                 <div className="max-w-48">
                     <TypeSelect type={local.type} source="Relationship" onChange={setType}/>

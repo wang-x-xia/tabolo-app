@@ -16,7 +16,7 @@ function createGraph(config: LocalStorageConfiguration): Graph {
     const {name} = config
 
     function getValues(source: "node" | "relationship"): Record<string, any> {
-        return JSON.parse(localStorage.getItem(`${name}-${source}`)) || {}
+        return JSON.parse(localStorage.getItem(`${name}-${source}`) || "{}")
     }
 
     function getValue(source: "node" | "relationship", id: string): any | null {
@@ -54,7 +54,7 @@ function createGraphEdit(config: LocalStorageConfiguration): GraphEdit {
     const {name} = config
 
     function editValues<T>(source: "node" | "relationship", fn: (data: Record<string, any>) => T): T {
-        const values = JSON.parse(localStorage.getItem(`${name}-${source}`)) || {}
+        const values = JSON.parse(localStorage.getItem(`${name}-${source}`) || "{}")
         const result = fn(values)
         localStorage.setItem(`${name}-${source}`, JSON.stringify(values))
         return result

@@ -1,4 +1,5 @@
 import type {Extendable} from "./base";
+import type {GraphId} from "./graph-id";
 import type {NodeSearcher} from "./node-searcher";
 import type {RelationshipSearcher} from "./relationship-searcher";
 
@@ -9,11 +10,11 @@ import type {RelationshipSearcher} from "./relationship-searcher";
  * 2. Impl for UT
  */
 export interface Graph {
-    getNode(id: string): Promise<GraphNode | null>
+    getNode(id: GraphId): Promise<GraphNode | null>
 
     searchNodes(searcher: NodeSearcher): Promise<GraphNode[]>
 
-    getRelationship(id: string): Promise<GraphRelationship | null>
+    getRelationship(id: GraphId): Promise<GraphRelationship | null>
 
     searchRelationships(searcher: RelationshipSearcher): Promise<GraphRelationship[]>
 }
@@ -29,17 +30,17 @@ export interface GraphMeta {
 }
 
 export interface GraphNode extends Extendable {
-    id: string;
+    id: GraphId;
     type: string;
     properties: any;
 }
 
 export interface GraphRelationship extends Extendable {
-    id: string;
+    id: GraphId;
     type: string;
     properties: any;
-    startNodeId: string;
-    endNodeId: string;
+    startNodeId: GraphId;
+    endNodeId: GraphId;
 }
 
 

@@ -1,28 +1,29 @@
 import type {GraphNode, GraphRelationship} from "./graph";
+import type {GraphId} from "./graph-id.ts";
 
 export interface GraphEdit {
 
     newEmptyNode(): Promise<GraphNode>
 
-    editNodeType(id: string, type: string): Promise<GraphNode>
+    editNodeType(id: GraphId, type: string): Promise<GraphNode>
 
-    editNodeProperty(id: string, properties: any): Promise<GraphNode>
+    editNodeProperty(id: GraphId, properties: any): Promise<GraphNode>
 
-    removeNode(id: string): Promise<void>
+    removeNode(id: GraphId): Promise<void>
 
-    copyNode(id: string): Promise<GraphNode>
+    copyNode(id: GraphId): Promise<GraphNode>
 
-    newEmptyRelationship(startNodeId: string, endNodeId: string): Promise<GraphRelationship>
+    newEmptyRelationship(startNodeId: GraphId, endNodeId: GraphId): Promise<GraphRelationship>
 
-    editRelationshipType(id: string, type: string): Promise<GraphRelationship>
+    editRelationshipType(id: GraphId, type: string): Promise<GraphRelationship>
 
-    editRelationshipStartNode(id: string, nodeId: string): Promise<GraphRelationship>
+    editRelationshipStartNode(id: GraphId, nodeId: GraphId): Promise<GraphRelationship>
 
-    editRelationshipEndNode(id: string, nodeId: string): Promise<GraphRelationship>
+    editRelationshipEndNode(id: GraphId, nodeId: GraphId): Promise<GraphRelationship>
 
-    editRelationshipProperty(id: string, properties: any): Promise<GraphRelationship>
+    editRelationshipProperty(id: GraphId, properties: any): Promise<GraphRelationship>
 
-    removeRelationship(id: string): Promise<void>
+    removeRelationship(id: GraphId): Promise<void>
 
-    copyRelationship(id: string): Promise<GraphRelationship>
+    copyRelationship(id: GraphId): Promise<GraphRelationship>
 }

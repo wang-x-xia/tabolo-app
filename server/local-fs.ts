@@ -2,7 +2,7 @@ import * as fs from "fs/promises";
 import * as crypto from "node:crypto";
 import type {FileHandle} from "node:fs/promises";
 import * as path from "path";
-import type {Graph, GraphEdit, GraphNode, GraphRelationship} from "../core"
+import type {Graph, GraphEdit, GraphId, GraphNode, GraphRelationship} from "../core"
 import {checkNode, checkRelationship, NodeSearcher, RelationshipSearcher} from "../core"
 
 export interface LocalFsConfiguration {
@@ -71,9 +71,9 @@ interface Types {
 }
 
 interface LocalFsOperation {
-    id2Type(source: keyof SourceMapping, id: string): Promise<string | null>
+    id2Type(source: keyof SourceMapping, id: GraphId): Promise<string | null>
 
-    randomId(source: keyof SourceMapping): Promise<string>
+    randomId(source: keyof SourceMapping): Promise<GraphId>
 
     types(source: keyof SourceMapping): Promise<string[]>
 
@@ -81,9 +81,9 @@ interface LocalFsOperation {
 
     write<T extends keyof SourceMapping>(source: T, type: string, data: SourceMapping[T]): Promise<void>
 
-    modifyId2Type(source: keyof SourceMapping, id: string, type: string): Promise<void>
+    modifyId2Type(source: keyof SourceMapping, id: GraphId, type: string): Promise<void>
 
-    removeId2Type(source: keyof SourceMapping, id: string): Promise<void>
+    removeId2Type(source: keyof SourceMapping, id: GraphId): Promise<void>
 
     readRaw(path: string): Promise<string | null>
 
@@ -135,9 +135,15 @@ export async function createLocalFsOperation(config: LocalFsConfiguration): Prom
         return writeRaw(name, JSON.stringify(content, null, 2));
     }
 
-    async function id2Type(source: "node" | "relationship", id: string): Promise<string | null> {
+    async function id2Type(source: "node" | "relationship", id: GraphId): Promise<string | null> {
         const id2Type = await readJson<Id2Type>(`${source}.id2type.json`, {data: {}})
-        const type = id2Type.data[id]
+        let searchKey: string;
+        if (typeof id !== "string") {
+            searchKey = JSON.stringify(id)
+        } else {
+            searchKey = id
+        }
+        const type = id2Type.data[searchKey]
         if (type === undefined) {
             return null
         } else {
@@ -373,7 +379,7 @@ function createGraphEdit(graph: Graph, op: LocalFsOperation, nodeExtensions: Nod
         return editType("node", id, type)
     }
 
-    async function editFields<T extends keyof SourceMapping>(source: T, id: string, set: (item: ItemSourceMapping<T>) => Promise<void>): Promise<ItemSourceMapping<T>> {
+    async function editFields<T extends keyof SourceMapping>(source: T, id: string, set: (item: ItemSourceMapping<T>) => Promise<void> | void): Promise<ItemSourceMapping<T>> {
         const type = (await op.id2Type(source, id))!
         const data = await op.read(source, type)
         const item = mustFoundById(source, id, data)
@@ -446,13 +452,13 @@ function createGraphEdit(graph: Graph, op: LocalFsOperation, nodeExtensions: Nod
         return editType("relationship", id, type)
     }
 
-    async function editRelationshipStartNode(id: string, nodeId: string): Promise<GraphRelationship> {
-        return editFields("relationship", id, item => {
+    async function editRelationshipStartNode(id: string, nodeId: GraphId): Promise<GraphRelationship> {
+        return editFields("relationship", id, (item) => {
             item.startNodeId = nodeId
         })
     }
 
-    async function editRelationshipEndNode(id: string, nodeId: string): Promise<GraphRelationship> {
+    async function editRelationshipEndNode(id: string, nodeId: GraphId): Promise<GraphRelationship> {
         return editFields("relationship", id, item => {
             item.endNodeId = nodeId
         })

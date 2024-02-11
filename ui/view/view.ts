@@ -1,5 +1,5 @@
 import {createContext} from "react";
-import type {Graph, GraphEdit, NodeSearcher} from "../../core";
+import type {Graph, GraphEdit, GraphId, NodeSearcher} from "../../core";
 import {emptySearcher, typeSearcher} from "../../core";
 import type {PropertyViewData} from "./property.ts";
 
@@ -14,12 +14,12 @@ export interface NodeViewData {
 
 export interface NodeEditViewData {
     type: "NodeEditView",
-    nodeId: string,
+    nodeId: GraphId,
 }
 
 export interface RelationshipEditViewData {
     type: "RelationshipEditView",
-    relationshipId: string,
+    relationshipId: GraphId,
 }
 
 export interface SavedViewData {
@@ -39,7 +39,7 @@ export function fromGraph(graph: Graph, graphEdit: GraphEdit): ViewHandler {
     return {
         async updateView(view: ViewData): Promise<ViewData> {
             let nodes = await graph.searchNodes(typeSearcher("View"));
-            let id: string
+            let id: GraphId
             if (nodes.length == 0) {
                 let node = await graphEdit.newEmptyNode();
                 id = node.id
