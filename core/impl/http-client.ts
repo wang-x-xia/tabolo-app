@@ -1,8 +1,8 @@
-import type {Graph, GraphNode, GraphRelationship} from "./graph"
-import type {GraphEdit} from "./graph-edit"
-import type {GraphId} from "./graph-id";
-import type {NodeSearcher} from "./node-searcher";
-import type {RelationshipSearcher} from "./relationship-searcher";
+import type {Graph, GraphNode, GraphRelationship} from "../graph"
+import type {GraphEdit} from "../graph-edit"
+import type {GraphId} from "../graph-id";
+import type {NodeSearcher} from "../node-searcher";
+import type {RelationshipSearcher} from "../relationship-searcher";
 
 export interface HttpClientConfig {
     baseUrl: string
