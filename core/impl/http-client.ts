@@ -1,6 +1,8 @@
-import type {Graph, GraphNode, GraphRelationship} from "../graph"
-import type {GraphEdit} from "../graph-edit"
+import type {Graph, GraphNode, GraphNodeEditMeta, GraphNodeMeta, GraphRelationship} from "../graph"
+import type {GraphEdit, GraphNodeBody, GraphRelationshipBody} from "../graph-edit"
 import type {GraphId} from "../graph-id";
+import type {GraphMeta} from "../graph-meta.ts";
+import type {GraphSuite} from "../graph-suite.ts";
 import type {NodeSearcher} from "../node-searcher";
 import type {RelationshipSearcher} from "../relationship-searcher";
 
@@ -27,6 +29,14 @@ async function jsonApi(url: string, data: any) {
     }
 }
 
+export function createHttpClient({baseUrl}: HttpClientConfig): GraphSuite {
+    return {
+        graph: createHttpClientGraph({baseUrl: `${baseUrl}/graph`}),
+        edit: createHttpClientGraphEdit({baseUrl: `${baseUrl}/graphEdit`}),
+        meta: createHttpClientGraphMeta({baseUrl: `${baseUrl}/graphMeta`}),
+    }
+}
+
 export function createHttpClientGraph(config: HttpClientConfig): Graph {
     return {
         async getNode(id: GraphId): Promise<GraphNode | null> {
@@ -47,42 +57,41 @@ export function createHttpClientGraph(config: HttpClientConfig): Graph {
 
 export function createHttpClientGraphEdit(config: HttpClientConfig): GraphEdit {
     return {
-        async newEmptyNode(): Promise<GraphNode> {
-            return jsonApi(`${config.baseUrl}/newEmptyNode`, {})
+        async createNode(node: GraphNodeBody): Promise<GraphNode> {
+            return jsonApi(`${config.baseUrl}/createNode`, {node})
         },
-        async editNodeType(id: GraphId, type: string): Promise<GraphNode> {
-            return jsonApi(`${config.baseUrl}/editNodeType`, {id, type})
-        },
-        async editNodeProperty(id: GraphId, properties: any): Promise<GraphNode> {
-            return jsonApi(`${config.baseUrl}/editNodeProperty`, {id, properties})
+        async createRelationship(relationship: GraphRelationshipBody): Promise<GraphRelationship> {
+            return jsonApi(`${config.baseUrl}/createRelationship`, {relationship})
         },
         async removeNode(id: GraphId): Promise<void> {
             return jsonApi(`${config.baseUrl}/removeNode`, {id})
         },
-        async copyNode(id: GraphId): Promise<GraphNode> {
-            return jsonApi(`${config.baseUrl}/copyNode`, {id})
+        async editNode(id: GraphId, node: Partial<GraphNodeBody>): Promise<GraphNode> {
+            return jsonApi(`${config.baseUrl}/editNode`, {id, node})
         },
-        async newEmptyRelationship(startNodeId: GraphId, endNodeId: GraphId): Promise<GraphRelationship> {
-            return jsonApi(`${config.baseUrl}/newEmptyRelationship`, {startNodeId, endNodeId})
-        },
-        async editRelationshipType(id: GraphId, type: string): Promise<GraphRelationship> {
-            return jsonApi(`${config.baseUrl}/editRelationshipType`, {id, type})
-        },
-        async editRelationshipStartNode(id: GraphId, nodeId: GraphId): Promise<GraphRelationship> {
-            return jsonApi(`${config.baseUrl}/editRelationshipStartNode`, {id, nodeId})
-        },
-        async editRelationshipEndNode(id: GraphId, nodeId: GraphId): Promise<GraphRelationship> {
-            return jsonApi(`${config.baseUrl}/editRelationshipEndNode`, {id, nodeId})
-        },
-        async editRelationshipProperty(id: GraphId, properties: any): Promise<GraphRelationship> {
-            return jsonApi(`${config.baseUrl}/editRelationshipProperty`, {id, properties})
+        async editRelationship(id: GraphId, relationship: Partial<GraphRelationshipBody>): Promise<GraphRelationship> {
+            return jsonApi(`${config.baseUrl}/editRelationship`, {id, relationship})
         },
         async removeRelationship(id: GraphId): Promise<void> {
             return jsonApi(`${config.baseUrl}/removeRelationship`, {id})
+        },
+    }
+}
 
+export function createHttpClientGraphMeta(config: HttpClientConfig): GraphMeta {
+    return {
+        async getNodeEditMeta(type): Promise<GraphNodeEditMeta> {
+            return await jsonApi(`${config.baseUrl}/getNodeEditMeta`, {type})
         },
-        async copyRelationship(id: GraphId): Promise<GraphRelationship> {
-            return jsonApi(`${config.baseUrl}/copyRelationship`, {id})
+        async getNodeMeta(type: string): Promise<GraphNodeMeta> {
+            return await jsonApi(`${config.baseUrl}/getNodeMeta`, {type})
         },
+        async getNodeTypes(): Promise<string[]> {
+            return await jsonApi(`${config.baseUrl}/getNodeTypes`, {})
+        },
+        async getRelationshipTypes(): Promise<string[]> {
+            return await jsonApi(`${config.baseUrl}/getRelationshipTypes`, {})
+        }
+
     }
 }

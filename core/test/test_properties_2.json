@@ -1,0 +1,60 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Alice",
+      "age": 25,
+      "email": "alice@example.com",
+      "address": {
+        "street": "456 Elm Street",
+        "city": "San Francisco",
+        "state": "CA",
+        "zip": "94101"
+      },
+      "hobbies": [
+        "running",
+        "cooking"
+      ],
+      "education": null,
+      "isEmployed": true,
+      "skills": {
+        "programming": [
+          "C++",
+          "Python"
+        ],
+        "languages": [
+          "English",
+          "French"
+        ]
+      },
+      "isMarried": false,
+      "spouse": null
+    },
+    {
+      "id": 2,
+      "name": "Bob",
+      "age": 35,
+      "email": "bob@example.com",
+      "address": {
+        "street": "789 Oak Avenue",
+        "city": "Los Angeles",
+        "state": "CA",
+        "zip": "90001"
+      },
+      "hobbies": [],
+      "education": {
+        "degree": "Master's",
+        "major": "Finance",
+        "university": "XYZ University"
+      },
+      "isEmployed": true,
+      "skills": null,
+      "isMarried": true,
+      "spouse": {
+        "name": "Carol",
+        "age": 33,
+        "email": "carol@example.com"
+      }
+    }
+  ]
+}

@@ -32,7 +32,7 @@ export function NodeDetail({data}: {
 
 
     async function setType(type: string) {
-        setLocal(await graphEdit.editNodeType(local.id, type))
+        setLocal(await graphEdit.editNode(local.id, {type}))
     }
 
     async function remove() {
@@ -43,14 +43,17 @@ export function NodeDetail({data}: {
     const deleteNodeItem = useMenuItem("Delete Node", <Button onClick={remove}>Delete</Button>);
 
     async function copy() {
-        const node = await graphEdit.copyNode(data.id);
+        const node = await graphEdit.createNode({
+            type: data.type,
+            properties: data.properties,
+        });
         await viewHandler.updateView(nodeDetailView(node.id))
     }
 
     const copyMenuItem = useMenuItem("Copy Node", <Button onClick={copy}>Copy</Button>);
 
     async function save() {
-        setLocal(await graphEdit.editNodeProperty(data.id, JSON.parse(property)))
+        setLocal(await graphEdit.editNode(data.id, {properties: JSON.parse(property)}))
     }
 
     const saveNodePropertyItem = useMenuItem("Save Node Property", <Button onClick={save}>Save</Button>);
@@ -63,7 +66,10 @@ export function NodeDetail({data}: {
 
 
     async function createRelationship() {
-        await graphEdit.newEmptyRelationship(data.id, data.id)
+        await graphEdit.createRelationship({
+            type: "New", properties: {},
+            startNodeId: data.id, endNodeId: data.id,
+        })
     }
 
     const createRelationshipItem = useMenuItem("Create Relationship",

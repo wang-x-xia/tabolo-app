@@ -1,29 +1,27 @@
 import type {GraphNode, GraphRelationship} from "./graph";
 import type {GraphId} from "./graph-id.ts";
 
+/**
+ * For Graph Edit, only type and properties are allowed
+ */
+export type GraphNodeBody = Pick<GraphNode, "type" | "properties">
+
+/**
+ * For Graph Edit, only type, properties and node ids are allowed
+ */
+export type GraphRelationshipBody = Pick<GraphRelationship, "type" | "properties" | "startNodeId" | "endNodeId">
+
 export interface GraphEdit {
 
-    newEmptyNode(): Promise<GraphNode>
+    createNode(node: GraphNodeBody): Promise<GraphNode>
 
-    editNodeType(id: GraphId, type: string): Promise<GraphNode>
-
-    editNodeProperty(id: GraphId, properties: any): Promise<GraphNode>
+    editNode(id: GraphId, node: Partial<GraphNodeBody>): Promise<GraphNode>
 
     removeNode(id: GraphId): Promise<void>
 
-    copyNode(id: GraphId): Promise<GraphNode>
+    createRelationship(relationship: GraphRelationshipBody): Promise<GraphRelationship>
 
-    newEmptyRelationship(startNodeId: GraphId, endNodeId: GraphId): Promise<GraphRelationship>
-
-    editRelationshipType(id: GraphId, type: string): Promise<GraphRelationship>
-
-    editRelationshipStartNode(id: GraphId, nodeId: GraphId): Promise<GraphRelationship>
-
-    editRelationshipEndNode(id: GraphId, nodeId: GraphId): Promise<GraphRelationship>
-
-    editRelationshipProperty(id: GraphId, properties: any): Promise<GraphRelationship>
+    editRelationship(id: GraphId, relationship: Partial<GraphRelationshipBody>): Promise<GraphRelationship>
 
     removeRelationship(id: GraphId): Promise<void>
-
-    copyRelationship(id: GraphId): Promise<GraphRelationship>
 }

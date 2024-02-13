@@ -1,6 +1,6 @@
 import {describe, expect, test} from "vitest"
 import {emptySearcher, typeSearcher} from "../core"
-import {verifyGraph} from "../core/graph-test"
+import {verifyGraph} from "../core/test/graph-test.ts"
 import {collectSearcherTypes, createFromLocalFs} from "./local-fs"
 
 test("Collect Searcher Types", () => {
@@ -18,9 +18,9 @@ test("Collect Searcher Types", () => {
 
 
 describe("Local FS Test", async () => {
-    const [graph, graphEdit] = await createFromLocalFs({
+    const suite = await createFromLocalFs({
         path: "node_modules/.test",
         idPrefix: "test.",
     })
-    verifyGraph(graph, graphEdit)
+    verifyGraph(suite)
 })

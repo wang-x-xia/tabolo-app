@@ -8,11 +8,11 @@ export function devGraph(): PluginOption {
         name: "Dev-Graph",
         configureServer(server) {
             const middlewareAsync = async function asyncLoad() {
-                const [graph, graphEdit] = await createFromLocalFs({
+                const suite = await createFromLocalFs({
                     path: "./tabolo",
                     idPrefix: "",
                 })
-                const koa = koaServer(graph, graphEdit)
+                const koa = koaServer(suite)
                 return koa.callback()
             }()
             return () => server.middlewares.use("/dev-graph", async (req, res) => {

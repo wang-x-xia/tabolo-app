@@ -1,5 +1,5 @@
 import {createContext} from "react";
-import type {Graph, GraphEdit, GraphId, NodeSearcher} from "../../core";
+import type {Graph, GraphEdit, GraphId, GraphNode, NodeSearcher} from "../../core";
 import {emptySearcher, typeSearcher} from "../../core";
 import type {PropertyViewData} from "./property.ts";
 
@@ -53,15 +53,16 @@ export function fromGraph(graph: Graph, graphEdit: GraphEdit): ViewHandler {
     return {
         async updateView(view: ViewData): Promise<ViewData> {
             let nodes = await graph.searchNodes(typeSearcher("View"));
-            let id: GraphId
+            let node: GraphNode
             if (nodes.length == 0) {
-                let node = await graphEdit.newEmptyNode();
-                id = node.id
-                await graphEdit.editNodeType(id, "View")
+                node = await graphEdit.createNode({
+                    type: "View",
+                    properties: view,
+                });
             } else {
-                id = nodes[0].id
+                node = await graphEdit.editNode(nodes[0].id, {properties: view})
             }
-            return (await graphEdit.editNodeProperty(id, view)).properties
+            return node.properties
         },
 
         async getView() {

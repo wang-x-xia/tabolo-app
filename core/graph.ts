@@ -19,16 +19,6 @@ export interface Graph {
     searchRelationships(searcher: RelationshipSearcher): Promise<GraphRelationship[]>
 }
 
-export interface GraphMeta {
-    getNodeMeta(type: string): Promise<GraphNodeMeta>
-
-    getNodeEditMeta(type: string): Promise<GraphNodeEditMeta>
-
-    getNodeTypes(): Promise<string[]>
-
-    getRelationshipTypes(): Promise<string[]>
-}
-
 export interface GraphNode extends Extendable {
     id: GraphId;
     type: string;

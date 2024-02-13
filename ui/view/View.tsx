@@ -90,13 +90,14 @@ export function SaveView({data}: { data: ViewData }) {
     const viewHandler = useViewHandler()
 
     async function saveView() {
-        const node = await graphEdit.newEmptyNode()
         const savedViewData: SavedViewData = {
             name: "New View",
             data,
         }
-        await graphEdit.editNodeProperty(node.id, savedViewData)
-        await graphEdit.editNodeType(node.id, "SavedView")
+        const node = await graphEdit.createNode({
+            type: "SavedView",
+            properties: savedViewData
+        })
         await viewHandler.updateView(nodeDetailView(node.id))
     }
 

@@ -2,20 +2,34 @@ import * as fs from "fs/promises";
 import * as crypto from "node:crypto";
 import type {FileHandle} from "node:fs/promises";
 import * as path from "path";
-import type {Graph, GraphEdit, GraphId, GraphNode, GraphRelationship} from "../core"
-import {checkNode, checkRelationship, NodeSearcher, RelationshipSearcher} from "../core"
+import {
+    checkNode,
+    checkRelationship,
+    createDefaultGraphMeta,
+    type Graph,
+    type GraphEdit,
+    type GraphId,
+    type GraphMeta,
+    type GraphNode,
+    type GraphRelationship,
+    type GraphSuite,
+    isSameGraphId,
+    NodeSearcher,
+    RelationshipSearcher
+} from "../core"
 
 export interface LocalFsConfiguration {
     path: string,
     idPrefix: string,
 }
 
-export async function createFromLocalFs(config: LocalFsConfiguration): Promise<[Graph, GraphEdit]> {
+export async function createFromLocalFs(config: LocalFsConfiguration): Promise<GraphSuite> {
     const fsOperation = await createLocalFsOperation(config)
     const markdownExtension = createMarkdownExtension(fsOperation)
     const graph = createGraph(fsOperation, [markdownExtension])
-    const graphEdit = createGraphEdit(graph, fsOperation, [markdownExtension])
-    return [graph, graphEdit]
+    const edit = createGraphEdit(fsOperation, [markdownExtension])
+    const meta = createGraphMeta(graph, fsOperation)
+    return {graph, edit, meta}
 }
 
 interface NodeExtension {
@@ -199,23 +213,23 @@ export async function createLocalFsOperation(config: LocalFsConfiguration): Prom
     }
 }
 
-function mustFoundById<T extends keyof SourceMapping>(source: T, id: string, data: SourceMapping[T]): ItemSourceMapping<T> {
+function mustFoundById<T extends keyof SourceMapping>(source: T, id: GraphId, data: SourceMapping[T]): ItemSourceMapping<T> {
     for (const item of data.data) {
-        if (item.id === id) {
+        if (isSameGraphId(item.id, id)) {
             return item
         }
     }
     throw Error(`Not found ${source}`)
 }
 
-function mustRemoveById<T extends keyof SourceMapping>(source: T, id: string, data: SourceMapping[T]): ItemSourceMapping<T> {
+function mustRemoveById<T extends keyof SourceMapping>(source: T, id: GraphId, data: SourceMapping[T]): void {
     for (const item of data.data) {
-        if (item.id === id) {
+        if (isSameGraphId(item.id, id)) {
             data.data = data.data.filter(it => it !== item)
-            return item
+            return
         }
     }
-    throw Error(`Not found ${source}`)
+    throw Error(`Not found ${source} of ${JSON.stringify(id)}`)
 }
 
 function createGraph(op: LocalFsOperation, nodeExtensions: NodeExtension[]): Graph {
@@ -232,67 +246,59 @@ function createGraph(op: LocalFsOperation, nodeExtensions: NodeExtension[]): Gra
         return result
     }
 
-    async function getNode(id: string): Promise<GraphNode | null> {
-        const type = await op.id2Type("node", id)
-        if (type === null) {
-            return null
-        }
-        return await postReadNode(mustFoundById("node", id, await op.read("node", type)))
-    }
-
-    async function searchNodes(searcher: NodeSearcher): Promise<GraphNode[]> {
-        let types = collectSearcherTypes(searcher)
-        if (types === null) {
-            types = await op.types("node")
-        }
-        if (types.length === 0) {
-            return []
-        }
-        const result: GraphNode[] = []
-        for (const type of types) {
-            const nodes = await op.read("node", type)
-            for (const node of Object.values(nodes.data)) {
-                if (checkNode(node, searcher)) {
-                    result.push(await postReadNode(node))
-                }
-            }
-        }
-        return result
-    }
-
-    async function getRelationship(id: string): Promise<GraphRelationship | null> {
-        const type = await op.id2Type("relationship", id)
-        if (type === null) {
-            return null
-        }
-        return mustFoundById("relationship", id, await op.read("relationship", type))
-    }
-
-    async function searchRelationships(searcher: RelationshipSearcher): Promise<GraphRelationship[]> {
-        let types = collectSearcherTypes(searcher)
-        if (types === null) {
-            types = await op.types("relationship")
-        }
-        if (types.length === 0) {
-            return []
-        }
-        const result: GraphRelationship[] = []
-        for (const type of types) {
-            const relationships = await op.read("relationship", type)
-            for (const relationship of Object.values(relationships.data)) {
-                if (checkRelationship(relationship, searcher)) {
-                    result.push(relationship)
-                }
-            }
-        }
-        return result
-    }
-
     return {
-        getNode,
-        searchNodes,
-        getRelationship,
-        searchRelationships,
+        async getNode(id): Promise<GraphNode | null> {
+            const type = await op.id2Type("node", id)
+            if (type === null) {
+                return null
+            }
+            return await postReadNode(mustFoundById("node", id, await op.read("node", type)))
+        },
+        async searchNodes(searcher): Promise<GraphNode[]> {
+            let types = collectSearcherTypes(searcher)
+            if (types === null) {
+                types = await op.types("node")
+            }
+            if (types.length === 0) {
+                return []
+            }
+            const result: GraphNode[] = []
+            for (const type of types) {
+                const nodes = await op.read("node", type)
+                for (const node of Object.values(nodes.data)) {
+                    if (checkNode(node, searcher)) {
+                        result.push(await postReadNode(node))
+                    }
+                }
+            }
+            return result
+        },
+        async getRelationship(id): Promise<GraphRelationship | null> {
+            const type = await op.id2Type("relationship", id)
+            if (type === null) {
+                return null
+            }
+            return mustFoundById("relationship", id, await op.read("relationship", type))
+        },
+        async searchRelationships(searcher): Promise<GraphRelationship[]> {
+            let types = collectSearcherTypes(searcher)
+            if (types === null) {
+                types = await op.types("relationship")
+            }
+            if (types.length === 0) {
+                return []
+            }
+            const result: GraphRelationship[] = []
+            for (const type of types) {
+                const relationships = await op.read("relationship", type)
+                for (const relationship of Object.values(relationships.data)) {
+                    if (checkRelationship(relationship, searcher)) {
+                        result.push(relationship)
+                    }
+                }
+            }
+            return result
+        },
     }
 }
 
@@ -320,7 +326,7 @@ export function collectSearcherTypes(searcher: NodeSearcher | RelationshipSearch
 }
 
 
-function createGraphEdit(graph: Graph, op: LocalFsOperation, nodeExtensions: NodeExtension[]): GraphEdit {
+function createGraphEdit(op: LocalFsOperation, nodeExtensions: NodeExtension[]): GraphEdit {
 
     function now(): string {
         return new Date().toISOString()
@@ -336,161 +342,114 @@ function createGraphEdit(graph: Graph, op: LocalFsOperation, nodeExtensions: Nod
         return result
     }
 
-
-    async function newEmptyNode(): Promise<GraphNode> {
-        const id = await op.randomId("node")
-        const nodes = await op.read("node", "New")
-        const result = {
-            id: id,
-            type: "New",
-            properties: {},
-            createTime: now(),
-            updateTime: now(),
-        }
-        nodes.data.push(result)
-        await op.write("node", "New", nodes)
-        await op.modifyId2Type("node", id, "New")
-        return result
-    }
-
-    async function editType<T extends keyof SourceMapping>(source: T, id: string, type: string): Promise<ItemSourceMapping<T>> {
-        const previousType = (await op.id2Type(source, id))!
-        if (type === previousType) {
-            if (source === "node") {
-                return (await graph.getNode(id))!
-            } else {
-                return (await graph.getRelationship(id))!
-            }
-        }
-        const listPreviousType = await op.read(source, previousType)
-        const item = mustRemoveById(source, id, listPreviousType)
-        await op.write(source, previousType, listPreviousType)
-        item.type = type
-        item.updateTime = now()
-        const list = await op.read(source, type)
-        // @ts-ignore The type is safe here
-        list.data.push(item)
-        await op.write(source, type, list)
-        await op.modifyId2Type(source, id, type)
-        return item
-    }
-
-    async function editNodeType(id: string, type: string): Promise<GraphNode> {
-        return editType("node", id, type)
-    }
-
-    async function editFields<T extends keyof SourceMapping>(source: T, id: string, set: (item: ItemSourceMapping<T>) => Promise<void> | void): Promise<ItemSourceMapping<T>> {
+    async function remove(source: keyof SourceMapping, id: GraphId) {
         const type = (await op.id2Type(source, id))!
-        const data = await op.read(source, type)
-        const item = mustFoundById(source, id, data)
-        await set(item)
-        item.updateTime = now()
-        await op.write(source, type, data)
-        return item
-    }
-
-    async function editNodeProperty(id: string, properties: any): Promise<GraphNode> {
-        return editFields("node", id, async (item) => {
-            item.properties = await preWriteNode(item, properties)
-        })
-    }
-
-    async function remove(source: keyof SourceMapping, id: string,) {
-        const type = (await op.id2Type(source, id))!
-        const nodes = await op.read(source, type)
-        mustRemoveById(source, id, nodes)
-        await op.write(source, type, nodes)
+        const items = await op.read(source, type)
+        mustRemoveById(source, id, items)
+        await op.write(source, type, items)
         await op.removeId2Type(source, id)
     }
 
-    async function removeNode(id: string): Promise<void> {
-        await remove("node", id)
-    }
-
-
-    async function copy<T extends keyof SourceMapping>(source: T, id: string): Promise<ItemSourceMapping<T>> {
-        const newId = await op.randomId(source);
-        const type = (await op.id2Type(source, id))!
-        const data = await op.read(source, type)
-        const item = mustFoundById(source, id, data)
-        const newItem = {
-            ...item,
-            id: newId,
-            createTime: now(),
-            updateTime: now(),
+    async function edit<T extends keyof SourceMapping>(
+        source: T, id: GraphId,
+        type: string | undefined,
+        set: (item: ItemSourceMapping<T>) => Promise<void> | void,
+    ): Promise<ItemSourceMapping<T>> {
+        const previousType = (await op.id2Type(source, id))!
+        const previousItems = await op.read(source, previousType)
+        const item = mustFoundById(source, id, previousItems)
+        let items: SourceMapping[T]
+        let currentType: string
+        if (type !== undefined && previousType !== type) {
+            mustRemoveById(source, id, previousItems)
+            await op.write(source, previousType, previousItems)
+            await op.modifyId2Type(source, id, type)
+            items = await op.read(source, type)
+            // @ts-ignore The type is safe here
+            items.data.push(item)
+            item.type = type
+            currentType = type
+        } else {
+            items = previousItems
+            currentType = previousType
         }
-        // @ts-ignore The type is safe here
-        data.data.push(newItem)
-        await op.write(source, type, data)
-        await op.modifyId2Type(source, newId, type)
-        return newItem
-    }
-
-    async function copyNode(id: string): Promise<GraphNode> {
-        return await copy("node", id)
-    }
-
-    async function newEmptyRelationship(startNodeId: string, endNodeId: string): Promise<GraphRelationship> {
-        const id = await op.randomId("relationship")
-        const relationships = await op.read("relationship", "New")
-        const result = {
-            id: id,
-            type: "New",
-            startNodeId: startNodeId,
-            endNodeId: endNodeId,
-            properties: {},
-            createTime: now(),
-            updateTime: now(),
-        }
-        relationships.data.push(result)
-        await op.write("relationship", "New", relationships)
-        await op.modifyId2Type("relationship", id, "New")
-        return result
-    }
-
-    async function editRelationshipType(id: string, type: string): Promise<GraphRelationship> {
-        return editType("relationship", id, type)
-    }
-
-    async function editRelationshipStartNode(id: string, nodeId: GraphId): Promise<GraphRelationship> {
-        return editFields("relationship", id, (item) => {
-            item.startNodeId = nodeId
-        })
-    }
-
-    async function editRelationshipEndNode(id: string, nodeId: GraphId): Promise<GraphRelationship> {
-        return editFields("relationship", id, item => {
-            item.endNodeId = nodeId
-        })
-    }
-
-    async function editRelationshipProperty(id: string, properties: any): Promise<GraphRelationship> {
-        return editFields("relationship", id, item => {
-            item.properties = properties
-        })
-    }
-
-    async function removeRelationship(id: string): Promise<void> {
-        await remove("relationship", id)
-    }
-
-    async function copyRelationship(id: string): Promise<GraphRelationship> {
-        return copy("relationship", id)
+        await set(item)
+        item.updateTime = now()
+        await op.write(source, currentType, items)
+        return item
     }
 
     return {
-        newEmptyNode,
-        editNodeType,
-        editNodeProperty,
-        removeNode,
-        copyNode,
-        newEmptyRelationship,
-        editRelationshipType,
-        editRelationshipStartNode,
-        editRelationshipEndNode,
-        editRelationshipProperty,
-        removeRelationship,
-        copyRelationship,
+        async createNode({type, properties}): Promise<GraphNode> {
+            const id = await op.randomId("node")
+            const nodes = await op.read("node", type)
+            const result: GraphNode = {
+                id,
+                type,
+                properties,
+                createTime: now(),
+                updateTime: now(),
+            }
+            nodes.data.push(result)
+            await op.write("node", type, nodes)
+            await op.modifyId2Type("node", id, type)
+            return result
+        },
+        async editNode(id, {type, properties}): Promise<GraphNode> {
+            return edit("node", id, type, async (item) => {
+                if (properties !== undefined) {
+                    item.properties = await preWriteNode(item, properties)
+                }
+            })
+        },
+        async removeNode(id): Promise<void> {
+            await remove("node", id)
+        },
+        async createRelationship({type, properties, startNodeId, endNodeId,}): Promise<GraphRelationship> {
+            const id = await op.randomId("node")
+            const relationships = await op.read("relationship", type)
+            const result: GraphRelationship = {
+                id,
+                type,
+                properties,
+                startNodeId,
+                endNodeId,
+                createTime: now(),
+                updateTime: now(),
+            }
+            relationships.data.push(result)
+            await op.write("relationship", type, relationships)
+            await op.modifyId2Type("relationship", id, type)
+            return result
+        },
+        async editRelationship(id, {type, properties, startNodeId, endNodeId,}): Promise<GraphRelationship> {
+            return edit("relationship", id, type, async (item) => {
+                if (properties !== undefined) {
+                    item.properties = properties
+                }
+                if (startNodeId !== undefined) {
+                    item.startNodeId = startNodeId
+                }
+                if (endNodeId !== undefined) {
+                    item.endNodeId = endNodeId
+                }
+            })
+        },
+        async removeRelationship(id): Promise<void> {
+            await remove("relationship", id)
+        },
+    }
+}
+
+function createGraphMeta(graph: Graph, fsOperation: LocalFsOperation): GraphMeta {
+    return {
+        ...createDefaultGraphMeta(graph),
+        async getNodeTypes() {
+            return await fsOperation.types("node")
+        },
+        async getRelationshipTypes() {
+            return await fsOperation.types("relationship")
+        }
     }
 }
 

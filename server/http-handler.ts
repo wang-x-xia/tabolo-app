@@ -1,9 +1,9 @@
 import Router from "@koa/router";
 import Koa from "koa";
 import {koaBody} from "koa-body"
-import {Graph, GraphEdit} from "../core"
+import {Graph, GraphEdit, type GraphMeta, type GraphSuite} from "../core"
 
-export function koaServer(graph: Graph, edit: GraphEdit): Koa {
+export function koaServer({graph, edit, meta}: GraphSuite): Koa {
     const server = new Koa()
     server.use(koaBody())
     const graphRouter = new Router({
@@ -14,10 +14,16 @@ export function koaServer(graph: Graph, edit: GraphEdit): Koa {
         prefix: "/graphEdit"
     })
     handlerGraphEdit(edit, graphEditRouter)
+    const graphMetaRouter = new Router({
+        prefix: "/graphMeta"
+    })
+    handlerGraphMeta(meta, graphMetaRouter)
     server.use(graphRouter.routes())
-    server.use(graphRouter.allowedMethods());
+    server.use(graphRouter.allowedMethods())
     server.use(graphEditRouter.routes())
     server.use(graphEditRouter.allowedMethods())
+    server.use(graphMetaRouter.routes())
+    server.use(graphMetaRouter.allowedMethods())
     return server
 }
 
@@ -45,28 +51,27 @@ function handlerGraph(graph: Graph, router: Router) {
 }
 
 function handlerGraphEdit(edit: GraphEdit, router: Router) {
-    register(router, "/newEmptyNode",
-        ({}) => edit.newEmptyNode())
-    register(router, "/editNodeType",
-        ({id, type}) => edit.editNodeType(id, type))
-    register(router, "/editNodeProperty",
-        ({id, properties}) => edit.editNodeProperty(id, properties))
+    register(router, "/createNode",
+        ({node}) => edit.createNode(node))
+    register(router, "/editNode",
+        ({id, node}) => edit.editNode(id, node))
     register(router, "/removeNode",
         ({id}) => edit.removeNode(id))
-    register(router, "/copyNode",
-        ({id}) => edit.copyNode(id))
-    register(router, "/newEmptyRelationship",
-        ({startNodeId, endNodeId}) => edit.newEmptyRelationship(startNodeId, endNodeId))
-    register(router, "/editRelationshipType",
-        ({id, type}) => edit.editRelationshipType(id, type))
-    register(router, "/editRelationshipStartNode",
-        ({id, nodeId}) => edit.editRelationshipStartNode(id, nodeId))
-    register(router, "/editRelationshipEndNode",
-        ({id, nodeId}) => edit.editRelationshipEndNode(id, nodeId))
-    register(router, "/editRelationshipProperty",
-        ({id, properties}) => edit.editRelationshipProperty(id, properties))
+    register(router, "/createRelationship",
+        ({relationship}) => edit.createRelationship(relationship))
+    register(router, "/editRelationship",
+        ({id, relationship}) => edit.editRelationship(id, relationship))
     register(router, "/removeRelationship",
         ({id}) => edit.removeRelationship(id))
-    register(router, "/copyRelationship",
-        ({id}) => edit.copyRelationship(id))
+}
+
+function handlerGraphMeta(meta: GraphMeta, router: Router) {
+    register(router, "/getNodeMeta",
+        ({type}) => meta.getNodeMeta(type))
+    register(router, "/getNodeEditMeta",
+        ({type}) => meta.getNodeEditMeta(type))
+    register(router, "/getNodeTypes",
+        ({}) => meta.getNodeTypes())
+    register(router, "/getRelationshipTypes",
+        ({}) => meta.getRelationshipTypes())
 }

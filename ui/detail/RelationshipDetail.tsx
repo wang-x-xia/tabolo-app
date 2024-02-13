@@ -25,7 +25,7 @@ export function RelationshipDetail({data}: {
 
 
     async function setType(type: string) {
-        setLocal(await graphEdit.editRelationshipType(local.id, type))
+        setLocal(await graphEdit.editRelationship(local.id, {type}))
     }
 
     async function remove() {
@@ -36,14 +36,19 @@ export function RelationshipDetail({data}: {
     const deleteItem = useMenuItem("Delete Relationship", <Button onClick={remove}>Delete</Button>);
 
     async function copy() {
-        const relationship = await graphEdit.copyRelationship(data.id);
+        const relationship = await graphEdit.createRelationship({
+            type: data.type,
+            properties: data.properties,
+            startNodeId: data.startNodeId,
+            endNodeId: data.endNodeId,
+        });
         await viewHandler.updateView(relationshipDetailView(relationship.id))
     }
 
     const copyItem = useMenuItem("Copy Relationship", <Button onClick={copy}>Copy</Button>);
 
     async function save() {
-        setLocal(await graphEdit.editRelationshipProperty(data.id, JSON.parse(property)))
+        setLocal(await graphEdit.editRelationship(data.id, {properties: JSON.parse(property)}))
     }
 
     const savePropertyItem = useMenuItem("Save Relationship Property", <Button onClick={save}>Save</Button>);
@@ -55,11 +60,11 @@ export function RelationshipDetail({data}: {
     const resetPropertyItem = useMenuItem("Reset Relationship Property", <Button onClick={reset}>Reset</Button>);
 
     async function changeStartNode(node: GraphNode) {
-        setLocal(await graphEdit.editRelationshipStartNode(local.id, node.id))
+        setLocal(await graphEdit.editRelationship(local.id, {startNodeId: node.id}))
     }
 
     async function changeEndNode(node: GraphNode) {
-        setLocal(await graphEdit.editRelationshipEndNode(local.id, node.id))
+        setLocal(await graphEdit.editRelationship(local.id, {endNodeId: node.id}))
     }
 
     return <>

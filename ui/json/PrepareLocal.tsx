@@ -1,35 +1,34 @@
 import {Button, Modal, Textarea} from "flowbite-react";
 import {Context, type PropsWithChildren, useCallback, useContext, useMemo, useState} from "react"
 import {
-    createHttpClientGraph,
-    createHttpClientGraphEdit,
+    createDefaultMemoryHandler,
+    createHttpClient,
+    createMemoryGraph,
     emptySearcher,
     type Graph,
     type GraphEdit,
-    type GraphMeta
+    type GraphMeta,
+    type GraphSuite
 } from "../../core"
 import {GraphContext, GraphEditContext, GraphMetaContext} from "../utils/hooks";
 import {useMenuItem} from "../view/menu.tsx";
-import {type BatchOperation, createGraphMetaFromGraph} from "./local-json-graph.ts"
-import {createLocalStorage} from "./local-storage-graph-source.ts";
+import {type BatchOperation} from "./local-json-graph.ts"
 
 export function PrepareLocal({children, batchOpKey}: PropsWithChildren & {
     batchOpKey: Context<BatchOperation>
 }) {
-    let graph: Graph, graphEdit: GraphEdit
+    let suite: GraphSuite
     if (import.meta.env.DEV) {
-        graph = createHttpClientGraph({baseUrl: `${location.origin}/dev-graph/graph`});
-        graphEdit = createHttpClientGraphEdit({baseUrl: `${location.origin}/dev-graph/graphEdit`});
+        suite = createHttpClient({baseUrl: `${location.origin}/dev-graph`})
     } else {
-        [graph, graphEdit] = useMemo(() => createLocalStorage({name: "Tabolo"}), [])
+        suite = useMemo(() => createMemoryGraph({handler: createDefaultMemoryHandler()}), [])
     }
 
-    const graphMeta = createGraphMetaFromGraph(graph)
     const batchOp: BatchOperation = {
         async exportAll() {
             return {
-                node: await graph.searchNodes(emptySearcher()),
-                relationship: await graph.searchRelationships(emptySearcher()),
+                node: await suite.graph.searchNodes(emptySearcher()),
+                relationship: await suite.graph.searchRelationships(emptySearcher()),
             }
         },
 
@@ -39,7 +38,7 @@ export function PrepareLocal({children, batchOpKey}: PropsWithChildren & {
         },
     }
 
-    return <SetupLocal graph={graph} graphEdit={graphEdit} graphMeta={graphMeta}>
+    return <SetupLocal graph={suite.graph} graphEdit={suite.edit} graphMeta={suite.meta}>
         <batchOpKey.Provider value={batchOp}>
             {children}
         </batchOpKey.Provider>

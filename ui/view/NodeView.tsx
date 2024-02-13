@@ -42,7 +42,7 @@ export function NodeView({data}: {
     const refreshMenu = useMenuItem("Refresh", <Button onClick={() => queryData()}>Refresh</Button>);
 
     async function addNode() {
-        const node = await graphEdit.newEmptyNode();
+        const node = await graphEdit.createNode({type: "New", properties: {}});
         await viewHandler.updateView({
             type: "NodeDetailView",
             nodeId: node.id,
