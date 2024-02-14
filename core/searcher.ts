@@ -21,6 +21,20 @@ export function typeSearcher(type: string): TypeSearcher {
     }
 }
 
+export interface PropertySearcher {
+    type: "eq",
+    jsonPath: string,
+    value: any,
+}
+
+export function propertySearcher(jsonPath: string, value: any): PropertySearcher {
+    return {
+        type: "eq",
+        jsonPath,
+        value,
+    }
+}
+
 export interface MatchAllSearcher<T> {
     type: "and",
     searchers: T[],

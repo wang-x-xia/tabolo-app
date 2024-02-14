@@ -25,20 +25,20 @@ export interface MemoryHandler {
 }
 
 export function createDefaultMemoryHandler(): MemoryHandler {
-    const data = {nodes: {}, relationships: {}}
+    const data = {nodes: "{}", relationships: "{}"}
 
     return {
         nodes(): Record<string, GraphNode> {
-            return data.nodes;
+            return JSON.parse(data.nodes)
         },
         relationships(): Record<string, GraphRelationship> {
-            return data.relationships;
+            return JSON.parse(data.relationships)
         },
         saveNodes(nodes: Record<string, GraphNode>): void {
-            data.nodes = nodes
+            data.nodes = JSON.stringify(nodes)
         },
         saveRelationships(relationships: Record<string, GraphRelationship>): void {
-            data.relationships = relationships
+            data.relationships = JSON.stringify(relationships)
         }
     }
 }
@@ -101,7 +101,7 @@ function createGraphEdit({handler}: MemoryConfiguration): GraphEdit {
         async editNode(id, {type, properties}): Promise<GraphNode> {
             assertIdIsString(id)
             const nodes = handler.nodes()
-            const node = handler.nodes()[id]
+            const node = nodes[id]
             if (type !== undefined) {
                 node.type = type
             }
@@ -122,7 +122,7 @@ function createGraphEdit({handler}: MemoryConfiguration): GraphEdit {
             const relationship: GraphRelationship = {id, type, properties, startNodeId, endNodeId,}
             const relationships = handler.relationships()
             relationships[id] = relationship
-            handler.saveNodes(relationships)
+            handler.saveRelationships(relationships)
             return relationship
         },
         async editRelationship(id, {type, properties, startNodeId, endNodeId}): Promise<GraphRelationship> {
@@ -148,6 +148,7 @@ function createGraphEdit({handler}: MemoryConfiguration): GraphEdit {
             assertIdIsString(id)
             const relationships = handler.relationships()
             delete relationships[id]
+            handler.saveRelationships(relationships)
         },
     }
 }
