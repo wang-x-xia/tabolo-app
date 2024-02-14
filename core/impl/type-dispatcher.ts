@@ -150,7 +150,7 @@ export function createTypeDispatcherGraph({suiteIds, nodeTypesOfSuite, getSuite,
         },
         async searchNodes(searcher): Promise<GraphNode[]> {
             const searchers = separateNodeSearcherByTypes(searcher)
-            const result: GraphNode[] = []
+            let result: GraphNode[] = []
             switch (searchers.type) {
                 case "ByType":
                     for (const [type, subSearcher] of Object.entries(searchers.data)) {
@@ -158,7 +158,7 @@ export function createTypeDispatcherGraph({suiteIds, nodeTypesOfSuite, getSuite,
                         const items = await graph.searchNodes(matchAllSearcher([
                             typeSearcher(type), subSearcher,
                         ]))
-                        result.concat(items.map(it => replaceGraphId(it)))
+                        result.push(...items.map(it => replaceGraphId(it)))
                     }
                     break
                 default:
@@ -169,7 +169,7 @@ export function createTypeDispatcherGraph({suiteIds, nodeTypesOfSuite, getSuite,
                             const items = await graph.searchNodes(matchAllSearcher([
                                 typeSearcher(type), searcher,
                             ]))
-                            result.concat(items.map(it => replaceGraphId(it)))
+                            result.push(...items.map(it => replaceGraphId(it)))
                         }
                     }
                     break
@@ -182,7 +182,7 @@ export function createTypeDispatcherGraph({suiteIds, nodeTypesOfSuite, getSuite,
             for (const suiteId of suiteIds()) {
                 const {graph, replaceGraphId} = getSuite(suiteId)
                 const items = await graph.searchRelationships(searcher)
-                result.concat(items.map(it => replaceGraphId(it)))
+                result.push(...items.map(it => replaceGraphId(it)))
             }
             return result
         },
