@@ -44,7 +44,7 @@ export function NodeCell({data}: {
         }
     }, [graphMeta, data.type])
 
-    async function editNode() {
+    async function goToNodeDetails() {
         await viewHandler.updateView(nodeDetailView(data.id))
     }
 
@@ -58,7 +58,7 @@ export function NodeCell({data}: {
         <div className="self-end">
             <Dropdown inline label="">
                 <Dropdown.Item>
-                    <a onClick={editNode}>Edit</a>
+                    <a onClick={goToNodeDetails}>Details</a>
                 </Dropdown.Item>
             </Dropdown>
         </div>

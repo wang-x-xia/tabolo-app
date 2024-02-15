@@ -8,7 +8,7 @@ export function RelationshipCell({data}: {
 }) {
     const viewHandler = useViewHandler()
 
-    async function editRelationship() {
+    async function goToRelationship() {
         await viewHandler.updateView(relationshipDetailView(data.id))
     }
 
@@ -19,7 +19,7 @@ export function RelationshipCell({data}: {
         <div className="self-end">
             <Dropdown inline label="">
                 <Dropdown.Item>
-                    <a onClick={editRelationship}>Edit</a>
+                    <a onClick={goToRelationship}>Details</a>
                 </Dropdown.Item>
             </Dropdown>
         </div>
