@@ -62,6 +62,12 @@ export function TypeSelect({type, source, onChange}: {
         focus,
         role,
     ])
+
+    function localOnchange(type: string) {
+        setSearch(type)
+        onChange(type)
+    }
+
     return <>
         <div className="flex" ref={refs.setReference} {...getReferenceProps()}>
             {isOpen ?
@@ -69,7 +75,7 @@ export function TypeSelect({type, source, onChange}: {
                        placeholder={type}
                        value={search}
                        onChange={e => setSearch(e.target.value)}/> :
-                <input className={INPUT_CLAZZ} value={type}/>}
+                <input className={INPUT_CLAZZ} placeholder={type}/>}
         </div>
         <div>
             {isOpen && <FloatingFocusManager context={context} modal={false} initialFocus={-1}>
@@ -77,8 +83,9 @@ export function TypeSelect({type, source, onChange}: {
                      style={floatingStyles} {...getFloatingProps()}>
                     {searchedTypes.length > 0 ?
                         searchedTypes.map(it => <button
+                            key={it}
                             className="p-2 text-sm hover:bg-gray-100"
-                            onClick={() => onChange(it)}>
+                            onClick={() => localOnchange(it)}>
                             {it}
                         </button>) :
                         <div className="text-sm font-bold">Not Found</div>}

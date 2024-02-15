@@ -1,26 +1,28 @@
-import {
-    type Dispatch,
-    type PropsWithChildren,
-    type ReactElement,
-    type ReactNode,
-    type SetStateAction,
-    useMemo,
-    useState
-} from "react";
+import React, {type PropsWithChildren, useMemo, useState} from "react";
 import {createPortal} from "react-dom";
 import {useAsyncOrDefault, useGraph, useGraphEdit} from "../utils/hooks";
-import {createMenuFromGraph, MenuContext, type MenuItem, type MenuRender, MenuRenderContext} from "./menu";
+import {debugRandomString, randomString} from "../utils/id.ts";
+import {
+    createMenuFromGraph,
+    emptyMenuItemRender,
+    MenuContext,
+    type MenuItem,
+    type MenuItemRender,
+    type MenuRender,
+    MenuRenderContext
+} from "./menu";
 
 /**
  * Use the structure to maintain
  */
 interface RefData {
-    update: Dispatch<SetStateAction<ReactElement>>,
-    component: ReactNode,
+    update: (value: string) => void,
     item: MenuItem,
 
     dom?: Element,
 }
+
+const debug = false
 
 export function SetupMenuBar({children}: PropsWithChildren) {
     const graph = useGraph()
@@ -38,37 +40,59 @@ export function SetupMenuBar({children}: PropsWithChildren) {
     const [refs, setRefs] = useState<RefData[]>([])
 
     const menuRender = useMemo<MenuRender>(() => ({
-        render(name, update, component): () => void {
+        newMenuItem(name, update): MenuItemRender {
             if (allItems == null) {
                 // Do nothing, and after the allItems changed, the context will trigger an update
-                return () => {
-                }
+                return emptyMenuItemRender()
+            }
+
+            const id = debugRandomString()
+            const item: MenuItem = allItems[name] || {name: name}
+            const ref: RefData = {item, update}
+
+            if (debug) {
+                console.log("New Menu Item", name, id, ref)
             }
             // When call this method, we wish to add a new items
             setRefs(refs => {
                 if (import.meta.env.DEV) {
                     if (refs.some(v => v.item.name == name)) {
-                        console.log("Duplicated Menu Items", refs)
+                        console.log("Duplicated Menu Items", name, ref, refs,)
                     }
                 }
-                const item: MenuItem = allItems[name] || {name: name}
-                return [...refs, {item, component, update}]
+                if (refs.some(it => it === ref)) {
+                    return refs
+                }
+                return [...refs, ref]
             })
 
-            function remove() {
-                setRefs(refs => {
-                    return refs.filter(it => it.component === component)
-                })
+            return {
+                render(component: React.ReactNode): React.ReactElement {
+                    if (ref.dom) {
+                        return createPortal(component, ref.dom)
+                    } else {
+                        return <></>
+                    }
+                },
+                close() {
+                    setRefs(refs => {
+                        if (debug) {
+                            console.log("Remove the menu item", name, id, ref)
+                        }
+                        return refs.filter(it => it !== ref)
+                    })
+                }
             }
-
-            return remove
         },
     }), [allItems])
 
     function setRef(ref: RefData, dom: HTMLElement | null) {
         if (dom) {
             ref.dom = dom
-            ref.update(createPortal(ref.component, dom))
+            ref.update(randomString("Updated the Dom"))
+            if (debug) {
+                console.log("Update the ref", ref.item.name, ref, dom)
+            }
         }
     }
 
