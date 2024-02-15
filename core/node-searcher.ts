@@ -1,33 +1,27 @@
-import {JSONPath} from "jsonpath-plus";
 import type {GraphNode} from "./graph";
 import {
+    checkGraphResource,
     emptySearcher,
-    type EmptySearcher,
+    type GraphResourceCommonSearcher,
     matchAllSearcher,
     type MatchAllSearcher,
-    type PropertySearcher,
-    type TypeSearcher
+    type MatchAnySearcher,
+    type NotSearcher
 } from "./searcher";
 
-export type NodeSearcher = EmptySearcher | TypeSearcher | PropertySearcher | MatchAllSearcher<NodeSearcher>
+export type NodeSearcher =
+    GraphResourceCommonSearcher |
+    // GraphResourceLogicSearcher will cause circuit reference issue
+    MatchAllSearcher<NodeSearcher> |
+    MatchAnySearcher<NodeSearcher> |
+    NotSearcher<NodeSearcher>
+
+function checkNodeInternal(_: GraphNode, searcher: NodeSearcher): boolean {
+    throw new Error(`Invalid searcher ${JSON.stringify(searcher)}`)
+}
 
 export function checkNode(node: GraphNode, searcher: NodeSearcher): boolean {
-    switch (searcher.type) {
-        case "type":
-            return node.type === searcher.value;
-        case "eq":
-            const path = searcher.jsonPath
-            const value = JSON.stringify(JSONPath({
-                path,
-                json: node.properties,
-                wrap: false
-            }))
-            return value === JSON.stringify(searcher.value)
-        case "and":
-            return searcher.searchers.every(s => checkNode(node, s))
-        case "empty":
-            return true;
-    }
+    return checkGraphResource(node, searcher, checkNodeInternal)
 }
 
 export type NodeSearchersByType = {

@@ -19,20 +19,19 @@ export interface Graph {
     searchRelationships(searcher: RelationshipSearcher): Promise<GraphRelationship[]>
 }
 
-export interface GraphNode extends Extendable {
-    id: GraphId;
-    type: string;
-    properties: any;
+export interface GraphResource extends Extendable {
+    id: GraphId
+    type: string
+    properties: any
 }
 
-export interface GraphRelationship extends Extendable {
-    id: GraphId;
-    type: string;
-    properties: any;
+export interface GraphNode extends GraphResource {
+}
+
+export interface GraphRelationship extends GraphResource {
     startNodeId: GraphId;
     endNodeId: GraphId;
 }
-
 
 export interface GraphNodeMeta {
     name: string,

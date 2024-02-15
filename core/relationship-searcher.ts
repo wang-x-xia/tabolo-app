@@ -1,12 +1,19 @@
 import type {GraphRelationship} from "./graph";
 import {type GraphId, isSameGraphId} from "./graph-id";
-import type {EmptySearcher, MatchAllSearcher, TypeSearcher} from "./searcher";
+import {
+    checkGraphResource,
+    type GraphResourceCommonSearcher,
+    type MatchAllSearcher,
+    type MatchAnySearcher,
+    type NotSearcher
+} from "./searcher";
 
 export type RelationshipSearcher =
-    EmptySearcher
-    | TypeSearcher
-    | RelationshipNodeSearcher
-    | MatchAllSearcher<RelationshipSearcher>
+    GraphResourceCommonSearcher |
+    RelationshipNodeSearcher |
+    MatchAllSearcher<RelationshipSearcher> |
+    MatchAnySearcher<RelationshipSearcher> |
+    NotSearcher<RelationshipSearcher>
 
 export interface RelationshipNodeSearcher {
     type: "node",
@@ -18,12 +25,8 @@ export function relationshipNodeSearcher(nodeId: GraphId, match: "start" | "end"
     return {type: "node", nodeId, match,}
 }
 
-export function checkRelationship(relationship: GraphRelationship, searcher: RelationshipSearcher): boolean {
+function checkRelationshipInternal(relationship: GraphRelationship, searcher: RelationshipSearcher): boolean {
     switch (searcher.type) {
-        case "empty":
-            return true;
-        case "type":
-            return relationship.type == searcher.value;
         case "node":
             switch (searcher.match) {
                 case "start":
@@ -31,11 +34,18 @@ export function checkRelationship(relationship: GraphRelationship, searcher: Rel
                 case "end":
                     return isSameGraphId(relationship.endNodeId, searcher.nodeId)
                 case "both":
-                    return isSameGraphId(relationship.startNodeId, searcher.nodeId) || isSameGraphId(relationship.endNodeId, searcher.nodeId)
-                default:
-                    throw Error()
+                    return isSameGraphId(relationship.startNodeId, searcher.nodeId) ||
+                        isSameGraphId(relationship.endNodeId, searcher.nodeId)
+                default: {
+                    throw Error(`Invalid searcher for node ${JSON.stringify(searcher)}`)
+                }
             }
-        case "and":
-            return searcher.searchers.every(s => checkRelationship(relationship, s))
+        default: {
+            throw Error(`Invalid searcher ${JSON.stringify(searcher)}`)
+        }
     }
+}
+
+export function checkRelationship(relationship: GraphRelationship, searcher: RelationshipSearcher): boolean {
+    return checkGraphResource(relationship, searcher, checkRelationshipInternal)
 }
