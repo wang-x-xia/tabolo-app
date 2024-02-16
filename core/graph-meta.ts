@@ -1,53 +1,77 @@
-import type {Graph, GraphNodeEditMeta, GraphNodeMeta} from "./graph.ts";
-import {typeSearcher} from "./searcher.ts";
+import {
+    defaultGraphNodeCellMeta,
+    defaultGraphNodeDetailsMeta,
+    type Graph,
+    type GraphNode,
+    type GraphNodeCellMeta,
+    type GraphNodeDetailsMeta
+} from "./graph.ts";
+import type {NodeSearcher} from "./node-searcher.ts";
+import {relationshipNodeSearcher} from "./relationship-searcher.ts";
+import {matchAllSearcher, propertySearcher, typeSearcher} from "./searcher.ts";
 
 
 export interface GraphMeta {
-    getNodeMeta(type: string): Promise<GraphNodeMeta>
+    getNodeCellMeta(type: string): Promise<GraphNodeCellMeta>
 
-    getNodeEditMeta(type: string): Promise<GraphNodeEditMeta>
+    getNodeDetailsMeta(type: string): Promise<GraphNodeDetailsMeta>
 
     getNodeTypes(): Promise<string[]>
 
     getRelationshipTypes(): Promise<string[]>
 }
 
+export async function searchOneNode(graph: Graph, searcher: NodeSearcher): Promise<GraphNode | null> {
+    const nodes = await graph.searchNodes(searcher)
+    if (nodes.length > 1) {
+        console.log("Multiple nodes of", searcher)
+        return nodes[0]
+    } else if (nodes.length == 1) {
+        return nodes[0]
+    } else {
+        return null
+    }
+}
+
 export function createDefaultGraphMeta(graph: Graph): GraphMeta {
     async function getNodeMetaNode<T>(nodeType: string, metaType: string): Promise<T | null> {
-        const metaNodes = await graph.searchNodes({
-            type: "and",
-            searchers: [
-                typeSearcher(metaType),
-                {
-                    type: "eq",
-                    jsonPath: "$.name",
-                    value: nodeType
-                }
-            ]
-        });
-        if (metaNodes.length != 1) {
-            console.log("Multiple meta nodes", metaNodes, nodeType, metaType)
-            throw Error("Multiple meta nodes")
-        } else if (metaNodes.length == 1) {
-            return metaNodes[0].properties
-        } else {
+        const typeNode = await searchOneNode(graph, matchAllSearcher([
+            typeSearcher(NodeType),
+            propertySearcher("$.name", nodeType),
+        ]))
+        if (typeNode === null) {
             return null
         }
+        const has = await graph.searchRelationships(matchAllSearcher([
+            typeSearcher("Has"),
+            relationshipNodeSearcher(typeNode.id, "start"),
+        ]))
+        for (const r of has) {
+            const node = await graph.getNode(r.endNodeId)
+            if (node === null) {
+                console.log("Failed to find node by id", r)
+                continue
+            }
+            if (node.type === metaType) {
+                return node.properties
+            }
+        }
+        return null
     }
 
     return {
-        async getNodeMeta(type: string): Promise<GraphNodeMeta> {
-            const r = await getNodeMetaNode<GraphNodeMeta>(type, "NodeType")
-            return r === null ? {name: type} : r;
+        async getNodeCellMeta(type: string): Promise<GraphNodeCellMeta> {
+            const r = await getNodeMetaNode<GraphNodeCellMeta>(type, "Node Cell Meta")
+            return r === null ? defaultGraphNodeCellMeta() : r;
         },
 
-        async getNodeEditMeta(type: string): Promise<GraphNodeEditMeta> {
-            const r = await getNodeMetaNode<GraphNodeEditMeta>(type, "Node Edit Meta")
-            return r === null ? {markdownJsonPath: ""} : r
+        async getNodeDetailsMeta(type: string): Promise<GraphNodeDetailsMeta> {
+            const r = await getNodeMetaNode<GraphNodeDetailsMeta>(type, "Node Edit Meta")
+            return r === null ? defaultGraphNodeDetailsMeta() : r
         },
 
         async getNodeTypes(): Promise<string[]> {
-            const nodes = await graph.searchNodes(typeSearcher("NodeType"));
+            const nodes = await graph.searchNodes(typeSearcher(NodeType));
             const types = new Set<string>();
             nodes.forEach(node => {
                 types.add(node.properties["name"]);
@@ -65,3 +89,5 @@ export function createDefaultGraphMeta(graph: Graph): GraphMeta {
         }
     }
 }
+
+export const NodeType = "NodeType"

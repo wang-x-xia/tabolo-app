@@ -2,13 +2,13 @@ import {Button, Table, Textarea, TextInput} from "flowbite-react";
 import {JSONPath} from "jsonpath-plus";
 import {useEffect, useMemo, useState} from "react";
 import Markdown from "react-markdown";
-import {displayGraphId, GraphNode, relationshipNodeSearcher} from "../../core";
+import {defaultGraphNodeDetailsMeta, displayGraphId, GraphNode, relationshipNodeSearcher} from "../../core";
 import {NodeCell, NodeIdCell} from "../cell/NodeCell.tsx";
 import {RelationshipCell} from "../cell/RelationshipCell.tsx";
 import {TABLE_THEME} from "../utils/flowbite.ts";
 import {useAsyncOrDefault, useGraph, useGraphEdit, useGraphMeta, useViewHandler} from "../utils/hooks";
 import {useMenuItem} from "../view/menu.tsx";
-import {nodeDetailView} from "../view/view.ts";
+import {nodeDetailView, relationshipDetailView} from "../view/view.ts";
 import {TypeSelect} from "./TypeSelect.tsx";
 
 export function NodeDetail({data}: {
@@ -21,8 +21,8 @@ export function NodeDetail({data}: {
     const [local, setLocal] = useState(data)
     const [property, setProperty] = useState("")
 
-    const editMeta = useAsyncOrDefault({},
-        async () => await graphMeta.getNodeEditMeta(local.type),
+    const editMeta = useAsyncOrDefault(defaultGraphNodeDetailsMeta(),
+        async () => await graphMeta.getNodeDetailsMeta(local.type),
         [local, graphMeta])
 
     useEffect(() => {
@@ -66,10 +66,11 @@ export function NodeDetail({data}: {
 
 
     async function createRelationship() {
-        await graphEdit.createRelationship({
+        const relationship = await graphEdit.createRelationship({
             type: "New", properties: {},
             startNodeId: data.id, endNodeId: data.id,
-        })
+        });
+        await viewHandler.updateView(relationshipDetailView(relationship.id))
     }
 
     const createRelationshipItem = useMenuItem("Create Relationship",
@@ -117,7 +118,7 @@ export function NodeRelationships({data}: {
 
     const relationships = useAsyncOrDefault([], async () => {
         return await graph.searchRelationships(relationshipNodeSearcher(data.id))
-    }, [graph])
+    }, [graph, data.id])
 
     if (relationships.length === 0) {
         return <label className="text-lg">No Relationship</label>

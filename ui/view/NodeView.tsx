@@ -1,6 +1,6 @@
 import {Button, Table} from "flowbite-react";
 import {useCallback, useEffect, useState} from "react"
-import {emptySearcher, GraphNode, NodeSearcher} from "../../core"
+import {alwaysTrueSearcher, GraphNode, NodeSearcher} from "../../core"
 import {NodeCell} from "../cell/NodeCell.tsx";
 import {NodeSearch} from "../search/NodeSearch.tsx";
 import {TABLE_THEME} from "../utils/flowbite.ts";
@@ -25,7 +25,7 @@ export function NodeView({data}: {
     }, [data])
 
     const [localSearcher, setLocalSearcher] =
-        useState<NodeSearcher>(emptySearcher())
+        useState<NodeSearcher>(data ? data.searcher : alwaysTrueSearcher())
     useEffect(() => {
         if (data !== undefined) {
             setLocalSearcher(data.searcher)

@@ -9,6 +9,17 @@
       },
       "createTime": "2024-02-10T15:36:44.185Z",
       "updateTime": "2024-02-10T15:37:42.710Z"
+    },
+    {
+      "id": "e145ee4b-f458-4642-a412-00cbc2ed2f8a",
+      "type": "Node Edit Meta",
+      "properties": {
+        "name": "Node Cell Meta",
+        "showJsonPath": "$.name",
+        "description": "Use to manage the meta of the Node Cell"
+      },
+      "createTime": "2024-02-15T15:05:48.827Z",
+      "updateTime": "2024-02-15T15:05:48.827Z"
     }
   ]
 }

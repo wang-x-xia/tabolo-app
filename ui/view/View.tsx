@@ -1,6 +1,6 @@
 import {Button, Dropdown} from "flowbite-react"
 import {useCallback, useEffect, useMemo, useState} from "react"
-import {emptySearcher, typeSearcher} from "../../core"
+import {typeSearcher} from "../../core"
 import {useAsyncOrDefault, useGraph, useGraphEdit, useViewHandler, ViewHandlerContext} from "../utils/hooks"
 import {useMenuItem} from "./menu.tsx";
 import {NodeDetailView} from "./NodeDetailView.tsx"
@@ -14,9 +14,7 @@ export function View() {
     const viewHandler = useMemo(() => fromGraph(graph, graphEdit), [graph, graphEdit]);
 
     const [viewData, setViewData] = useState<ViewData>({
-        type: "NodeView",
-        searcher: emptySearcher(),
-        columns: [],
+        type: "Loading",
     })
 
     useEffect(() => {
@@ -114,6 +112,7 @@ export function DispatchView({data}: {
             return <NodeDetailView data={data}/>
         case "RelationshipDetailView":
             return <RelationshipDetailView data={data}/>
-
+        case "Loading":
+            return <>Loading</>
     }
 }

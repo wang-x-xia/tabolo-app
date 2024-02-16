@@ -66,10 +66,10 @@ function handlerGraphEdit(edit: GraphEdit, router: Router) {
 }
 
 function handlerGraphMeta(meta: GraphMeta, router: Router) {
-    register(router, "/getNodeMeta",
-        ({type}) => meta.getNodeMeta(type))
-    register(router, "/getNodeEditMeta",
-        ({type}) => meta.getNodeEditMeta(type))
+    register(router, "/getNodeCellMeta",
+        ({type}) => meta.getNodeCellMeta(type))
+    register(router, "/getNodeDetailsMeta",
+        ({type}) => meta.getNodeDetailsMeta(type))
     register(router, "/getNodeTypes",
         ({}) => meta.getNodeTypes())
     register(router, "/getRelationshipTypes",

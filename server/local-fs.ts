@@ -15,7 +15,9 @@ import {
     type GraphSuite,
     isSameGraphId,
     NodeSearcher,
-    RelationshipSearcher
+    NodeType,
+    RelationshipSearcher,
+    typeSearcher
 } from "../core"
 
 export interface LocalFsConfiguration {
@@ -445,7 +447,16 @@ function createGraphMeta(graph: Graph, fsOperation: LocalFsOperation): GraphMeta
     return {
         ...createDefaultGraphMeta(graph),
         async getNodeTypes() {
-            return await fsOperation.types("node")
+            const types = new Set<string>();
+            for (const typeNode of (await graph.searchNodes(typeSearcher(NodeType)))) {
+                types.add(typeNode.properties.name);
+            }
+            for (const typeInFiles of await fsOperation.types("node")) {
+                types.add(typeInFiles)
+            }
+            const sorted = [...types]
+            sorted.sort()
+            return sorted
         },
         async getRelationshipTypes() {
             return await fsOperation.types("relationship")

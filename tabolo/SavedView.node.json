@@ -50,7 +50,7 @@
         "data": {
           "type": "NodeView",
           "searcher": {
-            "type": "empty"
+            "type": "true"
           }
         }
       }

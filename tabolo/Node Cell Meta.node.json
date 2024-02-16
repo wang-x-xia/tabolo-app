@@ -1,0 +1,34 @@
+{
+  "data": [
+    {
+      "id": "934ee2f8-06e5-42d9-bf13-67968a578f95",
+      "type": "Node Cell Meta",
+      "properties": {
+        "showJsonPath": "$.name",
+        "description": "Show the name in Node Cell"
+      },
+      "createTime": "2024-02-15T14:12:48.189Z",
+      "updateTime": "2024-02-15T15:05:29.118Z"
+    },
+    {
+      "id": "86e7cd43-c3e4-4db2-84f5-d7b19ddc7801",
+      "type": "Node Cell Meta",
+      "properties": {
+        "showJsonPath": "$.showJsonPath",
+        "description": "Show the JSON path of Node Cell Meta"
+      },
+      "createTime": "2024-02-16T11:24:46.302Z",
+      "updateTime": "2024-02-16T11:25:14.124Z"
+    },
+    {
+      "id": "7921db7b-05b4-452d-83e7-9ed1bd262f2c",
+      "type": "Node Cell Meta",
+      "properties": {
+        "showJsonPath": "$.type",
+        "description": "Show the type in Node Cell"
+      },
+      "createTime": "2024-02-16T11:32:22.915Z",
+      "updateTime": "2024-02-16T11:32:29.973Z"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 import {Button, Modal} from "flowbite-react";
 import {useState} from "react";
-import {emptySearcher, type GraphId, type GraphNode, type NodeSearcher} from "../../core";
+import {emptySearcher, type GraphId, type GraphNode, isSameGraphId, type NodeSearcher} from "../../core";
 import {NodeCell} from "../cell/NodeCell.tsx";
 import {NodeSearch} from "../search/NodeSearch.tsx";
 import {useAsyncOrDefault, useGraph} from "../utils/hooks";
@@ -35,7 +35,7 @@ export function NodeSelect({label, selectedId, onSelect}: {
                     {nodes.map(node => <div className="flex flex-col p-2">
                         <NodeCell data={node}/>
                         {
-                            node.id === selectedId ?
+                            isSameGraphId(node.id, selectedId) ?
                                 <Button color="success" size="xs" onClick={() => selectNode(node)}>Selected</Button> :
                                 <Button size="xs" onClick={() => selectNode(node)}>Select</Button>
                         }

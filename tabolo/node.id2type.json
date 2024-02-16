@@ -69,6 +69,11 @@
     "db35f763-6f19-4740-b8d9-6bab1b72b64e": "Markdown",
     "8985c1af-a5f1-43ee-b6b7-9746efd0b768": "NodeType",
     "bd89547b-98fb-42c1-a865-bf21a06edb8d": "NodeType",
-    "340a6e28-bd7a-4348-b7c3-2b71de742cbd": "Node Edit Meta"
+    "340a6e28-bd7a-4348-b7c3-2b71de742cbd": "Node Edit Meta",
+    "76603fd8-f085-4bca-9b63-b50b0c1d7fa9": "NodeType",
+    "934ee2f8-06e5-42d9-bf13-67968a578f95": "Node Cell Meta",
+    "e145ee4b-f458-4642-a412-00cbc2ed2f8a": "Node Edit Meta",
+    "86e7cd43-c3e4-4db2-84f5-d7b19ddc7801": "Node Cell Meta",
+    "7921db7b-05b4-452d-83e7-9ed1bd262f2c": "Node Cell Meta"
   }
 }

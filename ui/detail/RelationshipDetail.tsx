@@ -76,7 +76,7 @@ export function RelationshipDetail({data}: {
             <div className="flex flex-col items-center p-4 min-w-64 space-y-2">
                 <label className="text-lg self-start">Start Node</label>
                 <div className="flex flex-col items-center w-full p-6 bg-gray-50">
-                    <NodeIdCell data={data.startNodeId}/>
+                    <NodeIdCell data={local.startNodeId}/>
                 </div>
                 <label className="text-lg self-start">Overview</label>
                 <div className="flex flex-col items-center w-full p-6 bg-gray-100">
@@ -84,7 +84,7 @@ export function RelationshipDetail({data}: {
                 </div>
                 <label className="text-lg self-start">End Node</label>
                 <div className="flex flex-col items-center w-full p-6 bg-gray-50">
-                    <NodeIdCell data={data.endNodeId}/>
+                    <NodeIdCell data={local.endNodeId}/>
                 </div>
             </div>
             <div className="flex flex-col grow p-4 space-y-4">

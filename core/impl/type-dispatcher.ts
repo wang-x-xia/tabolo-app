@@ -2,9 +2,16 @@ import type {GraphEdit, GraphNodeBody, GraphRelationshipBody} from "../graph-edi
 import type {GraphId} from "../graph-id.ts";
 import {createDefaultGraphMeta, type GraphMeta} from "../graph-meta.ts";
 import type {GraphSuite} from "../graph-suite.ts";
-import type {Graph, GraphNode, GraphRelationship} from "../graph.ts";
-import {separateNodeSearcherByTypes} from "../node-searcher.ts";
-import {matchAllSearcher, typeSearcher} from "../searcher.ts";
+import type {Graph, GraphNode, GraphNodeCellMeta, GraphNodeDetailsMeta, GraphRelationship} from "../graph.ts";
+import type {NodeSearcher} from "../node-searcher.ts";
+import {relationshipNodeSearcher, type RelationshipSearcher} from "../relationship-searcher.ts";
+import {
+    alwaysFalseSearcher,
+    matchAllSearcher,
+    matchAnySearcher,
+    typeSearcher,
+    visitGraphResourceSearcher
+} from "../searcher.ts";
 
 export interface TypeDispatcherConfiguration {
     suites: Record<string, GraphSuite>
@@ -14,7 +21,7 @@ export interface TypeDispatcherConfiguration {
 
 export interface DispatcherGraphId {
     suite: string,
-    id: string,
+    id: GraphId,
 }
 
 
@@ -32,10 +39,6 @@ export function createTypeDispatcher(config: TypeDispatcherConfiguration): Graph
 interface InternalOp {
     suiteIds(): string[]
 
-    nodeTypesOfSuite(suiteId: string): string[],
-
-    relationshipTypesOfSuite(suiteId: string): string[],
-
     getSuite(suiteId: string): InternalSuite
 
     getNodeSuite(type: string): InternalSuite
@@ -50,7 +53,15 @@ interface InternalOp {
 interface InternalSuite extends GraphSuite {
     id: string,
 
-    replaceGraphId<T extends GraphNode | GraphRelationship>(entity: T): T,
+    replaceNodeGraphId(node: GraphNode): GraphNode,
+
+    replaceRelationshipGraphId(relationship: GraphRelationship): GraphRelationship,
+
+    resolveGraphId(id: GraphId, field: string): GraphId
+
+    resolveRelationshipSearcher(searcher: RelationshipSearcher): RelationshipSearcher
+
+    resolveNodeSearcher(searcher: NodeSearcher): NodeSearcher
 }
 
 function createInternalOp(
@@ -60,23 +71,90 @@ function createInternalOp(
         relationshipTypes,
     }: TypeDispatcherConfiguration): InternalOp {
 
-    function replaceGraphId<T extends GraphNode | GraphRelationship>(suiteId: string, entity: T): T {
-        entity.id = {
-            suite: suiteId,
-            id: entity.id,
-        }
-        return entity
-    }
 
     function getSuite(suiteId: string): InternalSuite {
         const suite = suites[suiteId]
         if (suite !== undefined) {
+
+            function replaceGraphId(id: GraphId): DispatcherGraphId {
+                return {
+                    suite: suiteId,
+                    id,
+                }
+            }
+
+            function resolveGraphId(id: GraphId, field: string): GraphId {
+                assertDispatcherGraphId(id)
+                if (id.suite != suiteId) {
+                    throw new Error(`Not in suite ${suiteId}, ${field} = ${JSON.stringify(id)}`)
+                }
+                return id.id
+            }
+
+            function nodeTypesOfSuite(): string[] {
+                return Object.entries(nodeTypes)
+                    .filter(([_, s]) => s == suiteId)
+                    .map(([t, _]) => t)
+            }
+
+            function resolveNodeSearcher(searcher: NodeSearcher): NodeSearcher {
+                return matchAllSearcher([
+                    visitGraphResourceSearcher(searcher, (s) => {
+                        switch (s.type) {
+                            case "type":
+                                return nodeTypes[s.value] == suiteId ? s : alwaysFalseSearcher()
+                            default:
+                                return s
+                        }
+                    }),
+                    matchAnySearcher(nodeTypesOfSuite().map(t => typeSearcher(t)))
+                ])
+            }
+
+            function relationshipTypesOfSuite(): string[] {
+                return Object.entries(relationshipTypes)
+                    .filter(([_, s]) => s == suiteId)
+                    .map(([t, _]) => t)
+            }
+
+            function resolveRelationshipSearcher(searcher: RelationshipSearcher): RelationshipSearcher {
+                return matchAllSearcher([
+                    visitGraphResourceSearcher(searcher, (s) => {
+                        switch (s.type) {
+                            case "type":
+                                return relationshipTypes[s.value] == suiteId ? s : alwaysFalseSearcher()
+                            case "node":
+                                assertDispatcherGraphId(s.nodeId)
+                                if (s.nodeId.suite !== suiteId) {
+                                    return alwaysFalseSearcher()
+                                }
+                                return relationshipNodeSearcher(
+                                    resolveGraphId(s.nodeId, "RelationshipNodeSearcher.nodeId"),
+                                    s.match)
+                            default:
+                                return s
+                        }
+                    }),
+                    matchAnySearcher(relationshipTypesOfSuite().map(t => typeSearcher(t)))
+                ])
+            }
+
             return {
                 ...suite,
                 id: suiteId,
-                replaceGraphId<T extends GraphNode | GraphRelationship>(entity: T): T {
-                    return replaceGraphId(suiteId, entity)
-                }
+                replaceNodeGraphId(node) {
+                    node.id = replaceGraphId(node.id)
+                    return node
+                },
+                replaceRelationshipGraphId(relationship) {
+                    relationship.id = replaceGraphId(relationship.id)
+                    relationship.startNodeId = replaceGraphId(relationship.startNodeId)
+                    relationship.endNodeId = replaceGraphId(relationship.endNodeId)
+                    return relationship
+                },
+                resolveGraphId,
+                resolveNodeSearcher,
+                resolveRelationshipSearcher,
             }
         }
         throw new Error(`Unknown suite ${suiteId}`)
@@ -85,16 +163,6 @@ function createInternalOp(
     return {
         suiteIds() {
             return Object.keys(suites)
-        },
-        nodeTypesOfSuite(suiteId: string): string[] {
-            return Object.entries(nodeTypes)
-                .filter(([_, s]) => s == suiteId)
-                .map(([t, _]) => t)
-        },
-        relationshipTypesOfSuite(suiteId: string): string[] {
-            return Object.entries(relationshipTypes)
-                .filter(([_, s]) => s == suiteId)
-                .map(([t, _]) => t)
         },
         getSuite,
         getNodeSuite(type: string): InternalSuite {
@@ -128,51 +196,32 @@ function assertDispatcherGraphId(id: GraphId): asserts id is DispatcherGraphId {
     throw new Error(`Invalid ID for type dispatcher ${JSON.stringify(id)}`)
 }
 
-export function createTypeDispatcherGraph({suiteIds, nodeTypesOfSuite, getSuite, getNodeSuite}: InternalOp): Graph {
+export function createTypeDispatcherGraph({suiteIds, getSuite}: InternalOp): Graph {
     return {
         async getNode(id): Promise<GraphNode | null> {
             assertDispatcherGraphId(id)
-            const {graph, replaceGraphId} = getSuite(id.suite)
+            const {graph, replaceNodeGraphId} = getSuite(id.suite)
             const node = await graph.getNode(id.id)
             if (node == null) {
                 return null
             }
-            return replaceGraphId(node)
+            return replaceNodeGraphId(node)
         },
         async getRelationship(id): Promise<GraphRelationship | null> {
             assertDispatcherGraphId(id)
-            const {graph, replaceGraphId} = getSuite(id.suite)
+            const {graph, replaceRelationshipGraphId} = getSuite(id.suite)
             const relationship = await graph.getRelationship(id.id)
             if (relationship == null) {
                 return null
             }
-            return replaceGraphId(relationship)
+            return replaceRelationshipGraphId(relationship)
         },
         async searchNodes(searcher): Promise<GraphNode[]> {
-            const searchers = separateNodeSearcherByTypes(searcher)
-            let result: GraphNode[] = []
-            switch (searchers.type) {
-                case "ByType":
-                    for (const [type, subSearcher] of Object.entries(searchers.data)) {
-                        const {graph, replaceGraphId,} = getNodeSuite(type)
-                        const items = await graph.searchNodes(matchAllSearcher([
-                            typeSearcher(type), subSearcher,
-                        ]))
-                        result.push(...items.map(it => replaceGraphId(it)))
-                    }
-                    break
-                default:
-                case "AllTypes":
-                    for (const suiteId of suiteIds()) {
-                        const {graph, replaceGraphId} = getSuite(suiteId)
-                        for (const type of nodeTypesOfSuite(suiteId)) {
-                            const items = await graph.searchNodes(matchAllSearcher([
-                                typeSearcher(type), searcher,
-                            ]))
-                            result.push(...items.map(it => replaceGraphId(it)))
-                        }
-                    }
-                    break
+            const result: GraphNode[] = []
+            for (const suiteId of suiteIds()) {
+                const {graph, replaceNodeGraphId, resolveNodeSearcher} = getSuite(suiteId)
+                const items = await graph.searchNodes(resolveNodeSearcher(searcher))
+                result.push(...items.map(it => replaceNodeGraphId(it)))
             }
             return result
         },
@@ -180,9 +229,9 @@ export function createTypeDispatcherGraph({suiteIds, nodeTypesOfSuite, getSuite,
         async searchRelationships(searcher): Promise<GraphRelationship[]> {
             const result: GraphRelationship[] = []
             for (const suiteId of suiteIds()) {
-                const {graph, replaceGraphId} = getSuite(suiteId)
-                const items = await graph.searchRelationships(searcher)
-                result.push(...items.map(it => replaceGraphId(it)))
+                const {graph, replaceRelationshipGraphId, resolveRelationshipSearcher} = getSuite(suiteId)
+                const items = await graph.searchRelationships(resolveRelationshipSearcher(searcher))
+                result.push(...items.map(it => replaceRelationshipGraphId(it)))
             }
             return result
         },
@@ -198,34 +247,47 @@ export function createTypeDispatcherGraphEdit(
     }: InternalOp): GraphEdit {
     return {
         async createNode(node: GraphNodeBody): Promise<GraphNode> {
-            const {edit, replaceGraphId} = getNodeSuite(node.type)
-            return replaceGraphId(await edit.createNode(node))
+            const {edit, replaceNodeGraphId} = getNodeSuite(node.type)
+            return replaceNodeGraphId(await edit.createNode(node))
         },
         async createRelationship(relationship: GraphRelationshipBody): Promise<GraphRelationship> {
-            const {edit, replaceGraphId} = getRelationshipSuite(relationship.type)
-            return replaceGraphId(await edit.createRelationship(relationship))
+            const {edit, replaceRelationshipGraphId, resolveGraphId} = getRelationshipSuite(relationship.type)
+            const body = {
+                ...relationship,
+                startNodeId: resolveGraphId(relationship.startNodeId, "StartNodeId"),
+                endNodeId: resolveGraphId(relationship.endNodeId, "EndNodeId")
+            }
+            return replaceRelationshipGraphId(await edit.createRelationship(body))
         },
         async editNode(id: GraphId, node: Partial<GraphNodeBody>): Promise<GraphNode> {
             assertDispatcherGraphId(id)
-            const {edit, id: currentSuiteId, replaceGraphId} = getSuite(id.suite)
+            const {edit, id: currentSuiteId, replaceNodeGraphId} = getSuite(id.suite)
             if (node.type !== undefined) {
                 const {id: afterSuiteId} = getNodeSuite(node.type)
                 if (afterSuiteId != currentSuiteId) {
                     throw new Error(`Not allow change the type between suites, from ${currentSuiteId} to ${afterSuiteId}(${node.type})`)
                 }
             }
-            return replaceGraphId(await edit.editNode(id.id, node))
+            return replaceNodeGraphId(await edit.editNode(id.id, node))
         },
         async editRelationship(id: GraphId, relationship: Partial<GraphRelationshipBody>): Promise<GraphRelationship> {
             assertDispatcherGraphId(id)
-            const {edit, id: currentSuiteId, replaceGraphId} = getSuite(id.suite)
+            const {edit, id: currentSuiteId, replaceRelationshipGraphId, resolveGraphId} = getSuite(id.suite)
             if (relationship.type !== undefined) {
                 const {id: afterSuiteId} = getRelationshipSuite(relationship.type)
                 if (afterSuiteId != currentSuiteId) {
                     throw new Error(`Not allow change the type between suites, from ${currentSuiteId} to ${afterSuiteId}(${relationship.type})`)
                 }
             }
-            return replaceGraphId(await edit.editRelationship(id.id, relationship))
+            // copy self for modified
+            const body = {...relationship}
+            if (body.startNodeId !== undefined) {
+                body.startNodeId = resolveGraphId(body.startNodeId, "StartNodeId")
+            }
+            if (body.endNodeId !== undefined) {
+                body.endNodeId = resolveGraphId(body.endNodeId, "EndNodeId")
+            }
+            return replaceRelationshipGraphId(await edit.editRelationship(id.id, body))
         },
         async removeNode(id: GraphId): Promise<void> {
             assertDispatcherGraphId(id)
@@ -243,6 +305,7 @@ export function createTypeDispatcherGraphEdit(
 
 export function createTypeDispatcherGraphMeta(
     {
+        getNodeSuite,
         getNodeTypes,
         getRelationshipTypes,
     }: InternalOp): Partial<GraphMeta> {
@@ -253,5 +316,13 @@ export function createTypeDispatcherGraphMeta(
         async getRelationshipTypes(): Promise<string[]> {
             return getRelationshipTypes()
         },
+        async getNodeCellMeta(type: string): Promise<GraphNodeCellMeta> {
+            const {meta} = getNodeSuite(type)
+            return await meta.getNodeCellMeta(type)
+        },
+        async getNodeDetailsMeta(type: string): Promise<GraphNodeDetailsMeta> {
+            const {meta} = getNodeSuite(type)
+            return await meta.getNodeDetailsMeta(type)
+        }
     }
 }

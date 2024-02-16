@@ -1,6 +1,13 @@
 import {Button, Select, TextInput} from "flowbite-react";
 import {type ReactNode, useEffect, useState} from "react";
-import {emptySearcher, type MatchAllSearcher, NodeSearcher, type PropertySearcher, type TypeSearcher} from "../../core";
+import {
+    alwaysTrueSearcher,
+    emptySearcher,
+    type MatchAllSearcher,
+    NodeSearcher,
+    type PropertySearcher,
+    type TypeSearcher
+} from "../../core";
 import {TypeSelect} from "../detail/TypeSelect.tsx";
 import {PopoverButton} from "../utils/PopoverButton.tsx";
 
@@ -17,8 +24,8 @@ export function NodeSearch({data, onChange}: {
 
     function updateType(type: string) {
         switch (type) {
-            case "empty":
-                onChange(emptySearcher())
+            case "true":
+                onChange(alwaysTrueSearcher())
                 break
             case "type":
                 onChange({type: "type", value: ""})
@@ -35,7 +42,7 @@ export function NodeSearch({data, onChange}: {
     const typeSelect = <>
         <Select className="min-w-xs max-w-sm" value={data.type}
                 onChange={e => updateType(e.target.value)}>
-            <option value="empty">Search All</option>
+            <option value="true">Search All</option>
             <option value="type">Match Type</option>
             <option value="eq">Match Property</option>
             <option value="and">All Match</option>
@@ -45,7 +52,7 @@ export function NodeSearch({data, onChange}: {
     let searcher
     switch (local.type) {
         default:
-        case "empty":
+        case "true":
             searcher = typeSelect
             break;
         case "type":

@@ -1,4 +1,4 @@
-import type {Graph, GraphNode, GraphNodeEditMeta, GraphNodeMeta, GraphRelationship} from "../graph"
+import type {Graph, GraphNode, GraphNodeCellMeta, GraphNodeDetailsMeta, GraphRelationship} from "../graph"
 import type {GraphEdit, GraphNodeBody, GraphRelationshipBody} from "../graph-edit"
 import type {GraphId} from "../graph-id";
 import type {GraphMeta} from "../graph-meta.ts";
@@ -80,11 +80,11 @@ export function createHttpClientGraphEdit(config: HttpClientConfig): GraphEdit {
 
 export function createHttpClientGraphMeta(config: HttpClientConfig): GraphMeta {
     return {
-        async getNodeEditMeta(type): Promise<GraphNodeEditMeta> {
-            return await jsonApi(`${config.baseUrl}/getNodeEditMeta`, {type})
+        async getNodeCellMeta(type: string): Promise<GraphNodeCellMeta> {
+            return await jsonApi(`${config.baseUrl}/getNodeCellMeta`, {type})
         },
-        async getNodeMeta(type: string): Promise<GraphNodeMeta> {
-            return await jsonApi(`${config.baseUrl}/getNodeMeta`, {type})
+        async getNodeDetailsMeta(type): Promise<GraphNodeDetailsMeta> {
+            return await jsonApi(`${config.baseUrl}/getNodeDetailsMeta`, {type})
         },
         async getNodeTypes(): Promise<string[]> {
             return await jsonApi(`${config.baseUrl}/getNodeTypes`, {})

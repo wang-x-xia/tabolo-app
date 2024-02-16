@@ -1,10 +1,20 @@
 import {createContext} from "react";
-import type {Graph, GraphEdit, GraphId, GraphNode, NodeSearcher} from "../../core";
-import {emptySearcher, typeSearcher} from "../../core";
+import {
+    alwaysTrueSearcher,
+    type Graph,
+    type GraphEdit,
+    type GraphId,
+    type GraphNode,
+    type NodeSearcher,
+    typeSearcher
+} from "../../core";
 import type {PropertyViewData} from "./property.ts";
 
-export type ViewData = NodeViewData | NodeDetailViewData | RelationshipDetailViewData
+export type ViewData = LoadingViewData | NodeViewData | NodeDetailViewData | RelationshipDetailViewData
 
+export interface LoadingViewData {
+    type: "Loading",
+}
 
 export interface NodeViewData {
     type: "NodeView",
@@ -68,7 +78,7 @@ export function fromGraph(graph: Graph, graphEdit: GraphEdit): ViewHandler {
         async getView() {
             let nodes = await graph.searchNodes(typeSearcher("View"));
             if (nodes.length == 0) {
-                return {type: "NodeView", searcher: emptySearcher()}
+                return {type: "NodeView", searcher: alwaysTrueSearcher()}
             } else {
                 return nodes[0].properties
             }

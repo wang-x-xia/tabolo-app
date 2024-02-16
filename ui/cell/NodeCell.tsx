@@ -1,9 +1,8 @@
 import {Dropdown} from "flowbite-react"
 import {JSONPath} from "jsonpath-plus"
-import type {GraphId, GraphNode} from "../../core"
+import {defaultGraphNodeCellMeta, type GraphId, type GraphNode, type GraphNodeCellMeta} from "../../core"
 import {useAsync, useAsyncOrDefault, useGraph, useGraphMeta, useViewHandler} from "../utils/hooks"
 import {nodeDetailView} from "../view/view.ts";
-import {NodeCellConfig} from "./node-cell.ts"
 import {PropertyValueCell} from "./PropertyValueCell"
 
 export function NodeIdCell({data}: {
@@ -31,25 +30,16 @@ export function NodeCell({data}: {
     const viewHandler = useViewHandler()
     const graphMeta = useGraphMeta()
 
-    const config: NodeCellConfig = useAsyncOrDefault({type: "ShowType", provider: "default"}, async () => {
-        const meta = await graphMeta.getNodeMeta(data.type)
-        if (meta.showJsonPath) {
-            return {
-                provider: "Node Meta",
-                type: "ShowJsonPath",
-                jsonPath: meta.showJsonPath
-            }
-        } else {
-            return {type: "ShowType", provider: "default"}
-        }
-    }, [graphMeta, data.type])
+    const config: GraphNodeCellMeta = useAsyncOrDefault(defaultGraphNodeCellMeta(),
+        async () => await graphMeta.getNodeCellMeta(data.type),
+        [graphMeta, data.type])
 
     async function goToNodeDetails() {
         await viewHandler.updateView(nodeDetailView(data.id))
     }
 
-    const showJsonPathPart = config.type === "ShowJsonPath" ?
-        <ShowJsonPath data={data} jsonPath={config.jsonPath}/> : <></>
+    const showJsonPathPart = config.showJsonPath ?
+        <ShowJsonPath data={data} jsonPath={config.showJsonPath}/> : <></>
 
     return <div className="flex flex-col items-center
         rounded-lg border border-gray-200 bg-white shadow-md

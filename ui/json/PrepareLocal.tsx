@@ -14,7 +14,7 @@ export function PrepareLocal({children}: PropsWithChildren) {
         nodeTypes["View"] = "Local"
         const relationshipTypes: Record<string, string> = {}
         for (const t of await remote.meta.getRelationshipTypes()) {
-            nodeTypes[t] = "Remote"
+            relationshipTypes[t] = "Remote"
         }
         return createTypeDispatcher({
             suites: {

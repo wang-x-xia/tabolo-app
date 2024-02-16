@@ -1,16 +1,32 @@
 import {JSONPath} from "jsonpath-plus";
 import type {GraphResource} from "./graph.ts";
 
-export interface EmptySearcher {
-    type: "empty",
+export interface TrueSearcher {
+    type: "true",
 }
 
-export function emptySearcher(): EmptySearcher {
+export interface FalseSearcher {
+    type: "false",
+}
+
+/**
+ * @deprecated
+ */
+export function emptySearcher(): TrueSearcher {
+    return alwaysTrueSearcher()
+}
+
+export function alwaysTrueSearcher(): TrueSearcher {
     return {
-        type: "empty",
+        type: "true",
     }
 }
 
+export function alwaysFalseSearcher(): FalseSearcher {
+    return {
+        type: "false",
+    }
+}
 
 export interface TypeSearcher {
     type: "type",
@@ -38,7 +54,7 @@ export function propertySearcher(jsonPath: string, value: any): PropertySearcher
     }
 }
 
-export type GraphResourceCommonSearcher = EmptySearcher | TypeSearcher | PropertySearcher
+export type GraphResourceCommonSearcher = TrueSearcher | FalseSearcher | TypeSearcher | PropertySearcher
 
 export interface MatchAllSearcher<T> {
     type: "and",
@@ -90,6 +106,10 @@ export function checkGraphResource<R extends GraphResource, S extends { "type": 
 ): boolean {
     const internal = searcher as GraphResourceCommonSearcher | GraphResourceLogicSearcher<S>
     switch (internal.type) {
+        case "true":
+            return true;
+        case "false":
+            return false
         case "type":
             return resource.type === internal.value;
         case "eq":
@@ -102,8 +122,6 @@ export function checkGraphResource<R extends GraphResource, S extends { "type": 
             return value === JSON.stringify(internal.value)
         case "and":
             return internal.searchers.every(s => checkGraphResource(resource, s, customChecker))
-        case "empty":
-            return true;
         case "not":
             return !checkGraphResource(resource, internal.searcher, customChecker)
         case "or":
@@ -111,5 +129,20 @@ export function checkGraphResource<R extends GraphResource, S extends { "type": 
         default:
             return customChecker(resource, internal)
     }
+}
 
+
+export function visitGraphResourceSearcher<S extends { "type": string }>(
+    searcher: S, visitor: (searcher: S) => S,): S {
+    const internal = searcher as any as GraphResourceLogicSearcher<S>
+    switch (internal.type) {
+        case "and":
+            return matchAllSearcher(internal.searchers.map(it => visitor(it))) as any
+        case "or":
+            return matchAnySearcher(internal.searchers.map(it => visitor(it))) as any
+        case "not":
+            return notSearcher(visitor(internal.searcher)) as any
+        default:
+            return visitor(internal)
+    }
 }

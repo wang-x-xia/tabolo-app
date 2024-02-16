@@ -33,11 +33,28 @@ export interface GraphRelationship extends GraphResource {
     endNodeId: GraphId;
 }
 
-export interface GraphNodeMeta {
-    name: string,
+export interface GraphNodeCellMeta {
     showJsonPath?: string | null,
 }
 
-export interface GraphNodeEditMeta {
+export function defaultGraphNodeCellMeta(): GraphNodeCellMeta {
+    return {}
+}
+
+export interface GraphResourceDetailsMeta {
+    typeEditable: boolean
+    propertiesEditable: boolean
+    copiable: boolean
+}
+
+export interface GraphNodeDetailsMeta extends GraphResourceDetailsMeta {
     markdownJsonPath?: string
+}
+
+export function defaultGraphNodeDetailsMeta(): GraphResourceDetailsMeta {
+    return {
+        typeEditable: true,
+        propertiesEditable: true,
+        copiable: true,
+    }
 }

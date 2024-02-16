@@ -97,7 +97,7 @@ export function SetupMenuBar({children}: PropsWithChildren) {
     }
 
     return <>
-        <header className="sticky top-0 z-10 flex p-2 space-x-2">
+        <header className="sticky top-0 z-10 bg-gray-200 shadow-md flex p-2 space-x-2 ">
             {refs.map(ref =>
                 <span key={ref.item.name} id={ref.item.name} ref={dom => setRef(ref, dom)}/>)}
         </header>
